@@ -143,10 +143,13 @@ export default {
   },
   methods: {
     init: function() {
-      this.$parent.publicFooter(false);
-      this.$parent.publicHeaderStyle('header');
-      this.$parent.publicHeaderMeuStyle('main-menu-black');
-      this.$parent.publicHeaderImage(require('../assets/images/background/background1.jpg'));
+
+      this.$store.dispatch('global/resetHeader');
+      this.$store.dispatch('global/switchHeader', true);
+      this.$store.dispatch('global/switchFooter', false);
+      this.$store.dispatch('global/setHeaderStyle', "header");
+      this.$store.dispatch('global/setHeaderMenuStyle', "main-menu-black");
+      this.$store.dispatch('global/setPageBackgroundImage', require("../assets/images/background/background1.jpg"));
       this.$emit("publicHeaderAdd", {
         name: "用户中心",
         link: "/sign-in/"

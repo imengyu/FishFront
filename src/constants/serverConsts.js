@@ -1,4 +1,17 @@
 export default {
+    PartPositions: {
+        viewPost: '/archives/post/',
+        viewClass: '/archives/class/',
+        viewDate: '/archives/month/',
+        viewTag: '/archives/tag/',
+    },
+    PostPrefix: {
+        none: 0,
+        original: 1,
+        reprint: 2,
+        album: 3,
+        video: 4
+    },
     UserLevels: {
         baned: 0,
         admin: 1,

@@ -36,8 +36,8 @@ export default {
     },
     methods: {
         init() {
-            this.$parent.publicHeaderStyleReset();
-            this.$parent.publicFooterStyle('small');
+            this.$store.dispatch('global/resetHeader');
+            this.$store.dispatch('global/setFooterStyle', 'small');
         },
         submitReply(){
             location.href=this.Utils.getJumpRealUrl('/')

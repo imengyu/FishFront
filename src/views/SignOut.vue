@@ -30,8 +30,8 @@ export default {
   },
   methods: {
     init: function() {
-      this.$parent.publicHeaderStyleReset();
-      this.$parent.publicFooterStyle('small');
+      this.$store.dispatch('global/resetHeader');
+      this.$store.dispatch('global/setFooterStyle', "small");
       this.$emit("publicHeaderAdd", {
         name: "用户中心",
         link: "/sign-out/"

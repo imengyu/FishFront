@@ -3,8 +3,10 @@
     <div v-if="pageBackgroundImage" class="bg-img" id="def-header-bg" :style="'background-image: url(' + pageBackgroundImage + ');'">
       <div v-if="pageBackgroundOverlay" class="overlay" :style="'opacity: ' + pageBackgroundOverlayOpactity + ';'"></div>
     </div>
-    <div :class="'container main-menu ' + headerMenuStyle" :style="headerStyle == 'header-minimum' ? 'padding-top: 15px; padding-bottom: 15px;' : ''">
-      <div class="row align-items-center justify-content-between d-flex">
+    <div :class="'container main-menu ' + headerMenuStyle">
+    <div class="container">
+      <div class="row">
+        <div class="col nav-title d-flex align-items-center justify-content-between ">
         <div class="nav-header-text">
           <span class="logo" id="header-logo"></span>
           <a href="/" id="header-title">ALONE SPACE</a>
@@ -48,6 +50,23 @@
             </li>
           </ul>
         </nav>
+        </div>
+      </div>
+      <div v-if="pageShowBreadcrumb && pageBreadcrumb" class="main-breadcrumb">
+        <div class="container">
+          <div class="row justify-content-start">
+            <div class="col">
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="mr-3"><a>当前位置 : </a></li>
+                  <li class="breadcrumb-item"><a href="/">首页</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">文章归档</li>
+                </ol>
+              </nav>
+            </div>
+          </div> 
+        </div> 
+      </div>
       </div>
     </div>
 
@@ -56,26 +75,20 @@
 
 <script>
 import Vue from "vue";
+import { mapState,mapGetters,mapActions } from 'vuex';
 
 export default {
-  props: {
-    pageBackgroundImage: {
-      default: null
-    },
-    pageBackgroundOverlay: {
-      default: true
-    },
-    pageBackgroundOverlayOpactity: {
-      default: '.2'
-    },
-    headerStyle: {
-      default: 'header-minimum'
-    },
-    headerMenuStyle: {
-      default: 'main-menu-white'
-    }
-  },
   name: "Header",
+  computed: mapState({
+
+    headerStyle: state => state.global.globalHeaderStyle,
+    headerMenuStyle: state => state.global.globalHeaderMenuStyle,
+    pageBackgroundImage: state => state.global.globalPageBackgroundImage,
+    pageBackgroundOverlay: state => state.global.globalPageBackgroundOverlay,
+    pageBackgroundOverlayOpactity: state => state.global.globalPageBackgroundOverlayOpactity,
+    pageBreadcrumb: state => state.global.globalPageBreadcrumb,
+    pageShowBreadcrumb: state => state.global.globalPageShowBreadcrumb,
+  }),
   data() {
     return {
       menuDataOrg: [
@@ -150,6 +163,7 @@ export default {
 </script>
 
 <style>
+  /*
   #header .main-menu-white .nav-menu-container .menu-active > a{
     border-radius: 15px;
     background-color: rgba(255,255,255,.2);
@@ -160,4 +174,5 @@ export default {
     background-color: rgba(0,0,0,.2);
     padding: 3px 13px 0 13px;
   }
+  */
 </style>

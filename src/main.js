@@ -5,6 +5,7 @@ import App from './App'
 import router from './router'
 import VueSweetalert2 from 'vue-sweetalert2';
 import NProgress from 'nprogress'
+import store from './store'
 
 NProgress.configure({     
   easing: 'ease',  // 动画方式    
@@ -23,6 +24,7 @@ const options = {
 var main = new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
 })
@@ -31,12 +33,9 @@ var main = new Vue({
 router.beforeEach((to, from , next) => {
   // 每次切换页面时，调用进度条
   NProgress.start();
-
-  main.$children[0].initLoginInfo();
-  main.$children[0].publicHeaderReset();
-  main.$children[0].publicFooterReset();
-
-
+  //修改页面标题
+  if (to.meta.title) 
+    document.title = to.meta.title;
   next();
 });
 //当路由进入后：关闭进度条

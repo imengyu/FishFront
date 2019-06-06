@@ -1,4 +1,5 @@
 import net from '../../constants/const.js'
+import serverConsts from '../../constants/serverConsts.js'
 
 export default
 {
@@ -16,6 +17,10 @@ export default
     delCookie,
     getJumpRealUrl,
     jump,
+    getPostRealUrl,
+    getClassRealUrl,
+    getCurrentFullHost,
+    getPostPrefix,
 }
 
 function mergeJSON(minor, main) {
@@ -128,6 +133,26 @@ function isNullOrEmpty(str){
     if(hash && hash.indexOf('http') == 0) return hash;
     else if(hash) return net.IMAGES_URL + '/' + hash + "." + ftype;
     else return hash;
+  }
+  function getPostRealUrl(post){
+    return getJumpRealUrl(serverConsts.PartPositions.viewPost + (post.urlName ? post.urlName.replace(/\+/g, ' ') : post.id) + '/')
+  }
+  function getClassRealUrl(post){
+    return getJumpRealUrl(serverConsts.PartPositions.viewClass + (post.urlName ? post.urlName.replace(/\+/g, ' ') : post.id) + '/')
+  }
+  function getCurrentFullHost(){
+    return location.protocol + '//' + location.host;
+  }
+  function getPostPrefix(prefixId){
+    switch(prefixId)
+    {
+      case serverConsts.PostPrefix.none: return '';
+      case serverConsts.PostPrefix.original: return '<span class="tag-post-prefix original">原创</span>';
+      case serverConsts.PostPrefix.reprint: return '<span class="tag-post-prefix reprint">转载</span>';
+      case serverConsts.PostPrefix.album: return '<span class="tag-post-prefix album">视频</span>';
+      case serverConsts.PostPrefix.video: return '<span class="tag-post-prefix video">相册</span>';
+    }
+    return '';
   }
 
 //

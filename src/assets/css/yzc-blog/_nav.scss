@@ -10,12 +10,17 @@
 	width: 100%;
 	max-width: 100%;
 	height: auto;
-	padding: 40px 50px 30px 50px;
+	padding: 12px 50px 5px 50px;
 	z-index: 15;
 
     @include prefix(transition, all 0.3s ease-in-out, webkit);
 
-
+    &.main-menu-fade-black {
+        background: linear-gradient(rgba(0,0,0,.5), rgba(0,0,0,.35), rgba(0,0,0,0));
+    }
+    &.main-menu-fade-white {
+        background: linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,.35), rgba(255,255,255,0));
+    }
 
     ol, ul {
         margin: 0;
@@ -65,8 +70,34 @@
         @include common-shadow;
     }
 }
+.main-menu.full .container {
+    margin: 0 5px;
+    max-width: 100%;
+}
 
 //Navs
+
+//breadcrumb
+.main-menu .main-breadcrumb {
+    
+    margin-top: 6px;
+
+    .breadcrumb {
+        padding: 8px 0 4px 0;
+        border-top: 1px solid #f3f3f3;
+        background-color: transparent;
+        font-size: 12px;
+    }
+
+    .breadcrumb-item+.breadcrumb-item::before {
+        font: normal normal normal 14px/1 FontAwesome;
+        display: inline-block;
+        padding-right: .5rem;
+        color: #6c757d;
+        content: "\f105";
+    }
+}
+
 
 /*Mobile navs*/
 #mobile-nav {
@@ -186,6 +217,7 @@
 }
 
 .nav-menu {
+
 	margin: 0;
 	padding: 0;
     list-style: none;
@@ -422,10 +454,15 @@
 	color: $white;
 }
 
+
+
+.nav-title {
+    height: 50px;
+}
 /*Header main text*/
 .nav-header-text {
 
-    display: flex;
+    display: inline-block;
 	color: $white;
     font-weight: bold;
     font-size: 23px;
@@ -450,6 +487,9 @@
     }
     
     .logo {
+        display: inline-block;
+        vertical-align: middle;
+
         @include size(66px, 26px);
 
         border: none;
@@ -460,6 +500,9 @@
         a { font-size: 20px; }
         img { @include size(60px, 23px); }
     }
+}
+.nav-menu-container{
+    display: inline-block;
 }
 
 /*mobile Nav toggle button*/
@@ -644,17 +687,15 @@ body.mobile-nav-active #mobile-nav {
 @media (max-width: 768px) {
     .sf-hr{ display: none; }
 	.main-menu {
-        padding: 10px 25px 10px 30px;
         .nav-menu-container { display: none; }
     }
+    #header-minimum .nav-title {
+		height: 30px;
+	}
 }
 @media (min-width: 769px) {
 	#mobile-nav-toggle { display: none; }
 	.navbar-toggle { display: none; }
 	.side-catalog-toggle-box { display: none; }
-	#header-minimum .main-menu {
-		padding-top: 15px;
-		padding-bottom: 15px;
-	}
 }
 

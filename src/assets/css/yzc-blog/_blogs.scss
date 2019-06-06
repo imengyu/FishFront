@@ -375,16 +375,20 @@ h3.blog-title{
 .tag-post-prefix{ 
     font-size: 55%;
     display: inline-block;
-    padding: 5px 6px 4px 6px;
+    padding: 1px 6px 1px 6px;
     color: #fff;
     background-color: #6195FF;
     border-radius: 5px;
-    margin-right: 5px;
+    margin-right: 0px;
     margin-bottom: 3px;
     vertical-align: top;
     opacity: .5;
     cursor: default!important;
 
+    &.big{
+        margin-right: 5px;
+        padding: 5px 6px 5px 6px;
+    }
     &:hover{
         opacity: .8;
     }
@@ -651,6 +655,19 @@ h3.blog-title{
                 top: 20px;
                 @include size(15px, 15px);
             }
+
+            &::before {
+                content: '';
+                display: inline-block;
+                position: absolute;
+                border-color:transparent #fff transparent transparent;
+                border-width: 7px 7px 7px 0;
+                border-style: solid;
+                left: -15px;
+                top: 20px;
+                @include size(15px, 15px);
+            }
+
 
             @media (max-width: 425px) {
                 margin-left: 10px;
@@ -1304,6 +1321,155 @@ $blog-nav-titles: (
     padding: 0.5rem 30px;
 }
 
+//New blog item
+
+.flat-blog-item {
+
+    position: relative;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid #e2e2e2;
+    padding-bottom: 35px;
+    padding-right: 300px;
+    padding-left: 15px;
+    min-height: 180px;
+
+    &.no-img {
+        padding-right: 30px;
+    }
+
+    h3 {
+        margin-bottom: 1rem;
+
+        a {
+            text-decoration: none;
+        }
+
+    }
+
+    p {
+        text-overflow: ellipsis;
+        font-size: 1rem;
+        color: #000;
+    }
+
+    .flat-blog-imghost {
+
+        position: absolute;
+        right: 10px;
+        top: 30px;
+        bottom: 30px;
+        width: auto;
+        max-width: 270px;
+        overflow: hidden;
+        border-radius: 10px;
+        /*box-shadow: 0px 10px 38px rgba(39,44,49,0.06), 1px 3px 8px rgba(39,44,49,0.03);*/
+
+        img.holder {
+            height: 100%;
+            max-height: 100%;
+            width: auto;
+            opacity: 0;
+            position: relative;
+            z-index: -1;
+        }
+        img {
+            height: 100%;
+            max-height: 100%;
+            width: auto;
+            transition: transform ease-in-out 1s;            
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translateY(-50%) translateX(-50%);
+
+            &:hover {
+                transform: scale(1.5) translateY(-33%) translateX(-33%);
+            }
+        }
+    }
+
+    .flat-blog-meta {
+
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        bottom: 10px;
+        left: 15px;
+        right: 0;
+
+        li {
+            padding: 0;
+            display: inline-block;
+            font-size: 14px;
+            color: #7d7d7d;
+            margin-right: 10px;
+
+            i {
+                color: #0089ea;
+                padding-right: 3px;
+            }
+        }
+    }
+}
+
+//New blog slider item
+.flat-blog-slider-item {
+
+    border-radius: 5px;
+    min-height: 300px;
+
+
+    .flat-blog-slider-inner {
+
+        display: flex;
+        background-color: #6195FF;
+        padding: 15px 40px;
+        text-align: center;
+        overflow: hidden;
+        background-position: center center;
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        border-radius: .25rem;
+        color: #fff;
+
+        .flat-blog-slider-mask{
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #000;
+            opacity: .5;
+            z-index: 0;
+            border-radius: .25rem;
+        }
+
+        h2 {
+            z-index: 1;
+            font-size: 2.3rem;
+            color: #fff;
+            text-shadow: 0 0.05rem 0.1rem rgba(0,0,0,0.6);
+            max-width: 100%;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+        p {
+            z-index: 1;
+            font-size: 12px;
+            color: #fff;
+            text-shadow: 0 0.05rem 0.1rem rgba(0,0,0,0.6);
+            max-width: 100%;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+    }
+
+}
 
 @media (max-width: 576px) {
     .blog-side {

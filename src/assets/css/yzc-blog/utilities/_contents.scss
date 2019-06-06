@@ -41,6 +41,10 @@
 	overflow-y: scroll;
 }
 
+.no-shadow {
+	@include no-shadow();
+}
+
 //Link style
 a {
 	position: relative;

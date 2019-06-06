@@ -30,28 +30,43 @@ export default new Router({
     {
       path: '/',
       name: 'Index',
-      component: Index
+      component: Index,
+      meta: {
+        title: '首页 - ALONE SPACE',
+      }
     },
     {
       path: '/sign-in/',
       name: 'SignIn',
-      component: SignIn
+      component: SignIn, 
+      meta: {
+        title: '登录 - ALONE SPACE',
+      }
     },
     {
       path: '/sign-out/',
       name: 'SignOut',
-      component: SignOut
+      component: SignOut,
+      meta: {
+        title: '登出 - ALONE SPACE',
+      }
     },
     //博客主页面
     {
       path: '/archives/',
       name: 'Archives',
-      component: Archives
+      component: Archives,
+      meta: {
+        title: '文章 - ALONE SPACE',
+      }
     },
     {
       path: '/archives/month/',
       name: 'Month',
-      component: Month
+      component: Month,
+      meta: {
+        title: '归档 - ALONE SPACE',
+      }
     },
 
 
@@ -61,7 +76,10 @@ export default new Router({
       path: '*', // 页面不存在的情况下会跳到404页面
       name: 'Page404',
       component: Page404,
-      hidden: true
+      hidden: true,
+      meta: {
+        title: '404 - ALONE SPACE',
+      }
     }
   ]
 })

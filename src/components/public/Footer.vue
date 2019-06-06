@@ -66,7 +66,7 @@
           <a
             class="jgwab"
             target="_blank"
-            href="https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=33080202000390"
+            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=33080202000390"
           >
             <p>
               <i></i>浙公网安备 33080202000390号
@@ -79,12 +79,16 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
-  props: ["footerStyle"],
   name: "Footer",
   data() {
     return {};
   },
+  computed: mapState({
+    footerStyle: state => state.global.globalFooterStyle,
+  }),
   methods: {}
 };
 </script>

@@ -1,18 +1,10 @@
 <template>
   <div id="app">
-    <app-header ref="Header" 
-      v-if="headerShow"
-      v-bind:header-style="headerStyle"
-      v-bind:page-background-image="pageBackgroundImage"
-      v-bind:header-menu-style="headerMenuStyle"></app-header>
+    <app-header ref="Header" v-if="isHeaderShow"></app-header>
     <router-view 
-      @publicHeader="publicHeader" 
-      @publicFooter="publicFooter" 
       @publicHeaderAdd="publicHeaderAdd"
       ></router-view>
-    <app-footer 
-      v-if="footerShow"
-      v-bind:footer-style="footerStyle"></app-footer>
+    <app-footer v-if="isFooterShow"></app-footer>
   </div>
 </template>
 
@@ -20,24 +12,22 @@
 import Header from './components/public/Header'
 import Footer from './components/public/Footer'
 import jQuery from 'jquery'
-
+import { mapState } from 'vuex';
 
 export default {
   name: 'App',
   data(){
     return {
-      headerShow: true,
-      headerStyle: 'header-minimum',
-      headerMenuStyle: 'main-menu-white',
-      pageBackgroundImage: null,
-      footerShow: true,
-      footerStyle: 'normal',
       authInfo: null,
       authed: false,
       authInfoLoaded: false,
       authInfoSended: false,
     }
   },
+  computed: mapState({  
+    isFooterShow: state => state.global.globalFooterShow,
+    isHeaderShow: state => state.global.globalHeaderShow,
+  }),
   components: {
     'app-header': Header,
     'app-footer': Footer,
@@ -45,53 +35,29 @@ export default {
   mounted() {
     this.init();
   },
+  watch:{
+    $route(to,from){
+      this.rePage();
+      console.log(to.path);
+    }
+  },
   methods:{
-      //是否显示头部
-      publicHeader: function (bool) {
-        this.headerShow = bool;
-      },
+
       publicHeaderAdd: function (menuItem) {
         this.$refs.Header.addItem(menuItem);
       },
-      publicHeaderImage: function (img) {
-        this.pageBackgroundImage = img;
-      },
-      publicHeaderStyle: function (st) {
-        this.headerStyle = st;
-      },
-      publicHeaderMeuStyle: function (st) {
-        this.headerMenuStyle = st;
-      },
-      publicHeaderStyleReset: function () {
-        this.headerStyle = 'header-minimum';
-        this.headerMenuStyle = 'main-menu-white';
-        this.pageBackgroundImage = null;
-        if(this.headerShow){
+      publicHeaderReset() {
+        if(this.$store.getters["global/isHeaderShow"]){
           this.$refs.Header.reset();
           this.$refs.Header.initLoginInfo(this.authInfo);
         }
-      },
-      publicHeaderReset: function () {
-        //this.headerStyle = 'header-minimum';
-        //this.headerMenuStyle = 'main-menu-white';
-        //this.pageBackgroundImage = null;
-        if(this.headerShow){
-          this.$refs.Header.reset();
-          this.$refs.Header.initLoginInfo(this.authInfo);
-        }
-      },
-      //是否显示底部
-      publicFooterReset: function () {
-        this.footerShow = true;
-        this.footerStyle = 'normal';
-      },
-      publicFooter: function (bool) {
-        this.footerShow = bool;
-      },
-      publicFooterStyle: function (st) {
-        this.footerStyle = st;
       },
 
+      //路由页面切换
+      rePage(){
+        this.initLoginInfo();
+        this.publicHeaderReset();
+      },
       //初始化
       init: function(){
         this.initLoginInfo();
@@ -105,8 +71,12 @@ export default {
       },
       //初始化登录信息
       initLoginInfo: function(notsend){
-
         var main = this;
+        if(main.authed) {
+          if(!notsend) main.sendLoginfoInited();
+          return;
+        }
+        
         jQuery.ajax({
           type: 'get',
           url: main.NET.API_URL + "/auth/auth-test",
@@ -116,14 +86,13 @@ export default {
             if(rep.success){
               main.authInfo = rep.data;
               main.authed = true;
-              main.publicHeaderReset();   
-              if(!notsend) main.sendLoginfoInited();
+              main.publicHeaderReset();
             }else{
               main.authInfo = null;
               main.authed = false;
               main.publicHeaderReset();
-              if(!notsend) main.sendLoginfoInited();
             }
+            if(!notsend) main.sendLoginfoInited();
           },
           error(){
             main.authInfo = null;

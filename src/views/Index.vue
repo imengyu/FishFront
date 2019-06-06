@@ -26,7 +26,7 @@
                   <br>感谢你能来光顾如此垃圾的我的博客 （＞人＜；）
                   <br>如果你也喜欢一样的技术，我们不妨聊一聊？
                   <br>
-                  <a class="link" href="/archives/post/about/">更多关于我的信息</a>
+                  <a class="link" :href="getJumpRealUrl('/archives/post/about/')">更多关于我的信息</a>
                 </div>
               </div>
             </div>
@@ -83,7 +83,7 @@
       <ul>
         <li>
           &copy; 2019
-          <a class="main-link" href="/archives/post/about/">DreamFish</a>
+          <a class="main-link" :href="getJumpRealUrl('/archives/post/about/')">DreamFish</a>
         </li>
         <li>
           <a class="main-link" href="http://www.miitbeian.gov.cn" target="_blank">浙ICP备18051956号-1</a>
@@ -112,11 +112,15 @@ export default {
     this.init();
   },
   methods: {
+    
     init: function() {
-      this.$parent.publicFooter(false);
-      this.$parent.publicHeaderStyle("header");
-      this.$parent.publicHeaderMeuStyle("main-menu-black");
-      this.$parent.publicHeaderImage(require("../assets/images/background/background5.jpg"));
+      this.$store.dispatch('global/resetHeader');
+      this.$store.dispatch('global/switchHeader', true);
+      this.$store.dispatch('global/switchFooter', false);
+      this.$store.dispatch('global/setHeaderStyle', "header");
+      this.$store.dispatch('global/setHeaderMenuStyle', "main-menu-black main-menu-fade-black full");
+      this.$store.dispatch('global/setPageBackgroundImage', require("../assets/images/background/background5.jpg"));
+
       this.loadStats();
     },
     jump(link) {
@@ -148,7 +152,7 @@ export default {
                     main.statPv = d.pv;
                     main.statIp = d.ip;
                     main.statArchiveCount = d.count + " 篇";
-                    console.log("%c 您是今天第 %c " + d.ip + " %c 个访问者！ ", "color:white;background-color:black;padding:5px 0", "color:white;background-color:#6195FF;padding:5px 0", "color:white;background-color:black;padding:5px 0")
+                    console.log("%c 你好！您是今天第 %c " + d.ip + " %c 个访问者！ ", "color:white;background-color:black;padding:5px 0", "color:white;background-color:#6195FF;padding:5px 0", "color:white;background-color:black;padding:5px 0")
                 }
             } catch (e) {}
         }
