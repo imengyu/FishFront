@@ -37,7 +37,7 @@
               <p>加载中</p>
             </div>
             <div v-if="blogDataListLoadStatus=='error'" class="text-center text-danger">
-              <div class="text-center">{{ blogDataListLoadError }}</div>
+              <div class="text-center"><span class="text-danger">加载错误</span><br/>{{ blogDataListLoadError }}</div>
             </div>
             <div v-if="blogDataListPageCurrent &lt; blogDataListPageCount" class="text-center more-button">
               <a
@@ -157,11 +157,11 @@ export default {
             main.blogDataListPageCurrent++;
             main.blogDataListLoadStatus = "loaded";
           } else {
-            main.blogDataListLoadError = err;
+            main.blogDataListLoadError = response.message;
             main.blogDataListLoadStatus = "error";
           }
         },
-        error() {
+        error(xhr, err, e) {
           main.blogDataListLoadError = err;
           main.blogDataListLoadStatus = "error";
         }

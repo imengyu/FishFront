@@ -6,6 +6,7 @@ import router from './router'
 import VueSweetalert2 from 'vue-sweetalert2';
 import NProgress from 'nprogress'
 import store from './store'
+import serverConsts from './constants/serverConsts.js'
 
 NProgress.configure({     
   easing: 'ease',  // 动画方式    
@@ -35,7 +36,8 @@ router.beforeEach((to, from , next) => {
   NProgress.start();
   //修改页面标题
   if (to.meta.title) 
-    document.title = to.meta.title;
+    document.title = to.meta.title + ' - ' + serverConsts.SiteTitle;
+  else document.title = serverConsts.SiteTitle;
   next();
 });
 //当路由进入后：关闭进度条

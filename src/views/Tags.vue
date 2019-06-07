@@ -2,11 +2,16 @@
   <article id="main" class="sm-padding bg-grey">
     <div class="container">
       <div class="row justify-content-center">
-        <div class="col-12 col-sm-12 col-lg-3">
-          <side-area ref="side-area"></side-area>
-        </div>
-        <div class="col-12 col-sm-12 col-lg-9 blog-list-col">
-          <div class="blog-date-list mt-4 pt-2 pb-2">
+        <div class="col-12 col-sm-12 blog-list-col">
+          <div class="tags mt-4 pt-2 pb-2" v-if="blogTagList">
+              <a v-for="(tag, index) in blogTagList" :key="index" class="tag-color tag-big"
+                v-on:click="switchTag(tag.id)" href="javascript:void(0);"
+                  :id="'tag_'+tag.id"
+                  :style="'background-color:#'+(tag.id==blogTagCurrent?'343a40!important;font-size:18px;line-height:35px;':(tag.color+';'))">{{ tag.name }}</a>
+            </div>
+          <div class="blog-date-list pt-2 pb-2">
+            
+
             <ul v-if="blogDataList">
               <blog-time-list-item v-for="(item, index) in blogDataList" :key="index" v-bind:blog-data="item"></blog-time-list-item>
             </ul>
@@ -31,9 +36,13 @@
               >加载更多文章</a>
             </div>
             <div
-              v-else-if="blogDataListLoadStatus=='loaded'"
+              v-else-if="blogDataListLoadStatus=='loaded' && blogDataList"
               class="text-center text-secondary no-more"
             >到底啦，去别处看看吧</div>
+                        <div
+              v-else-if="blogDataListLoadStatus=='loaded'"
+              class="text-center text-secondary no-more"
+            >这里没有文章哦，去别处看看吧</div>
           </div>
         </div>
       </div>
@@ -43,12 +52,11 @@
 
 <script>
 import jQuery from "jquery";
-import BlogItem from "../components/BlogItem";
-import SideArea from "../components/SideArea";
+import serverConsts from '../constants/serverConsts.js'
 import BlogTimeListItem from "../components/BlogTimeListItem";
 
 export default {
-  name: "Month",
+  name: "Tags",
   data() {
     return {
       blogDataList: null,
@@ -56,13 +64,10 @@ export default {
       blogDataListLoadError: null,
       blogDataListPageSize: 15,
       blogDataListPageCount: 0,
-      blogDataListPageCurrent: 0
+      blogDataListPageCurrent: 0,
+      blogTagCurrent: '',
+      blogTagList: null,
     };
-  },
-  components: {
-    "blog-item": BlogItem,
-    "side-area": SideArea,
-    'blog-time-list-item' : BlogTimeListItem
   },
   mounted() {
     this.init();
@@ -70,54 +75,49 @@ export default {
   watch:{
     $route(to,from){
       this.rePage();
+    },
+    blogTagCurrent(to,from){
+      this.blogDataList = null;
+      this.blogDataListPageCurrent = 0;
+      this.loadArchivePage();
+      this.initMenuBreadcrumb();
     }
+  },
+  components: {
+    'blog-time-list-item' : BlogTimeListItem
   },
   methods: {
     init: function() {
       this.$store.dispatch('global/resetHeader');
       this.$store.dispatch('global/setPageShowBreadcrumb', true);
 
-      if(this.$route.params.year && this.$route.params.month){
-        this.$store.dispatch('global/setPageBreadcrumb', [
-          {
-            title: '首页',
-            link: this.getJumpRealUrl('/')
-          },
-          {
-            title: '归档',
-            link: this.getJumpRealUrl('/archives/month/'),
-          },
-          {
-            title: this.$route.params.year + ' 年' + this.$route.params.month + ' 月的文章',
-            link: this.getJumpRealUrl('/archives/month/' + this.$route.params.year + '/' + this.$route.params.month + '/'),
-            active: true
-          },
-        ]);
-      } else {
-        this.$store.dispatch('global/setPageBreadcrumb', [
-          {
-            title: '首页',
-            link: this.getJumpRealUrl('/')
-          },
-          {
-            title: '归档',
-            link: this.getJumpRealUrl('/archives/month/'),
-            active: true
-          },
-        ]);
-      }
+      this.initMenuBreadcrumb();
       this.loadArchivePage();
+      this.loadArchiveCategories();
     },
     rePage(){
-      if(this.$route.params.year && this.$route.params.month){
-        var ref = '#date-' + this.$route.params.year + '-' + this.$route.params.month;
-        setTimeout(function(){
-          jQuery("html,body").animate({scrollTop: jQuery(ref).offset().top - "120" + "px"}, 500);
-        }, 1000);
+      if(this.$route.params.tag){
+        this.blogTagCurrent = this.$route.params.tag;
       }
     },
-    jump(link) {
-      location.href = this.getJumpRealUrl(link);
+    initMenuBreadcrumb(){
+      if(this.$route.params.tag)
+        this.blogTagCurrent = this.$route.params.tag;
+      this.$store.dispatch('global/setPageBreadcrumb', [
+          {
+            title: '首页',
+            link: this.getJumpRealUrl('/')
+          },
+          {
+            title: '文章',
+            link: this.getJumpRealUrl('/archives/')
+          },
+          {
+            title: '标签',
+            link: this.getJumpRealUrl('/archives/tags/'),
+            active: true
+          },
+        ]);
     },
     getJumpRealUrl(link) {
       return this.NET.URL_PREFIX + link;
@@ -131,41 +131,38 @@ export default {
     getBlogPrefix(item) {
       return this.Utils.getPostPrefix(item.postPrefix);
     },
-    authInfoInited() {},
-
-    resolvePostArr: function(arr) {
-      var new_arr = {};
-      var i = 0,
-        y = "";
-      for (var key in arr) {
-        if (arr[key].isHead) continue;
-        if (typeof arr[key].postDate != "undefined") {
-          var this_y = arr[key].postDate.substr(0, 7);
-          if (this_y != y) {
-            y = this_y;
-            new_arr[i] = {
-              isHead: true,
-              year: this_y
-            };
-            i++;
+    authInfoInited() {
+      
+    },
+    switchTag(id){
+      var newUrl = this.Utils.getJumpRealUrl(serverConsts.PartPositions.viewTag + id + "/");
+      location.href = newUrl;
+    },
+    loadArchiveCategories(){
+      var main = this;
+      jQuery.get(
+        main.NET.API_URL + "/tags",
+        function(response) {
+          if (response.success) {
+            main.blogTagList = response.data;
           }
-        }
-        new_arr[i] = arr[key];
-        i++;
-      }
-      return new_arr;
+        },
+        "json"
+      );
     },
     loadArchivePage() {
       var main = this;
-      if (this.blogDataListLoadStatus == "loading") return;
+      if (this.blogDataListLoadStatus == "loading" || this.Utils.isNullOrEmpty(this.blogTagCurrent)) return;
       this.blogDataListLoadStatus = "loading";
+      //https://www.imyzc.com/api/v1/posts/page/0/10?sortBy=date&noTopMost=true&byClass=linux
       jQuery.ajax({
         type: "get",
         url:
           main.NET.API_URL +
           "/posts/page/" +
           main.blogDataListPageCurrent +
-          "/20?sortBy=date&noTopMost=true",
+          "/10?sortBy=date&noTopMost=true&onlyTag=" +
+          main.blogTagCurrent,
         crossDomain: true,
         xhrFields: { withCredentials: true },
         success: function(response) {
@@ -178,7 +175,6 @@ export default {
                 main.blogDataList,
                 response.data.content
               );
-            main.blogDataList = main.resolvePostArr(main.blogDataList);
             main.blogDataListPageCurrent++;
             main.blogDataListLoadStatus = "loaded";
           } else {

@@ -1,9 +1,10 @@
 export default {
+    SiteTitle: 'ALONE SPACE',
     PartPositions: {
         viewPost: '/archives/post/',
-        viewClass: '/archives/class/',
+        viewClass: '/archives/categories/',
         viewDate: '/archives/month/',
-        viewTag: '/archives/tag/',
+        viewTag: '/archives/tags/',
     },
     PostPrefix: {
         none: 0,

@@ -1,5 +1,7 @@
 <template>
-
+  <div>
+    这里什么也没有
+  </div>
 </template>
 
 <script>
@@ -17,7 +19,7 @@ export default {
   },
   methods: {
     init: function() {
-      this.$parent.publicHeaderStyleReset();
+
     },
     jump(link){
       location.href=this.getJumpRealUrl(link)

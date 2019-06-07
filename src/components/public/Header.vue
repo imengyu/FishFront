@@ -58,9 +58,11 @@
             <div class="col">
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                  <li class="mr-3"><a>当前位置 : </a></li>
-                  <li class="breadcrumb-item"><a href="/">首页</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">文章归档</li>
+                  <li v-for="(item, index) in pageBreadcrumb" :key="index" 
+                    :class="'breadcrumb-item' + (item.active ? ' active' : '')">
+                    <span v-if="item.active">{{ item.title }}</span>
+                    <a v-else :href="item.link">{{ item.title }}</a>
+                    </li>
                 </ol>
               </nav>
             </div>

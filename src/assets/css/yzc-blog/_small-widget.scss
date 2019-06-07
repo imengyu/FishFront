@@ -910,6 +910,7 @@
         .btn-like {
             display: inline-block;
             font-size: 19px;
+            cursor: pointer;
 
             a {
                 position: relative;
@@ -924,7 +925,7 @@
                 top: 2px;
                 width: 50px;
                 height: 50px;
-                background-image: url(/images/blocks/like_animation_steps.png);
+                background-image: url(../images/blocks/like_animation_steps.png);
                 background-position: left;
                 background-repeat: no-repeat;
                 background-size: 1000px 50px;

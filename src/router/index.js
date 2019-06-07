@@ -23,6 +23,9 @@ import SignOut from '@/views/SignOut'
 import Archives from '@/views/Archives'
 import Month from '@/views/Month'
 import Page404 from '@/views/Page404'
+import Tags from '@/views/Tags'
+import Classes from '@/views/Classes'
+import ViewPost from '@/views/ViewPost'
 
 export default new Router({
   /*mode: 'history',*/
@@ -32,7 +35,7 @@ export default new Router({
       name: 'Index',
       component: Index,
       meta: {
-        title: '首页 - ALONE SPACE',
+        title: '首页',
       }
     },
     {
@@ -40,7 +43,7 @@ export default new Router({
       name: 'SignIn',
       component: SignIn, 
       meta: {
-        title: '登录 - ALONE SPACE',
+        title: '登录',
       }
     },
     {
@@ -48,7 +51,7 @@ export default new Router({
       name: 'SignOut',
       component: SignOut,
       meta: {
-        title: '登出 - ALONE SPACE',
+        title: '登出',
       }
     },
     //博客主页面
@@ -57,7 +60,7 @@ export default new Router({
       name: 'Archives',
       component: Archives,
       meta: {
-        title: '文章 - ALONE SPACE',
+        title: '文章',
       }
     },
     {
@@ -65,11 +68,43 @@ export default new Router({
       name: 'Month',
       component: Month,
       meta: {
-        title: '归档 - ALONE SPACE',
+        title: '归档',
+      }
+    },
+    {
+      path: '/archives/month/:year/:month/',
+      name: 'Month',
+      component: Month,
+      meta: {
+        title: '归档',
+      }
+    },
+    {
+      path: '/archives/tags/:tag/',
+      name: 'Tags',
+      component: Tags,
+      meta: {
+        title: '标签',
+      }
+    },
+    {
+      path: '/archives/categories/:category/',
+      name: 'Classes',
+      component: Classes,
+      meta: {
+        title: '分类',
+      }
+    },
+    {
+      path: '/archives/post/:post/',
+      name: 'ViewPost',
+      component: ViewPost,
+      meta: {
+        title: '浏览文章',
       }
     },
 
-
+    
     
     // 404page
     {

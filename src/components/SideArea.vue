@@ -237,8 +237,8 @@ export default {
     goViewTag(tagId) {
       var newUrl = this.Utils.getJumpRealUrl(serverConsts.PartPositions.viewTag + tagId + "/");
       if (
-        location.pathname.indexOf(serverConsts.PartPositions.viewTag) == 0 &&
-        location.pathname != serverConsts.PartPositions.viewAll
+        this.$route.path.indexOf(serverConsts.PartPositions.viewTag) == 0 &&
+        this.$route.path != serverConsts.PartPositions.viewAll
       )
         location.href = newUrl;
       else window.open(newUrl);
@@ -246,8 +246,8 @@ export default {
     goViewDate(year, month) {
       var newUrl = this.Utils.getJumpRealUrl(serverConsts.PartPositions.viewDate + year + "/" + month + "/");
       if (
-        location.pathname.indexOf(serverConsts.PartPositions.viewDate) == 0 &&
-        location.pathname != serverConsts.PartPositions.viewAll
+        this.$route.path.indexOf(serverConsts.PartPositions.viewDate) == 0 &&
+        this.$route.path != serverConsts.PartPositions.viewAll
       )
         location.href = newUrl;
       else window.open(newUrl);
@@ -255,8 +255,8 @@ export default {
     goViewClass(classIdOrName) {
       var newUrl = this.Utils.getJumpRealUrl(serverConsts.PartPositions.viewClass + classIdOrName + "/");
       if (
-        location.pathname.indexOf(serverConsts.PartPositions.viewClass) == 0 &&
-        location.pathname != serverConsts.PartPositions.viewAll
+        this.$route.path.indexOf(serverConsts.PartPositions.viewClass) == 0 &&
+        this.$route.path != serverConsts.PartPositions.viewAll
       )
         location.href = newUrl;
       else window.open(newUrl);
