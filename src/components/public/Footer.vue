@@ -75,21 +75,37 @@
         </li>
       </ul>
     </div>
+    <a href="javascript:;" @click="backToTop()" :class="'go-top' + (backToTopShow ? ' show' : '')" data-original-title="返回顶部" title="返回顶部"><i class="fa fa-angle-up"></i></a>
   </footer>
 </template>
 
 <script>
 import { mapState } from 'vuex';
+import jQuery from "jquery";
 
 export default {
   name: "Footer",
   data() {
-    return {};
+    return {
+      backToTopShow: false,
+    };
   },
   computed: mapState({
     footerStyle: state => state.global.globalFooterStyle,
   }),
-  methods: {}
+  mounted() {
+    window.addEventListener('scroll', this.watchScroll)
+  },
+  methods: {
+    backToTop() {
+      jQuery('html, body').animate({ scrollTop: 0 }, 300);
+    },
+    watchScroll () {
+        var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
+        this.backToTopShow = (scrollTop > 200)
+     }
+
+  }
 };
 </script>
 

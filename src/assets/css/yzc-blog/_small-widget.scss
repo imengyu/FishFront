@@ -7,12 +7,15 @@
 	transition: color, background-color 0.3s ease;
 	bottom: 2em;
     right: 2em;
+    opacity: 0;
 
+    transition: opacity ease-in-out .5s;
+    
     background-color: $white;
     color: $defbg-foregound-color;
     
 	font-size: 18px;
-	display: none;
+    display: inline-block;
 	position: fixed;
     text-decoration: none;
     
@@ -22,6 +25,9 @@
 	text-align: center;
     z-index: 100;
     
+    &.show {
+        opacity: 1;
+    }
     &:hover,&:active {
         background: $highlight-color;
         color: $colorbg-foregound-color;

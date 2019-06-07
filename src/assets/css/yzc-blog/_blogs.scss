@@ -576,6 +576,13 @@ h3.blog-title{
 }
 
 /*Blog list with date*/
+.blog-meta {
+    color: #7d7d7d;
+
+    i {
+        color: $highlight-color-content;
+    }
+}
 .blog-date-list{
 
     position: relative;
@@ -814,8 +821,11 @@ $blog-nav-titles: (
 );
 
 .post-container {
-    padding: 10px;
-    
+
+    div {
+        overflow: visible;
+    }
+
     img {
         max-width: 100%;
         height: auto;
@@ -1221,7 +1231,6 @@ $blog-nav-titles: (
 	display: block;
 	overflow: auto;
 	padding-bottom: 40px;
-    width: 285px;
     border-left: 1px solid #e5e5e5;
     transition: 0.4s;
     
@@ -1289,7 +1298,7 @@ $blog-nav-titles: (
 }
 .side-catalog-fixed {
 	position: fixed;
-	top: 65px;
+	top: 115px;
 	max-height: 80%;
 	overflow: auto;
 }

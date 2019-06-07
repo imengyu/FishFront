@@ -78,15 +78,18 @@
 //Navs
 
 //breadcrumb
-.main-menu .main-breadcrumb {
+.main-breadcrumb {
     
-    margin-top: 6px;
+    position: absolute;
+    margin-top: 10px;
+    top: 60px;
 
     .breadcrumb {
         padding: 8px 0 4px 0;
         border-top: 1px solid #f3f3f3;
         background-color: transparent;
         font-size: 12px;
+        margin: 0;
     }
 
     .breadcrumb-item+.breadcrumb-item::before {

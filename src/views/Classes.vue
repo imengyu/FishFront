@@ -119,7 +119,7 @@ export default {
           },
           {
             title: '分类',
-            link: this.getJumpRealUrl('/archives/category/'),
+            link: this.getJumpRealUrl('/archives/'),
           },
           {
             title: this.$route.params.category,
@@ -139,7 +139,7 @@ export default {
           },
           {
             title: '分类',
-            link: this.getJumpRealUrl('/archives/category/'),
+            link: '',
             active: true
           },
         ]);

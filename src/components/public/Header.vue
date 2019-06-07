@@ -52,26 +52,24 @@
         </nav>
         </div>
       </div>
-      <div v-if="pageShowBreadcrumb && pageBreadcrumb" class="main-breadcrumb">
-        <div class="container">
-          <div class="row justify-content-start">
-            <div class="col">
-              <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                  <li v-for="(item, index) in pageBreadcrumb" :key="index" 
-                    :class="'breadcrumb-item' + (item.active ? ' active' : '')">
-                    <span v-if="item.active">{{ item.title }}</span>
-                    <a v-else :href="item.link">{{ item.title }}</a>
-                    </li>
-                </ol>
-              </nav>
-            </div>
-          </div> 
+      
+    </div>
+    </div>
+    <div v-if="pageShowBreadcrumb" class="container main-menu-breadcrumb">
+      <div v-if="pageBreadcrumb" class="row justify-content-start main-breadcrumb">
+        <div class="col">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li v-for="(item, index) in pageBreadcrumb" :key="index" 
+                :class="'breadcrumb-item' + (item.active ? ' active' : '')">
+                <span v-if="item.active">{{ item.title }}</span>
+                <a v-else :href="item.link">{{ item.title }}</a>
+              </li>
+            </ol>
+          </nav>
         </div> 
       </div>
-      </div>
     </div>
-
   </header>
 </template>
 
@@ -164,17 +162,5 @@ export default {
 };
 </script>
 
-<style>
-  /*
-  #header .main-menu-white .nav-menu-container .menu-active > a{
-    border-radius: 15px;
-    background-color: rgba(255,255,255,.2);
-    padding: 3px 13px 0 13px;
-  }
-  #header .main-menu-black .nav-menu-container .menu-active > a{
-    border-radius: 15px;
-    background-color: rgba(0,0,0,.2);
-    padding: 3px 13px 0 13px;
-  }
-  */
+<style scoped>
 </style>
