@@ -1,9 +1,13 @@
 <template>
   <div id="app">
     <app-header ref="Header" v-if="isHeaderShow"></app-header>
-    <router-view 
-      @publicHeaderAdd="publicHeaderAdd"
-      ></router-view>
+    <transition name="fade">
+      
+        <router-view 
+          @publicHeaderAdd="publicHeaderAdd"
+        ></router-view>
+    
+    </transition>
     <app-footer v-if="isFooterShow"></app-footer>
   </div>
 </template>
@@ -11,6 +15,7 @@
 <script>
 import Header from './components/public/Header'
 import Footer from './components/public/Footer'
+import serverConsts from './constants/serverConsts.js'
 import jQuery from 'jquery'
 import { mapState } from 'vuex';
 
@@ -37,7 +42,7 @@ export default {
   },
   watch:{
     $route(to,from){
-      this.rePage();
+      this.rePage(to);
       console.log(to.path);
     }
   },
@@ -47,20 +52,23 @@ export default {
         this.$refs.Header.addItem(menuItem);
       },
       publicHeaderReset() {
-        if(this.$store.getters["global/isHeaderShow"]){
+        if(this.$refs.Header)
           this.$refs.Header.reset();
-          this.$refs.Header.initLoginInfo(this.authInfo);
-        }
       },
 
       //路由页面切换
-      rePage(){
-        this.initLoginInfo();
-        this.publicHeaderReset();
+      rePage(to){
+        this.$nextTick(() => {
+          //修改页面标题
+          if (to.meta.title) document.title = to.meta.title + ' - ' + serverConsts.SiteTitle;
+          else document.title = serverConsts.SiteTitle;
+          this.publicHeaderReset();
+          this.initLoginInfo(false);
+        });　
       },
       //初始化
       init: function(){
-        this.initLoginInfo();
+        this.rePage(this.$route);
       },
       sendLoginfoInited(){
         this.authInfoSended = true;
@@ -73,7 +81,7 @@ export default {
       initLoginInfo: function(notsend){
         var main = this;
         if(main.authed) {
-          if(!notsend) main.sendLoginfoInited();
+          main.sendLoginfoInited();
           return;
         }
         
@@ -117,5 +125,16 @@ export default {
 </script>
 
 <style>
-
+.fade-enter-active,
+.fade-leave-active {
+  will-change: transform;
+  transition: all .3s;
+  opacity: 1;
+}
+.fade-enter {
+  opacity: 0;
+}
+.fade-leave-active {
+  opacity: 0;
+}
 </style>

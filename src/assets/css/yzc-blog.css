@@ -1555,7 +1555,7 @@ h3.blog-title { border-bottom: 1px solid #eee; color: #484848; font-weight: norm
 
 .side-catalog li a:hover { color: #4e4e4e; }
 
-.side-catalog-fixed { position: fixed; top: 115px; max-height: 80%; overflow: auto; }
+.side-catalog-fixed { position: fixed; top: 70px; max-height: 80%; overflow: auto; }
 
 .side-catalog-toggle-box { position: relative; width: 100%; background-color: rgba(255, 255, 255, 0.85); padding: 3px; padding-left: 13px; border-bottom: 1px solid rgba(0, 0, 0, 0.05); margin: 0; z-index: 19; }
 

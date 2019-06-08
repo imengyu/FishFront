@@ -6,7 +6,7 @@ import router from './router'
 import VueSweetalert2 from 'vue-sweetalert2';
 import NProgress from 'nprogress'
 import store from './store'
-import serverConsts from './constants/serverConsts.js'
+
 
 NProgress.configure({     
   easing: 'ease',  // 动画方式    
@@ -34,14 +34,12 @@ var main = new Vue({
 router.beforeEach((to, from , next) => {
   // 每次切换页面时，调用进度条
   NProgress.start();
-  //修改页面标题
-  if (to.meta.title) 
-    document.title = to.meta.title + ' - ' + serverConsts.SiteTitle;
-  else document.title = serverConsts.SiteTitle;
   next();
 });
 //当路由进入后：关闭进度条
 router.afterEach(() => {  
+  
+
   // 在即将进入新的页面组件前，关闭掉进度条
   NProgress.done();
 })

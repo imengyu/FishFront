@@ -1,5 +1,6 @@
 export default {
     SiteTitle: 'ALONE SPACE',
+    AnonymousComment: true,
     PartPositions: {
         viewPost: '/archives/post/',
         viewClass: '/archives/categories/',

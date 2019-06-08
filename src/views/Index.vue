@@ -133,12 +133,12 @@ export default {
       this.isDetailsView = !this.isDetailsView;
     },
     loadStats(){
-      var a = new Date, b, c = this.df(a, new Date("2018-11-29"));
-      this.statYear = a.getFullYear() - 2e3 + " 岁";
+      var a = new Date, b, c = this.df(a, new Date("2018-11-29")), d = this.df(a, new Date("2000-09-29"));
+      this.statYear = parseInt(d / 365) + " 岁";
       if(c<365) this.statSiteLive = c + " 天"
       else {
-        var d = parseInt(c / 365), e = c - (d * 365);
-        this.statSiteLive = d + ' 年 ' + e + " 天"
+        var e = parseInt(c / 365), f = c - (e * 365);
+        this.statSiteLive = e + ' 年 ' + f + " 天"
       }
       var url = this.NET.API_URL + "/stat/today";
       var main = this;

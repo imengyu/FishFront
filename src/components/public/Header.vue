@@ -155,6 +155,9 @@ export default {
         else if(authInfo.level==this.ServerConsts.UserLevels.guest) this.currentUserLevel = 'guest';
       }else this.currentAuthed = false;
     },
+    authInfoInited() {
+      this.initLoginInfo(this.$parent.getAuthInfo());
+    },
     resetAuthInfo() {
       this.currentAuthed = false;
     }

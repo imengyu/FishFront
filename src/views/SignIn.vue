@@ -148,7 +148,7 @@ export default {
       this.$store.dispatch('global/switchHeader', true);
       this.$store.dispatch('global/switchFooter', false);
       this.$store.dispatch('global/setHeaderStyle', "header");
-      this.$store.dispatch('global/setHeaderMenuStyle', "main-menu-black");
+      this.$store.dispatch('global/setHeaderMenuStyle', "main-menu-black full");
       this.$store.dispatch('global/setPageBackgroundImage', require("../assets/images/background/background1.jpg"));
       this.$emit("publicHeaderAdd", {
         name: "用户中心",
@@ -158,6 +158,8 @@ export default {
       var v = window.localStorage.getItem("last_user");
       if(!this.Utils.isNullOrEmpty(v)) 
         this.currentUserName = v;
+       var a = this.getRedirectUrl();
+      console.log(decodeURI(a));
     },
     authInfoInited(){
       if(this.$parent.getAuthed()){
@@ -229,8 +231,7 @@ export default {
       return invalid ? "flat is-invalid" : "flat";
     },
     getRedirectUrl: function(){
-      const query = Qs.parse(location.hash.substring(3))
-      return query.redirect_url
+      return this.$route.query.redirect_url;
     },
     getJumpRealUrl(link){
       return this.NET.URL_PREFIX + link;
@@ -300,7 +301,7 @@ export default {
             //通知父组件刷新顶栏登录信息
             main.$parent.initLoginInfo();
             var a = main.getRedirectUrl();
-            if (!main.Utils.isNullOrEmpty(a)) location.href = decodeURI(a);
+            if (!main.Utils.isNullOrEmpty(a)) location.href = decodeURIComponent(a);
             else {
               if (
                 data.data && data.data.userData &&
@@ -489,7 +490,7 @@ export default {
   color: #6195ff;
 }
 .logon-logged {
-  min-height: 200px;
+  min-height: 250px;
   padding:10px 10px 30px 10px;
   text-align: center
 }

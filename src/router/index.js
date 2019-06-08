@@ -26,6 +26,7 @@ import Page404 from '@/views/Page404'
 import Tags from '@/views/Tags'
 import Classes from '@/views/Classes'
 import ViewPost from '@/views/ViewPost'
+import UserInfo from '@/views/UserInfo'
 
 export default new Router({
   /*mode: 'history',*/
@@ -35,6 +36,7 @@ export default new Router({
       name: 'Index',
       component: Index,
       meta: {
+        index: 0,
         title: '首页',
       }
     },
@@ -44,6 +46,7 @@ export default new Router({
       component: SignIn, 
       meta: {
         title: '登录',
+        index: 1,
       }
     },
     {
@@ -52,6 +55,7 @@ export default new Router({
       component: SignOut,
       meta: {
         title: '登出',
+        index: 1,
       }
     },
     //博客主页面
@@ -61,6 +65,7 @@ export default new Router({
       component: Archives,
       meta: {
         title: '文章',
+        index: 1,
       }
     },
     {
@@ -69,6 +74,7 @@ export default new Router({
       component: Month,
       meta: {
         title: '归档',
+        index: 1,
       }
     },
     {
@@ -77,6 +83,7 @@ export default new Router({
       component: Month,
       meta: {
         title: '归档',
+        index: 2,
       }
     },
     {
@@ -85,6 +92,7 @@ export default new Router({
       component: Tags,
       meta: {
         title: '标签',
+        index: 2,
       }
     },
     {
@@ -93,6 +101,7 @@ export default new Router({
       component: Classes,
       meta: {
         title: '分类',
+        index: 2,
       }
     },
     {
@@ -101,6 +110,16 @@ export default new Router({
       component: ViewPost,
       meta: {
         title: '浏览文章',
+        index: 3,
+      }
+    },
+    {
+      path: '/user/:userid/',
+      name: 'UserInfo',
+      component: UserInfo,
+      meta: {
+        title: '用户',
+        index: 2,
       }
     },
 
@@ -114,6 +133,7 @@ export default new Router({
       hidden: true,
       meta: {
         title: '404 - ALONE SPACE',
+        index: 0,
       }
     }
   ]
