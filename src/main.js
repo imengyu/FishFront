@@ -5,8 +5,17 @@ import App from './App'
 import router from './router'
 import VueSweetalert2 from 'vue-sweetalert2';
 import NProgress from 'nprogress'
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
 import store from './store'
+import axios from 'axios'
+import VueAxios from 'vue-axios'
 
+Vue.use(VueAxios,axios);
+Vue.use(ElementUI);
+Vue.use(VueSweetalert2, options)
+
+axios.defaults.withCredentials = true
 
 NProgress.configure({     
   easing: 'ease',  // 动画方式    
@@ -38,12 +47,12 @@ router.beforeEach((to, from , next) => {
 });
 //当路由进入后：关闭进度条
 router.afterEach(() => {  
-  
+
 
   // 在即将进入新的页面组件前，关闭掉进度条
   NProgress.done();
 })
 
-Vue.use(VueSweetalert2, options)
+
 Vue.config.productionTip = false
 

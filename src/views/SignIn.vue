@@ -89,15 +89,7 @@
                   <p>拼命加载中</p>
                 </div>
               </div>
-              <div v-else>
-                测试测试测试测试<br />
-                测试测试测试测试<br />
-                测试测试测试测试<br />
-                测试测试测试测试<br />
-                测试测试测试测试<br />
-                测试测试测试测试<br />
-                测试测试测试测试<br />
-              </div>
+              <div v-else>暂不支持快捷登录</div>
             </div>
             </div>
             <div class="logon-footer">
@@ -141,6 +133,11 @@ export default {
   mounted() {
     this.init();
   },
+  watch: {
+    $route(to, from) {
+      this.rePage();
+    }
+  },
   methods: {
     init: function() {
 
@@ -154,17 +151,28 @@ export default {
         name: "用户中心",
         link: "/sign-in/"
       });
-      
+    
+      this.rePage();
+    },
+    rePage(){
       var v = window.localStorage.getItem("last_user");
       if(!this.Utils.isNullOrEmpty(v)) 
         this.currentUserName = v;
-       var a = this.getRedirectUrl();
-      console.log(decodeURI(a));
+      this.showErrorInfo();
+    },
+    showErrorInfo(){
+      var a = this.$route.query.error;
+      if(!this.Utils.isNullOrEmpty(a)) {
+		    switch(a){
+			    case 'BadRequest': this.$swal('错误的登录请求', '请检查登录请求是否正确', 'error'); break;
+			    case 'SessionOut': this.$swal('您的登录信息已过期', '为了保证安全，您需要重新登录', 'warning'); break;
+			    case 'RequestLogin': this.$swal('请登录', '您需要登录才能访问该页面', 'warning'); break;
+			    case 'RequestMorPrivilege': this.$swal('请切换账号', '您当前没有权限进入控制台，请切换至更高级的账号', 'warning'); break;
+		    }
+	    }
     },
     authInfoInited(){
-      if(this.$parent.getAuthed()){
-        this.authed = true;
-      }
+      this.authed = this.$store.getters["auth/authed"];
     },
     initVerifyCode: function() {
       if (this.verifyInited) return;

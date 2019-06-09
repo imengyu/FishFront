@@ -220,6 +220,12 @@
     }
 }
 
+.better-scroll {
+    @include pc-fix-scrollbar()
+}
+.better-scroll-white {
+    @include pc-fix-scrollbar-white()
+}
 
 //Image list
 .image-list {
@@ -892,7 +898,7 @@
 
             background-size: 15px 15px;
             background-repeat: no-repeat;
-            background-image: url(/assets/images/icon/ico-close.svg)
+            background-image: url(../images/icon/ico-close.svg)
         }
     }
 }

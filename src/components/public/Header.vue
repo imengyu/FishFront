@@ -7,9 +7,10 @@
     <div class="container">
       <div class="row">
         <div class="col nav-title d-flex align-items-center justify-content-between ">
-        <div class="nav-header-text">
+        <div class="nav-header-text d-flex align-items-center justify-content-between">
           <span class="logo" id="header-logo"></span>
           <a href="/" id="header-title">ALONE SPACE</a>
+          <el-button v-if="isAdmin" :icon="isAdminCollape ? 'el-icon-s-unfold' : 'el-icon-s-fold'" circle @click="switchAdminCollape()" style="margin-left: 13px;"></el-button>
         </div>
         <button type="button" class="icon-menu" id="mobile-nav-toggle"></button>
         <nav id="nav-menu-container" class="nav-menu-container">
@@ -51,8 +52,7 @@
           </ul>
         </nav>
         </div>
-      </div>
-      
+      </div>   
     </div>
     </div>
     <div v-if="pageShowBreadcrumb" class="container main-menu-breadcrumb">
@@ -79,6 +79,7 @@ import { mapState,mapGetters,mapActions } from 'vuex';
 
 export default {
   name: "Header",
+  props: ['isAdmin'],
   computed: mapState({
 
     headerStyle: state => state.global.globalHeaderStyle,
@@ -88,6 +89,8 @@ export default {
     pageBackgroundOverlayOpactity: state => state.global.globalPageBackgroundOverlayOpactity,
     pageBreadcrumb: state => state.global.globalPageBreadcrumb,
     pageShowBreadcrumb: state => state.global.globalPageShowBreadcrumb,
+    isAdminCollape: state => state.global.globalAdminCollape,
+
   }),
   data() {
     return {
@@ -129,6 +132,9 @@ export default {
         ? "menu-active"
         : "";
     },
+    switchAdminCollape(){
+      this.$store.dispatch("global/switchAdminCollape");
+    },
     addItem(menuItem) {
       var newArr = this.Utils.mergeJsonArray(this.menuDataOrg, { 0:menuItem });
       this.menuData = newArr;
@@ -156,7 +162,7 @@ export default {
       }else this.currentAuthed = false;
     },
     authInfoInited() {
-      this.initLoginInfo(this.$parent.getAuthInfo());
+      this.initLoginInfo(this.$store.getters["auth/authInfo"]);
     },
     resetAuthInfo() {
       this.currentAuthed = false;

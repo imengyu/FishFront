@@ -10,7 +10,9 @@ const state = {
     globalPageBackgroundOverlay: true,
     globalPageShowBreadcrumb: false,
     globalPageBreadcrumb: null,
-    globalPageBackgroundOverlayOpactity: '.2'
+    globalPageBackgroundOverlayOpactity: '.2',
+    globalAdminPanel: false,
+    globalAdminCollape: false,
 };
 const getters = {
     footerShow(state) { return state.globalFooterShow },
@@ -23,6 +25,8 @@ const getters = {
     pageShowBreadcrumb(state) { return state.globalPageShowBreadcrumb },
     pageBreadcrumb(state) { return state.globalPageBreadcrumb },
     pageBackgroundOverlayOpactity(state) { return state.globalPageBackgroundOverlayOpactity },
+    adminPanel(state) { return state.globalAdminPanel },
+    adminCollape(state) { return state.globalAdminCollape },
 };
 const mutations = {
     switchFooter(state, show) { state.globalFooterShow = show; },
@@ -35,6 +39,9 @@ const mutations = {
     setPageShowBreadcrumb(state, show) { state.globalPageShowBreadcrumb = show; },
     setPageBreadcrumb(state, breadcrumb) { state.globalPageBreadcrumb = breadcrumb; },
     setPageBackgroundOverlayOpactity(state, op) { state.globalPageBackgroundOverlayOpactity = op; },
+    setAdminPanel(state, is) { state.globalAdminPanel = is; },
+    setAdminCollape(state, collape) { state.globalAdminCollape = collape; },
+    switchAdminCollape(state) { state.globalAdminCollape = !state.globalAdminCollape; },
 };
 const actions = {
 
@@ -48,6 +55,8 @@ const actions = {
     setPageShowBreadcrumb(context, show) { context.commit('setPageShowBreadcrumb', show);  },
     setPageBreadcrumb(context, breadcrumb) { context.commit('setPageBreadcrumb', breadcrumb);  },
     setPageBackgroundOverlayOpactity(context, op) { context.commit('setPageBackgroundOverlayOpactity', op); },
+    setAdminCollape(state, collape) { state.commit('setAdminCollape', collape); },
+    setAdminPanel(context, is) { context.commit('setAdminPanel', is); },
     resetHeader(context){
         context.commit('switchFooter', true);
         context.commit('switchHeader', true);
@@ -56,6 +65,10 @@ const actions = {
         context.commit('setHeaderMenuStyle', 'main-menu-white');
         context.commit('setPageBackgroundImage', null);
         context.commit('setPageShowBreadcrumb', false);
+        context.commit('setAdminPanel', false);
+    },
+    switchAdminCollape(context){
+        context.commit('switchAdminCollape');
     },
 };
 

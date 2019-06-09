@@ -210,6 +210,12 @@ import "../assets/lib/BigPicture/BigPicture.min.js";
 
 import Commenter from "../components/Commenter";
 
+    //这一块大部分代码取旧的项目1.1版本
+    //因为vue非常特殊，修改代码为vue的模式非常困难，我不想改了，就当这是祖传代码1世吧
+    //原谅我懒，但是这里真的不想重构了（好像祖传代码运行还挺稳定）
+    //这里有非常多的DOM操作，还有jquery，违背了vue的设计思想，大家不要学
+    //我以后有精力了再重构这一块
+
 export default {
   name: "ViewPost",
   data() {
@@ -369,14 +375,10 @@ export default {
       this.$refs.postComment.showFastLogin();
     },
     authInfoInited() {
-      this.authed = this.$parent.getAuthed();
-      this.authedUserInfo = this.$parent.getAuthInfo();
+      this.authed = this.$store.getters["auth/authed"];
+      this.authedUserInfo = this.$store.getters["auth/authInfo"];
       console.log('authInfoInited');
     },
-
-    //这一块大部分代码取旧的项目1.1版本
-    //因为vue非常特殊，修改代码为vue的模式非常困难，我不想改了，就当这是祖传代码1世吧
-    //原谅我懒，但是这里真的不想重构了（好像祖传代码运行还挺稳定）
     loadPostObject() {
       var main = this;
       main.postObjectLoadStatus = "loading";
@@ -408,7 +410,6 @@ export default {
         }
       });
     },
-    //这里有非常多的DOM操作，还有jquery，违背了vue的设计思想，大家不要学
     loadPostContent() {
       var a = null;
       //生成HTML

@@ -70,9 +70,16 @@
         @include common-shadow;
     }
 }
-.main-menu.full .container {
-    margin: 0 5px;
-    max-width: 100%;
+
+.main-menu.full{
+
+    padding-left: 10px!important;
+    padding-right: 20px!important;
+
+    .container {
+        margin: 0 5px;
+        max-width: 100%;
+    }
 }
 
 //Navs

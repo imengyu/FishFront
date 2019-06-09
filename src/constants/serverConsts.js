@@ -6,6 +6,7 @@ export default {
         viewClass: '/archives/categories/',
         viewDate: '/archives/month/',
         viewTag: '/archives/tags/',
+        editArchive: '/admin/write-archive/',
     },
     PostPrefix: {
         none: 0,

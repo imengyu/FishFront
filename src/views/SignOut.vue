@@ -44,11 +44,9 @@ export default {
         link: "/sign-out/"
       });
       this.rePage();
-      
     },
     rePage() {
       this.logoutLastPage = this.$route.query.redirect_url;
-      console.log(decodeURIComponent(this.logoutLastPage));
     },
     jump(link){
       location.href=this.getJumpRealUrl(link)
@@ -59,7 +57,7 @@ export default {
     authInfoInited(){
       if(this.logoutFinish)
         return;
-      if (this.$parent.getAuthed()) {
+      if (this.$store.getters["auth/authed"]) {
         this.signOut();
         this.logoutFinish = true;
       }else{

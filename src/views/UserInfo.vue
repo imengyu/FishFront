@@ -208,7 +208,7 @@ export default {
       return this.NET.URL_PREFIX + link;
     },
     authInfoInited() {
-      var authedUser = this.$parent.getAuthInfo();
+      var authedUser = this.$store.getters["auth/authInfo"];
       if (authedUser) {
         this.currentAuthedUser = authedUser;
         if (this.currentUser && this.currentUser.id == this.currentAuthedUser.id)

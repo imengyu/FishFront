@@ -1,20 +1,30 @@
 <template>
   <div id="app">
-    <app-header ref="Header" v-if="isHeaderShow"></app-header>
-    <transition name="fade">
-      
-        <router-view 
-          @publicHeaderAdd="publicHeaderAdd"
-        ></router-view>
-    
-    </transition>
-    <app-footer v-if="isFooterShow"></app-footer>
+    <app-header ref="Header" v-if="isHeaderShow" v-bind:is-admin="isAdminPanel"></app-header>
+    <div v-if="isAdminPanel">
+      <el-container class="admin-area">
+        <app-admin-sidearea></app-admin-sidearea>
+        <el-container>
+          <transition name="fade">
+            <router-view ref="View" @publicHeaderAdd="publicHeaderAdd"></router-view>
+          </transition>
+          <el-footer class="better-footer"><span>&copy; 2019 FishBlog. UI Powered by <a href="https://element.eleme.cn">element-ui</a>.</span></el-footer>
+        </el-container>
+      </el-container>
+    </div>
+    <div v-else>
+      <transition name="fade">
+        <router-view @publicHeaderAdd="publicHeaderAdd"></router-view>
+      </transition>
+    </div>
+    <app-footer ref="Footer" v-if="isFooterShow"></app-footer>
   </div>
 </template>
 
 <script>
 import Header from './components/public/Header'
 import Footer from './components/public/Footer'
+import AdminSideArea from './views/admin/SideArea'
 import serverConsts from './constants/serverConsts.js'
 import jQuery from 'jquery'
 import { mapState } from 'vuex';
@@ -23,8 +33,6 @@ export default {
   name: 'App',
   data(){
     return {
-      authInfo: null,
-      authed: false,
       authInfoLoaded: false,
       authInfoSended: false,
     }
@@ -32,10 +40,13 @@ export default {
   computed: mapState({  
     isFooterShow: state => state.global.globalFooterShow,
     isHeaderShow: state => state.global.globalHeaderShow,
+    isAdminPanel: state => state.global.globalAdminPanel,
+    isAdminCollape: state => state.global.globalAdminCollape,
   }),
   components: {
     'app-header': Header,
     'app-footer': Footer,
+    'app-admin-sidearea': AdminSideArea,
   },
   mounted() {
     this.init();
@@ -76,49 +87,54 @@ export default {
           if(typeof this.$children[i].authInfoInited != 'undefined')
             this.$children[i].authInfoInited();
         }
+        if(this.$refs.View){
+          if(typeof this.$refs.View.authInfoInited != 'undefined')
+            this.$refs.View.authInfoInited();
+        }
+
       },
       //初始化登录信息
       initLoginInfo: function(notsend){
         var main = this;
-        if(main.authed) {
+        if(main.$store.getters["auth/authed"]) {
           main.sendLoginfoInited();
           return;
         }
-        
-        jQuery.ajax({
-          type: 'get',
-          url: main.NET.API_URL + "/auth/auth-test",
-          crossDomain: true,
-          xhrFields: { withCredentials: true },
-          success: function (rep) {
-            if(rep.success){
-              main.authInfo = rep.data;
-              main.authed = true;
-              main.publicHeaderReset();
-            }else{
-              main.authInfo = null;
-              main.authed = false;
-              main.publicHeaderReset();
-            }
-            if(!notsend) main.sendLoginfoInited();
-          },
-          error(){
-            main.authInfo = null;
-            main.authed = false;
+        //请求服务器是否登录
+        this.axios.get(main.NET.API_URL + "/auth/auth-test").then((response)=>{
+          if(response.data.success){
+            main.$store.dispatch("auth/setAuthInfo", response.data.data);
+            main.$store.dispatch("auth/setAuthed", true);
             main.publicHeaderReset();
-            if(!notsend) main.sendLoginfoInited();
+          }else{
+            main.$store.dispatch("auth/setAuthed", false);
+            main.$store.dispatch("auth/setAuthInfo", null);
+            main.publicHeaderReset();
+            if(main.$store.getters["global/adminPanel"])
+              main.redirectToLogin(response.data.data.authCode);
           }
+          if(!notsend) main.sendLoginfoInited();
+        }).catch((response)=>{
+          main.$store.dispatch("auth/setAuthed", false);
+          main.$store.dispatch("auth/setAuthInfo", null);
+          main.publicHeaderReset();
+          if(!notsend) main.sendLoginfoInited();
         })
-        
       },
-      //获取登录信息
-      getAuthInfo: function(){
-        return this.authInfo;
+      //重定向到登录页面使用户登录
+      redirectToLogin(errCode) {
+        var authCode = {
+          FAIL_BAD_TOKEN: -2,
+          FAIL_EXPIRED: -3,
+          FAIL_NOT_LOGIN: -6,
+          FAIL_BAD_IP: -8,
+        };
+        var err;
+        if(errCode == authCode.FAIL_BAD_TOKEN || errCode == authCode.FAIL_BAD_IP) err='BadRequest';
+        else if(errCode == authCode.FAIL_EXPIRED) err='SessionOut';
+        else if(errCode == authCode.FAIL_NOT_LOGIN) err='RequestLogin';
+        this.Utils.jump('/sign-in/?error=' + err + '&redirect_url=' + encodeURIComponent(location.href));
       },
-      //获取当前用户是否登录
-      getAuthed: function(){
-        return this.authed;
-      }
   }
 
 }
@@ -136,5 +152,26 @@ export default {
 }
 .fade-leave-active {
   opacity: 0;
+}
+.admin-area{
+  position: absolute;
+  top: 70px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 100%;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.better-footer{
+  position: relative;
+  height: 35px!important;
+  font-size: 14px;
+}
+.better-footer span{
+  position: absolute;
+  bottom: 5px;
+  right: 30px;
+  color: #a3a3a3;
 }
 </style>

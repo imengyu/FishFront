@@ -28,6 +28,10 @@ import Classes from '@/views/Classes'
 import ViewPost from '@/views/ViewPost'
 import UserInfo from '@/views/UserInfo'
 
+import AdminIndex from '@/views/admin/Index'
+import AdminManageArchives from '@/views/admin/ManageArchives'
+import AdminManageClassfication from '@/views/admin/ManageClassfication'
+
 export default new Router({
   /*mode: 'history',*/
   routes: [
@@ -123,8 +127,37 @@ export default new Router({
       }
     },
 
+    // Admin controller
+    {
+      path: '/admin/',
+      name: 'AdminIndex',
+      component: AdminIndex,
+      meta: {
+        title: '仪表盘',
+        index: 3,
+      }
+    },
+    {
+      path: '/admin/manage-archives/',
+      name: 'AdminManageArchives',
+      component: AdminManageArchives,
+      meta: {
+        title: '文章管理',
+        index: 4,
+      }
+    },
+    {
+      path: '/admin/manage-classfication/',
+      name: 'AdminManageClassfication',
+      component: AdminManageClassfication,
+      meta: {
+        title: '标签和分类管理',
+        index: 4,
+      }
+    },
+
     
-    
+
     // 404page
     {
       path: '*', // 页面不存在的情况下会跳到404页面

@@ -21,3 +21,24 @@
         }
     }
 }
+
+@mixin pc-fix-scrollbar-white(){
+    @media (min-width: 768px) {
+        &::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: #909090;
+            opacity: .7;
+            border-radius: 3px;
+    
+            &:hover {
+                background: #707070;
+            }
+        }
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+    }
+}

@@ -22,6 +22,7 @@ export default
     getClassRealUrl,
     getCurrentFullHost,
     getPostPrefix,
+    getPostStatusString,
   }
 
 function mergeJSON(minor, main) {
@@ -159,6 +160,14 @@ function getPostPrefix(prefixId) {
     case serverConsts.PostPrefix.reprint: return '<span class="tag-post-prefix reprint">转载</span>';
     case serverConsts.PostPrefix.album: return '<span class="tag-post-prefix album">视频</span>';
     case serverConsts.PostPrefix.video: return '<span class="tag-post-prefix video">相册</span>';
+  }
+  return '';
+}
+function getPostStatusString(statusString) {
+  switch (statusString) {
+    case serverConsts.ArchiveStatus.PUBLISH: return '公开文章';
+    case serverConsts.ArchiveStatus.PRIVATE: return '私有文章';
+    case serverConsts.ArchiveStatus.DRAFT: return '文章草稿';
   }
   return '';
 }

@@ -12,6 +12,7 @@ var toasts = [];
 var toastCurrentTop = 15;
 var toastCount = 0;
 var toast_overlay;
+var uidz = 0;
 
 function toastTypeToIcon(type){
     switch(type){
@@ -52,7 +53,7 @@ function toastCloseById(uidz){
 }
 function toastClose(toast, anim){
     if(!toast.closed){
-        $alert = toast.alert;
+        var $alert = toast.alert;
         toast.closed = true;
         if(anim=='slide') $alert.slideUp(300, function(){ toastRemove(toast, $(this)) });
         else $alert.fadeOut(600, function(){ toastRemove(toast, $(this)) });
@@ -68,16 +69,19 @@ function toast(str, type, time, noclose){
 
     var top = toastCurrentTop;
 
-    $toast_overlay = $('#toast-overlay');
+    var $toast_overlay = $('#toast-overlay');
     if($toast_overlay.length == 0){
         toast_overlay = document.createElement('div');
         toast_overlay.setAttribute('id', 'toast-overlay');
         toast_overlay.setAttribute('class', 'toast-overlay-wrapper position-fixed');
-        body.appendChild(toast_overlay);
+        document.body.appendChild(toast_overlay);
+        $toast_overlay = $('#toast-overlay');
     }
-    $newAlert = $('<div class="toast-alert" id="toast-' + uidz + '">' + toastTypeToIcon(type) + 
+    var alertId = 'toast-' + uidz;
+    var $newAlert = $('<div class="toast-alert" id="' + alertId + '">' + toastTypeToIcon(type) + 
         '<div class="toast-text" style="' +(noclose?'padding-right:20px':'')+'">' +  str + '</div>' +
-        (noclose ? '' : '<a class="toast-close" href="javascript:;" onclick="toastCloseById(' + uidz + ')"></a>') + '</div>')
+        (noclose ? '' : '<a class="toast-close" href="javascript:;"></a>') + '</div>')
+    $('#' + alertId).click(function(){ toastCloseById(' + uidz + ') });
     $toast_overlay.append($newAlert);
     $newAlert.css('top', top + 'px');
     $newAlert.css('left', ($(window).width() / 2 - $newAlert.width() / 2) + 'px');
