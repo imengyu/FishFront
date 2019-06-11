@@ -56,7 +56,7 @@
                 >{{ tag.name }}</a>
               </div>
               <div class="like" @click="updateLikeCount()">
-                <div class="btn like-group">
+                <div :class="'btn like-group' + (authedUserLiked ? ' active' : '')">
                   <div class="btn-like">
                     <a>喜欢</a>
                   </div>

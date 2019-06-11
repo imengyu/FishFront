@@ -4,7 +4,8 @@ import jQuery from "jquery";
 
 export default {
     toast,
-    toastCloseById
+    toastCloseById,
+    toastClose
 }
 
 var $ = jQuery;

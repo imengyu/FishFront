@@ -1,13 +1,13 @@
 <template>
   <el-container>
-    <el-header style="text-align: right; font-size: 12px; padding: 24px">
+    <el-header style="text-align: right; font-size: 12px; padding: 24px 36px">
       <el-breadcrumb separator-class="el-icon-arrow-right">
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
         <el-breadcrumb-item>文章管理</el-breadcrumb-item>
         <el-breadcrumb-item>文章列表</el-breadcrumb-item>
       </el-breadcrumb>
     </el-header>
-    <el-main class="better-scroll-white" style="padding:0 24px">
+    <el-main class="better-scroll-white" style="padding:0 36px">
       <el-tabs v-model="currentTab" @tab-click="handleTabClick">
         <el-tab-pane label="所有文章" name="all">
           <div v-if="postListAllLoadStatus.indexOf('error')==0" class="box">
@@ -19,7 +19,7 @@
                 <p class="text-secondary mt-2">
                   <span class="h4">加载失败</span>
                   <br>
-                  {{ postListAllLoadStatus.split(':')[0] }}
+                  {{ postListAllLoadStatus.split(':')[1] }}
                 </p>
                 <el-button type="primary" round @click="loadListAll">重试</el-button>
               </div>

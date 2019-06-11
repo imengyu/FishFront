@@ -39,7 +39,7 @@
               <div
                 v-if="logSending"
                 class="simple-loading-center"
-                style="display:none;height:250px;"
+                style="height:250px;"
               >
                 <div class="simple-loading-container">
                   <span class="simple-loading"></span>

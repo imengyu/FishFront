@@ -32,7 +32,7 @@
           v-on:click="goViewTag(tag.id)"
           href="javascript:void(0);"
           :id="'tag_'+tag.id"
-          :style="'background-color:#'+tag.color+';'"
+          :style="'background-color:'+tag.color+';'"
         >{{ tag.name }}</a>
       </div>
       <div

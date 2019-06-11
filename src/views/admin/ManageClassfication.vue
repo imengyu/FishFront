@@ -1,22 +1,22 @@
 <template>
   <el-container>
-    <el-header style="text-align: right; font-size: 12px; padding: 24px">
+    <el-header style="text-align: right; font-size: 12px; padding: 24px 36px">
       <el-breadcrumb separator-class="el-icon-arrow-right">
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
         <el-breadcrumb-item>分类和标签</el-breadcrumb-item>
       </el-breadcrumb>
     </el-header>
-    <el-main class="better-scroll-white" style="padding:0 24px">
+    <el-main class="better-scroll-white" style="padding:0 36px">
       <el-tabs v-model="currentTab" @tab-click="handleTabClick">
         <el-tab-pane label="标签管理" name="tags">
           <div class="tags" v-if="contentTags && !tagsLoading">
             <div
               v-for="(tag, index) in contentTags"
               class="tag-mgr-item" :key="index"
-              :style="'background-color:#' + tag.color"
+              :style="'background-color:' + tag.color"
             >
               {{ tag.name }}
-              <a href="javascript:;" v-on:click="handleEditTag(tag.id)">
+              <a href="javascript:;" v-on:click="handleEditTag(tag)">
                 <i class="fa fa-pencil"></i>
               </a>
               <a href="javascript:;" v-on:click="handleDeleteTag(tag.id)">
@@ -45,7 +45,7 @@
                 <p class="text-secondary mt-2">
                   <span class="h4">加载失败</span>
                   <br>
-                  {{ postListCategoriesLoadStatus.split(':')[0] }}
+                  {{ postListCategoriesLoadStatus.split(':')[1] }}
                 </p>
                 <el-button type="primary" round @click="loadListCategories">重试</el-button>
               </div>
@@ -66,11 +66,11 @@
             <el-table-column prop="urlName" label="URL路径"></el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
-                <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                <el-button size="mini" @click="handleEditClass(scope.$index, scope.row)">编辑</el-button>
                 <el-button
                   size="mini"
                   type="danger"
-                  @click="handleDelete(scope.$index, scope.row)"
+                  @click="handleDeleteClass(scope.$index, scope.row)"
                 >删除</el-button>
               </template>
             </el-table-column>
@@ -97,21 +97,63 @@
                 :label="item.label"
                 :value="item.value"
               ></el-option>
-            </el-select>
+            </el-select>&nbsp;
+            <el-button size="small" type="success" @click="handleAddClass()"><i class="fa fa-plus mr-2"></i>添加分类</el-button>
           </div>
         </el-tab-pane>
       </el-tabs>
+      <!--Editing dialogs-->
+      <el-dialog
+        :title="(currentEditingTag && currentEditingTag.new) ? '添加标签' : '编辑标签'"
+        :visible.sync="editingTag"
+        width="30%">
+        <el-form ref="fromTag" v-if="currentEditingTag" :model="currentEditingTag" label-position="right" :rules="editingTagRules" label-width="80px">
+          <el-form-item label="标签名称" prop="name">
+            <el-input v-model="currentEditingTag.name" placeholder=""></el-input>
+          </el-form-item>
+          <el-form-item label="标签颜色" prop="color">
+            <el-color-picker v-model="currentEditingTag.color" :predefine="predefineColors"></el-color-picker>
+          </el-form-item>
+          <el-form-item label="" size="mini">
+            <div v-if="currentEditingTag" class="tag-mgr-item pr-2" :style="'background-color:' + currentEditingTag.color">{{ currentEditingTag.name }}</div>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="handleEditTagCancel()">取消</el-button>
+          <el-button type="primary" @click="saveTag()">保存</el-button>
+        </span>
+      </el-dialog>
+      <el-dialog
+        :title="(currentEditingClass && currentEditingClass.new) ? '添加分类' : '编辑分类'"
+        :visible.sync="editingClass"
+        width="50%">
+        <el-form ref="fromClass" v-if="currentEditingClass" :model="currentEditingClass" label-position="right" :rules="editingClassRules" label-width="140px">
+          <el-form-item label="分类名称" prop="title" >
+            <el-input v-model="currentEditingClass.title"></el-input>
+          </el-form-item>
+          <el-form-item label="URL名称" prop="urlName">
+            <el-input v-model="currentEditingClass.urlName"></el-input>
+          </el-form-item>
+          <el-form-item label="说明文字" prop="previewText">
+            <el-input v-model="currentEditingClass.previewText"></el-input>
+          </el-form-item>
+          <el-form-item label="预览图片URL" prop="previewImage">
+            <el-input v-model="currentEditingClass.previewImage"></el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="handleEditClassCancel()">取消</el-button>
+          <el-button type="primary" @click="saveClass()">保存</el-button>
+        </span>
+      </el-dialog>
     </el-main>
   </el-container>
 </template>
 
 <script>
-import jQuery from "jquery";
-import Chart from "chart.js";
+
 import serverConsts from "../../constants/serverConsts.js";
 import toast from "../../assets/lib/toast/toast.simply.js";
-
-var $ = jQuery;
 
 export default {
   name: "ManageClassfication",
@@ -148,7 +190,50 @@ export default {
       currentUser: null,
       currentUserIsAdmin: false,
 
-      currentTab: "tags"
+      currentTab: "tags",
+
+      editingTag: false,
+      editingTagRules: {
+        name: [
+          { required: true, message: '请输入标签名称', trigger: 'blur' },
+          { max: 10, message: '名称不超过 10 个字符', trigger: 'blur' }
+        ],
+      }, 
+      currentEditingTag: null,
+      currentEditingTagBackup: null,
+      predefineColors: [
+        '#FF9999',
+        '#CC9999',
+        '#CC6699',
+        '#CC3399',
+        '#CC0033',
+        '#FF0033',
+        '#FF6666',
+        '#FF6600',
+        '#FF9900',
+        '#FFCC33',
+        '#FFFF00',
+        '#CCFF66',
+        '#BBE85E',
+        '#99CC00',
+        '#009966',
+        '#15C9B1',
+        '#66CCCC',
+        '#0099FF',
+        '#0099CC',
+        '#3399CC',
+      ],
+
+      editingClass: false,
+      editingClassRules: {
+        title: [
+          { required: true, message: '请输入分类名称', trigger: 'blur' },
+          { max: 100, message: '名称不超过 100 个字符', trigger: 'blur' }
+        ],
+      }, 
+      currentEditingClass: null,
+      currentEditingClassBackup: null,
+
     };
   },
   mounted() {
@@ -169,8 +254,7 @@ export default {
     },
     authInfoInited() {
       this.currentUser = this.$store.getters["auth/authInfo"];
-      this.currentUserIsAdmin =
-        this.currentUser.level == serverConsts.UserLevels.admin;
+      if(this.currentUser) this.currentUserIsAdmin = this.currentUser.level == serverConsts.UserLevels.admin;
       this.loadTags();
     },
 
@@ -182,16 +266,25 @@ export default {
       )
         this.loadListCategories();
     },
-    handleEdit(index, post) {},
-    handleDelete(index, category) {
+    handleEditClass(index, category) {
+      this.editingClass = true;
+      this.currentEditingClassBackup = this.Utils.clone(category);//克隆一个原对象
+      this.currentEditingClass = category;
+    },
+    handleEditClassCancel(){
+      this.editingClass = false;
+      this.Utils.cloneValue(this.currentEditingClass, this.currentEditingClassBackup);
+      this.currentEditingClassBackup = null;
+    },
+    handleDeleteClass(index, category) {
       this.$swal({
         type: "warning",
         title: "您真的要删除这个分类吗?",
         html:
           "<h5>注意，此操作不能恢复！</h5><b>标题：</b>" +
-          post.title +
+          category.title +
           "<br /><b>ID：</b>" +
-          post.id,
+          category.id,
         confirmButtonColor: "#d33",
         confirmButtonText: "确定删除",
         showCancelButton: true,
@@ -201,6 +294,16 @@ export default {
         reverseButtons: true
       }).then(isConfirm => {
         if (isConfirm.value) {
+           this.axios.delete(this.NET.API_URL + '/class/' + category.id).then(response => {
+            if (response.data.success) {
+              toast.toast('删除分类成功', 'success')
+              this.loadListCategories();
+            } else {
+              this.$swal("删除分类失败", response.data.message, "error");
+            }
+          }).catch(response => {
+            this.$swal("删除分类失败", "错误信息：" + response, "error");
+          });
         }
       });
     },
@@ -208,14 +311,65 @@ export default {
       this.postListCategoriesPageCurrent = page;
       this.loadListCategories();
     },
+    handleAddClass(){
+      this.editingClass = true;
+      this.currentEditingClass = {
+        id: 0,
+        title: '',
+        urlName: '',
+        previewText: '',
+        previewImage: '',
+        new: true
+      };
+    },
     handleAddTag(){
-
+      this.editingTag = true;
+      this.currentEditingTag = {
+        id: 0,
+        name: '',
+        color: '#000',
+        new: true
+      };
     },
     handleDeleteTag(tagid){
-
+      this.$swal({
+        type: "warning",
+        title: "您真的要删除这个标签吗?",
+        html: "<h5>注意，此操作不能恢复！</h5><b>ID：</b>" + tagid,
+        confirmButtonColor: "#d33",
+        confirmButtonText: "确定删除",
+        showCancelButton: true,
+        cancelButtonColor: "#3085d6",
+        cancelButtonText: "取消",
+        focusCancel: true,
+        reverseButtons: true
+      }).then(isConfirm => {
+        if (isConfirm.value) {
+           this.axios.delete(this.NET.API_URL + '/tag/' + tagid).then(response => {
+            if (response.data.success) {
+              toast.toast('删除标签成功', 'success')
+              //清除旧标签数据
+              var newData = {};
+              for (var key in this.contentTags) { if (this.contentTags[key].id != tagid) newData[key] = this.contentTags[key] }
+              this.contentTags = newData;
+            } else {
+              this.$swal("删除标签失败", response.data.message, "error");
+            }
+          }).catch(response => {
+            this.$swal("删除标签失败", "错误信息：" + response, "error");
+          });
+        }
+      });
     },
-    handleEditTag(tagid){
-
+    handleEditTag(tag){
+      this.editingTag = true;
+      this.currentEditingTag = tag;
+      this.currentEditingTagBackup = this.Utils.clone(tag);//克隆一个原对象
+    },
+    handleEditTagCancel(){
+      this.editingTag = false;
+      this.Utils.cloneValue(this.currentEditingTag, this.currentEditingTagBackup);
+      this.currentEditingTagBackup = null;
     },
 
     loadTags() {
@@ -258,7 +412,87 @@ export default {
         .catch(response => {
           this.postListCategorieshLoadStatus = "error:" + response;
         });
-    }
+    },
+
+    saveTag(){
+      this.$refs['fromTag'].validate((valid) => {
+        if (valid) {
+          this.editingTag = false;
+          if(this.currentEditingTag){
+            if(this.currentEditingTag.new){
+              //POST 新的条目
+              this.axios.post(this.NET.API_URL + '/tag', this.currentEditingTag).then(response => {
+              if (response.data.success) {
+                toast.toast('添加标签成功', 'success')
+                //刷新数据
+                var newData = {}, i=0;
+                for (var key in this.contentTags) {
+                  newData[key] = this.contentTags[key];
+                  i++
+                }
+                this.currentEditingTag.new = undefined;
+                newData[i]=this.currentEditingTag;
+                this.contentTags = newData;
+                this.currentEditingTag = null;
+              } else this.$swal("添加标签失败", response.data.message, "error");
+              }).catch(response => {
+                this.$swal("添加标签失败", "错误信息：" + response, "error");
+              });
+            }else{
+              //PUT 修改条目
+              this.axios.put(this.NET.API_URL + '/tag/' + this.currentEditingTag.id, this.currentEditingTag).then(response => {
+              if (response.data.success) {
+                toast.toast('更新标签成功', 'success')
+                this.currentEditingTag = null;
+              } else this.$swal("更新标签失败", response.data.message, "error");
+              }).catch(response => {
+                this.$swal("更新标签失败", "错误信息：" + response, "error");
+              });
+            }
+          }
+        } else return false;
+      });
+    },
+    saveClass(){
+      this.$refs['fromClass'].validate((valid) => {
+        if (valid) {
+          this.editingClass = false;
+          if(this.currentEditingClass){
+            if(this.currentEditingClass.new){
+              //POST 新的条目
+              this.axios.post(this.NET.API_URL + '/class', this.currentEditingClass).then(response => {
+              if (response.data.success) {
+                toast.toast('添加分类成功', 'success')
+                //刷新数据
+                var newData = {}, i=0;
+                for (var key in this.postListCategoriesData) {
+                  newData[key] = this.postListCategoriesData[key];
+                  i++
+                }
+                this.currentEditingClass.new = undefined;
+                newData[i]=this.currentEditingTag;
+                this.postListCategoriesData = newData;
+                this.currentEditingClass = null;
+              } else this.$swal("添加分类失败", response.data.message, "error");
+              }).catch(response => {
+                this.$swal("添加分类失败", "错误信息：" + response, "error");
+              });
+            }else{
+              //PUT 修改条目
+              this.axios.put(this.NET.API_URL + '/class/' + this.currentEditingClass.id, this.currentEditingClass).then(response => {
+              if (response.data.success) {
+                toast.toast('更新分类成功', 'success')
+                this.currentEditingClass = null;
+              } else this.$swal("更新分类失败", response.data.message, "error");
+              }).catch(response => {
+                this.$swal("更新分类失败", "错误信息：" + response, "error");
+              });
+            }
+          }
+        } else return false;
+      });
+    },
+
   }
 };
 </script>

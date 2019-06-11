@@ -991,7 +991,7 @@ input[type="text"].flat, input[type="password"].flat, input[type="email"].flat, 
 
 .like .like-group .modal-wrap a { color: #EA6F5A; padding: 18px 26px 18px 18px; }
 
-.like .like-group.active { border: none; background-color: #EA6F5A; color: #fff; }
+.like .like-group.active { border: 1px solid #EA6F5A; background-color: #EA6F5A; color: #fff; }
 
 .like .like-group.active .btn-like a { position: relative; color: #fff; }
 

@@ -31,6 +31,10 @@ import UserInfo from '@/views/UserInfo'
 import AdminIndex from '@/views/admin/Index'
 import AdminManageArchives from '@/views/admin/ManageArchives'
 import AdminManageClassfication from '@/views/admin/ManageClassfication'
+import AdminWriteArchive from '@/views/admin/WriteArchive'
+import AdminUserCenter from '@/views/admin/UserCenter'
+import AdminManageUsers from '@/views/admin/ManageUsers'
+
 
 export default new Router({
   /*mode: 'history',*/
@@ -147,6 +151,15 @@ export default new Router({
       }
     },
     {
+      path: '/admin/write-archive/',
+      name: 'AdminWriteArchive',
+      component: AdminWriteArchive,
+      meta: {
+        title: '写文章',
+        index: 4,
+      }
+    },
+    {
       path: '/admin/manage-classfication/',
       name: 'AdminManageClassfication',
       component: AdminManageClassfication,
@@ -155,7 +168,25 @@ export default new Router({
         index: 4,
       }
     },
-
+    {
+      path: '/admin/user-center/',
+      name: 'AdminUserCenter',
+      component: AdminUserCenter,
+      meta: {
+        title: '用户信息修改',
+        index: 4,
+      }
+    },
+    {
+      path: '/admin/manage-users/',
+      name: 'AdminManageUsers',
+      component: AdminManageUsers,
+      meta: {
+        title: '管理作者和用户',
+        index: 4,
+      }
+    },
+    
     
 
     // 404page

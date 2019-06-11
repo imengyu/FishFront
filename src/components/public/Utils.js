@@ -3,6 +3,8 @@ import serverConsts from '../../constants/serverConsts.js'
 
 export default
   {
+    clone,
+    cloneValue,
     isNullOrEmpty,
     isNumber,
     isJSON,
@@ -24,6 +26,45 @@ export default
     getPostPrefix,
     getPostStatusString,
   }
+
+// 对象操作
+//================
+
+/**
+ * 克隆对象
+ * @param {Object} obj 要克隆对象
+ */
+function clone(obj) {
+  let temp = null;
+  if (obj instanceof Array) {
+    temp = obj.concat();
+  } else if (obj instanceof Function) {
+    //函数是共享的是无所谓的，js也没有什么办法可以在定义后再修改函数内容
+    temp = obj;
+  } else {
+    temp = new Object();
+    for (let item in obj) {
+      let val = obj[item];
+      temp[item] = typeof val == 'object' ? clone(val) : val; //这里也没有判断是否为函数，因为对于函数，我们将它和一般值一样处理
+    }
+  }
+  return temp;
+}
+/**
+ * 将源对象每个属性都复制到目标对象
+ * @param {*} setObj 
+ * @param {*} sourceObj 
+ */
+function cloneValue(setObj, sourceObj){
+  if(!setObj || !sourceObj) return;
+  Object.keys(setObj).forEach(function(key){
+    if(typeof sourceObj[key] != 'undefined') {
+      if(isJSON(setObj[key])) cloneValue(setObj[key], sourceObj[key]);
+      else setObj[key] = sourceObj[key];
+    }
+  });
+}
+
 
 function mergeJSON(minor, main) {
   for (var key in minor) {
@@ -47,6 +88,11 @@ function isJSON(target) {
 function isArray(o) {
   return Object.prototype.toString.call(o) == '[object Array]';
 }
+/**
+ * 混合两个 JsonArray
+ * @param {*} a 
+ * @param {*} b 
+ */
 function mergeJsonArray(a, b) {
   var r = {};
   var i = 0;
@@ -60,6 +106,11 @@ function mergeJsonArray(a, b) {
   }
   return r;
 }
+
+// 字符串操作
+//================
+
+
 /**
  * 判断一个字符串是否为空
  * @param {*} str 要判断的字符串
@@ -71,12 +122,15 @@ function isNullOrEmpty(str) {
 }
 /**
 * 判断字符串是否是 Base64 编码
-* @param {*} str 
+* @param {String} str 
 */
 function isBase64(str) {
   return /^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$/.test(str);
 }
-
+/**
+ * 检测字符串是否是一串数字
+ * @param {String} val 
+ */
 function isNumber(val) {
   var regPos = /^\d+(\.\d+)?$/; //非负浮点数
   var regNeg = /^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$/; //负浮点数
@@ -86,6 +140,9 @@ function isNumber(val) {
     return false;
   }
 }
+/**
+ * 数字补0
+ */
 function pad(num, n) {
   var len = num.toString().length;
   while (len < n) {
@@ -117,6 +174,9 @@ Date.prototype.format = function (formatStr) {
   str = str.replace(/ss/, pad(this.getSeconds(), 2));
   return str;
 }
+
+// 应用操作数据前缀处理
+//================
 
 //textare getCursorPosition
 function getInputCursorPosition(input) {
@@ -172,17 +232,24 @@ function getPostStatusString(statusString) {
   return '';
 }
 
-//
-//Cookies
+// Cookie 操作
+//================
 
+/**
+ * 设置 Cookie
+ * @param {String} name Cookie 名称
+ * @param {*} value 
+ */
 function setCookie(name, value) {
   var Days = 30;
   var exp = new Date();
   exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
   document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString();
 }
-
-//读取cookies 
+/**
+ * 读取 Cookie
+ * @param {String} name Cookie 名称
+ */ 
 function getCookie(name) {
   var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
 
@@ -192,8 +259,10 @@ function getCookie(name) {
   else
     return null;
 }
-
-//删除cookies 
+/**
+ * 删除 Cookie
+ * @param {String} name Cookie 名称
+ */ 
 function delCookie(name) {
   var exp = new Date();
   exp.setTime(exp.getTime() - 1);
@@ -201,7 +270,6 @@ function delCookie(name) {
   if (cval != null)
     document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
 }
-
 
 //
 //Jumps
