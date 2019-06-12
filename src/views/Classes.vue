@@ -4,14 +4,16 @@
       <div class="row justify-content-center">
         <div class="col-12 col-sm-12 col-lg-3">
           <!-- Category List -->
-          <div class="tags mt-4 pt-2 pb-2" v-if="blogCategoryList">
+          <div class="flat-tags mt-4 pt-2 pb-2" v-if="blogCategoryList">
             <a v-for="(category, index) in blogCategoryList" :key="index" 
               v-on:click="switchCategory(category.urlName ? category.urlName : category.id)" 
               href="javascript:void(0);" 
-              :class="'tag-color ' + ((blogCategoryCurrent == category.urlName || blogCategoryCurrent == blogCategoryCurrent.id) ? 'bg-primary' : 'bg-secondary') + ' btn-block text-center'" 
-              :style="(index==0?'margin-top: 25px;':'')"
+              :class="'flat-tag-color ' + ((blogCategoryCurrent == category.urlName || blogCategoryCurrent == blogCategoryCurrent.id) ? 'bg-primary' : 'bg-secondary') + ' btn-block text-center'" 
+              :style="(index==0?'margin-top: 25px;':'') + (category.previewImage ? 'background-image:url(' + getBlogImageRealUrl(category.previewImage) + ')' : '')"
               :title="category.previewText">
-                {{ category.title }}
+                <h5 style="font-size: 16px; font-weight: bold;margin-bottom: 0">{{ category.title }} </h5>
+                {{ category.previewText }}
+                <div class="flat-tag-mask"></div>
               </a>
           </div>
         </div>
@@ -154,6 +156,9 @@ export default {
     getBlogPrefix(item) {
       return this.Utils.getPostPrefix(item.postPrefix);
     },
+    getBlogImageRealUrl(url) {
+      return this.Utils.getImageUrlFormHash(url);
+    },
     authInfoInited() {
       
     },
@@ -162,16 +167,10 @@ export default {
       location.href = newUrl;
     },
     loadArchiveCategories(){
-      var main = this;
-      jQuery.get(
-        main.NET.API_URL + "/classes",
-        function(response) {
-          if (response.success) {
-            main.blogCategoryList = response.data;
-          }
-        },
-        "json"
-      );
+      this.axios.get(this.NET.API_URL + "/classes").then((response) => {
+        if (response.data.success)
+          this.blogCategoryList = response.data.data;
+      });
     },
     loadArchivePage() {
       var main = this;

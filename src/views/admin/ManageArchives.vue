@@ -543,7 +543,7 @@ export default {
       this.axios
         .post(this.NET.API_URL + "/posts/stat", getPosts)
         .then(response => {
-          if (response.data.success) reloadPostsStat(response.data);
+          if (response.data.success) reloadPostsStat(response.data.data);
         })
         .catch(response => {
           console.log(response);

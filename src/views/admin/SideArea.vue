@@ -5,7 +5,7 @@
       <el-submenu index="archives">
         <template slot="title"><i class="el-icon-notebook-2"></i><span slot="title">文章管理</span></template>
         <el-menu-item index="/admin/manage-archives/"><span slot="title">文章列表</span></el-menu-item>
-        <el-menu-item index="/admin/write-archives/"><span slot="title">写文章</span></el-menu-item>
+        <el-menu-item index="/admin/write-archive/"><span slot="title">写文章</span></el-menu-item>
       </el-submenu>
       <el-menu-item index="/admin/media-center/"><i class="el-icon-film"></i><span slot="title">媒体库</span></el-menu-item>
       <el-menu-item index="/admin/manage-classfication/"><i class="el-icon-collection-tag"></i><span slot="title">分类和标签</span></el-menu-item>

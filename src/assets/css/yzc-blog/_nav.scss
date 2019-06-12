@@ -11,7 +11,8 @@
 	max-width: 100%;
 	height: auto;
 	padding: 12px 50px 5px 50px;
-	z-index: 15;
+    z-index: 15;
+    min-height: 60px;
 
     @include prefix(transition, all 0.3s ease-in-out, webkit);
 
@@ -35,6 +36,11 @@
     .nav-header-text .logo{
         background-image: url(../images/logo/logo-white.svg);
     }
+
+    @media (max-width: 576px) {
+        padding: 19px 10px 11px 10px;
+    }
+
 }
 
 .dashboard .main-menu {
@@ -123,6 +129,10 @@
     transition: 0.4s;
     padding: 18px 8px 0px 8px;
 
+    &.show{
+        left: 0;
+    }
+
     @include common-shadow;
 
     ul {
@@ -178,14 +188,18 @@
         padding: 10px 22px 10px 20px;
     
         img {
-            width: 32px;
-            height: 32px;
+            width: 66px;
+            height: 66px;
             border-radius: 50%;
+            margin-top: 11px;
+            margin-bottom: 11px;
         }
     
         span {
             color: #000;
+            margin-top: 8px;
             margin-left: 6px;
+            word-break: break-all;
         }
     }
 
@@ -523,17 +537,18 @@
     background-color: transparent;
     background-repeat: no-repeat;
     background-position: center center;
+    margin-top: -5px;
 
 	font-size: 26px;
 	transition: all 0.4s;
     outline: none;
     width: 30px;
-    height: 41px;
+    height: 26px;
 
-    &.icon-menu {
+    &.flat-icon-menu {
         background-size: 26px 26px;
     }
-    &.icon-close {
+    &.flat-icon-close {
         background-size: 21px 21px;
     }
 
@@ -600,10 +615,10 @@
     color: $white;
 }
 .main-menu-black #mobile-nav-toggle{
-    &.icon-menu {
+    &.flat-icon-menu {
         background-image: url(../images/icon/ico-menu-white.svg)
     }
-    &.icon-close {
+    &.flat-icon-close {
         background-image: url(../images/icon/ico-close-white.svg)
     }
 }

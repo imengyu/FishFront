@@ -4,93 +4,184 @@
       <div v-if="pageBackgroundOverlay" class="overlay" :style="'opacity: ' + pageBackgroundOverlayOpactity + ';'"></div>
     </div>
     <div :class="'container main-menu ' + headerMenuStyle">
-    <div class="container">
-      <div class="row">
-        <div class="col nav-title d-flex align-items-center justify-content-between ">
-        <div class="nav-header-text d-flex align-items-center justify-content-between">
-          <span class="logo" id="header-logo"></span>
-          <a href="/" id="header-title">ALONE SPACE</a>
-          <el-button v-if="isAdmin" :icon="isAdminCollape ? 'el-icon-s-unfold' : 'el-icon-s-fold'" circle @click="switchAdminCollape()" style="margin-left: 13px;"></el-button>
-        </div>
-        <button type="button" class="icon-menu" id="mobile-nav-toggle"></button>
-        <nav id="nav-menu-container" class="nav-menu-container">
-          <ul class="nav-menu sf-js-enabled sf-arrows" style="touch-action: auto;" id="header-menu">
-            <li v-for="(menu, index) in menuData" :key="index" :class="isMenuActive(menu.link)">
-              <a v-if="isMenuActive(menu.link)=='menu-active'">{{ menu.name }}</a>
-              <a v-else :href="getMenuRealUrl(menu.link)">{{ menu.name }}</a>
-            </li>
-            <li v-if="currentAuthed" class="nav-user">
-              <button v-if="currentUserLevel == 'admin'" type="button" class="flat-pill flat-btn flat-btn-transparent flat-danger mr-2" v-on:click="gotToWriteArchive()">写文章</button>
-              <div id="current_user_center_dropdown" class="dropdown">
-                <img lass="current-user-head" :src="currentUserHead" >
-                <span v-if="currentUserMessageCount>0" class="current-user-message-count">{{ currentUserMessageCount }}</span>
-                <div class="dropdown-menu shadow-dirty dropdown-menu-right">
-                  <div class="message-list" id="current_user_message_list">
-                    
+      <div class="container">
+        <div class="row">
+          <div class="col nav-title d-flex align-items-center justify-content-between">
+            <div class="nav-header-text d-flex align-items-center justify-content-between">
+              <span class="logo" id="header-logo"></span>
+              <a href="/" id="header-title">ALONE SPACE</a>
+              <el-button v-if="isAdmin" :icon="isAdminCollape ? 'el-icon-s-unfold' : 'el-icon-s-fold'" circle @click="switchAdminCollape()" style="margin-left: 13px;"></el-button>
+            </div>
+            <button type="button" :class="menuMoblieShow ? 'flat-icon-close' : 'flat-icon-menu'" id="mobile-nav-toggle" @click="menuMoblieShow=!menuMoblieShow"></button>
+            <nav id="nav-menu-container" class="nav-menu-container">
+              <ul class="nav-menu sf-js-enabled sf-arrows" style="touch-action: auto;" id="header-menu">
+                <li v-for="(menu, index) in menuData" :key="index" :class="isMenuActive(menu.link)">
+                  <a v-if="isMenuActive(menu.link)=='menu-active'">{{ menu.name }}</a>
+                  <a v-else :href="getMenuRealUrl(menu.link)">{{ menu.name }}</a>
+                </li>
+                <li v-if="currentAuthed" class="nav-user">
+                  <button
+                    v-if="currentUserLevel == 'admin'"
+                    type="button"
+                    class="flat-pill flat-btn flat-btn-transparent flat-danger mr-2"
+                    v-on:click="gotToWriteArchive()"
+                  >写文章</button>
+                  <div id="current_user_center_dropdown" class="dropdown">
+                    <img lass="current-user-head" :src="currentUserHead">
+                    <span
+                      v-if="currentUserMessageCount>0"
+                      class="current-user-message-count"
+                    >{{ currentUserMessageCount }}</span>
+                    <div class="dropdown-menu shadow-dirty dropdown-menu-right">
+                      <div class="message-list" id="current_user_message_list"></div>
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div id="current_user_dropdown" class="dropdown">
-                <span class="current-user-name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="0,20" >
-                  {{ currentUserName }}
-                  <i></i>
-                </span>
-                <div v-if="currentUserLevel == 'admin' || currentUserLevel == 'write'" class="dropdown-menu dropdown-menu-right shadow-dirty">
-                  <a class="dropdown-item" :href="getMenuRealUrl('/admin/')">博客控制台</a>
-                  <a class="dropdown-item" :href="getMenuRealUrl('/admin/write-archives/')">写文章</a>
-                  <a class="dropdown-item" :href="getMenuRealUrl('/admin/manage-archives/')">文章管理</a>
-                  <a class="dropdown-item" :href="getMenuRealUrl('/admin/user-center/')">个人信息</a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" :href="getMenuRealUrl('/sign-out/')">退出登录</a>
-                </div>
-                <div v-else-if="currentUserLevel == 'guest'" class="dropdown-menu dropdown-menu-right shadow-dirty">
-                  <a class="dropdown-item" :href="getMenuRealUrl('/user/')">我的个人信息</a>
-                  <a class="dropdown-item" :href="getMenuRealUrl('/sign-out/')">退出登录</a>
-                </div>
-              </div>
-            </li>
-          </ul>
-        </nav>
+                  <div id="current_user_dropdown" class="dropdown">
+                    <span
+                      class="current-user-name"
+                      data-toggle="dropdown"
+                      aria-haspopup="true"
+                      aria-expanded="false"
+                      data-offset="0,20"
+                    >
+                      {{ currentUserName }}
+                      <i></i>
+                    </span>
+                    <div
+                      v-if="currentUserLevel == 'admin' || currentUserLevel == 'writer'"
+                      class="dropdown-menu dropdown-menu-right shadow-dirty"
+                    >
+                      <a class="dropdown-item" :href="getMenuRealUrl('/admin/')">博客控制台</a>
+                      <a class="dropdown-item" :href="getMenuRealUrl('/admin/write-archives/')">写文章</a>
+                      <a
+                        class="dropdown-item"
+                        :href="getMenuRealUrl('/admin/manage-archives/')"
+                      >文章管理</a>
+                      <a class="dropdown-item" :href="getMenuRealUrl('/admin/user-center/')">个人信息</a>
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" :href="getMenuRealUrl('/sign-out/')">退出登录</a>
+                    </div>
+                    <div
+                      v-else-if="currentUserLevel == 'guest'"
+                      class="dropdown-menu dropdown-menu-right shadow-dirty"
+                    >
+                      <a class="dropdown-item" :href="getMenuRealUrl('/user/')">我的个人信息</a>
+                      <a class="dropdown-item" :href="getMenuRealUrl('/sign-out/')">退出登录</a>
+                    </div>
+                    <div v-else class="dropdown-menu dropdown-menu-right shadow-dirty">
+                      <a class="dropdown-item" :href="getMenuRealUrl('/sign-in/')">登录</a>
+                      <a class="dropdown-item" :href="getMenuRealUrl('/sign-up/')">注册</a>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </nav>
+          </div>
         </div>
-      </div>   
-    </div>
+      </div>
     </div>
     <div v-if="pageShowBreadcrumb" class="container main-menu-breadcrumb">
       <div v-if="pageBreadcrumb" class="row justify-content-start main-breadcrumb">
         <div class="col">
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-              <li v-for="(item, index) in pageBreadcrumb" :key="index" 
-                :class="'breadcrumb-item' + (item.active ? ' active' : '')">
+              <li
+                v-for="(item, index) in pageBreadcrumb"
+                :key="index"
+                :class="'breadcrumb-item' + (item.active ? ' active' : '')"
+              >
                 <span v-if="item.active">{{ item.title }}</span>
                 <a v-else :href="item.link">{{ item.title }}</a>
               </li>
             </ol>
           </nav>
-        </div> 
+        </div>
       </div>
     </div>
+    <!-- Mobile nav -->
+    <nav id="mobile-nav" :class="'nav-menu-container' + (menuMoblieShow ? ' show' : '')">
+      <li v-if="currentAuthed" class="nav-user">
+        <button
+                    v-if="currentUserLevel == 'admin'"
+                    type="button"
+                    class="flat-pill flat-btn flat-btn-transparent flat-danger mr-2"
+                    v-on:click="gotToWriteArchive()"
+                  >写文章</button>
+                  <div id="current_user_center_dropdown" class="dropdown">
+                    <img lass="current-user-head" :src="currentUserHead">
+                    <span
+                      v-if="currentUserMessageCount>0"
+                      class="current-user-message-count"
+                    >{{ currentUserMessageCount }}</span>
+                    <div class="dropdown-menu shadow-dirty dropdown-menu-right">
+                      <div class="message-list" id="current_user_message_list"></div>
+                    </div>
+                  </div>
+                  <div id="current_user_dropdown" class="dropdown">
+                    <span
+                      class="current-user-name"
+                      data-toggle="dropdown"
+                      aria-haspopup="true"
+                      aria-expanded="false"
+                      data-offset="0,20"
+                    >
+                      {{ currentUserName }}
+                      <i></i>
+                    </span>
+                    <div
+                      v-if="currentUserLevel == 'admin' || currentUserLevel == 'writer'"
+                      class="dropdown-menu dropdown-menu-right shadow-dirty"
+                    >
+                      <a class="dropdown-item" :href="getMenuRealUrl('/admin/')">博客控制台</a>
+                      <a class="dropdown-item" :href="getMenuRealUrl('/admin/write-archives/')">写文章</a>
+                      <a
+                        class="dropdown-item"
+                        :href="getMenuRealUrl('/admin/manage-archives/')"
+                      >文章管理</a>
+                      <a class="dropdown-item" :href="getMenuRealUrl('/admin/user-center/')">个人信息</a>
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" :href="getMenuRealUrl('/sign-out/')">退出登录</a>
+                    </div>
+                    <div
+                      v-else-if="currentUserLevel == 'guest'"
+                      class="dropdown-menu dropdown-menu-right shadow-dirty"
+                    >
+                      <a class="dropdown-item" :href="getMenuRealUrl('/user/')">我的个人信息</a>
+                      <a class="dropdown-item" :href="getMenuRealUrl('/sign-out/')">退出登录</a>
+                    </div>
+                    <div v-else class="dropdown-menu dropdown-menu-right shadow-dirty">
+                      <a class="dropdown-item" :href="getMenuRealUrl('/sign-in/')">登录</a>
+                      <a class="dropdown-item" :href="getMenuRealUrl('/sign-up/')">注册</a>
+                    </div>
+                  </div>
+                </li>                  
+      <ul class="" style="touch-action: auto;" id="">
+        <li v-for="(menu, index) in menuData" :key="index" :class="isMenuActive(menu.link)">
+          <a v-if="isMenuActive(menu.link)=='menu-active'">{{ menu.name }}</a>
+          <a v-else :href="getMenuRealUrl(menu.link)" @click="menuMoblieShow=false">{{ menu.name }}</a>
+        </li>
+      </ul>
+    </nav>
   </header>
 </template>
 
 <script>
 import Vue from "vue";
-import { mapState,mapGetters,mapActions } from 'vuex';
+import { mapState, mapGetters, mapActions } from "vuex";
 
 export default {
   name: "Header",
-  props: ['isAdmin'],
+  props: ["isAdmin"],
   computed: mapState({
-
     headerStyle: state => state.global.globalHeaderStyle,
     headerMenuStyle: state => state.global.globalHeaderMenuStyle,
     pageBackgroundImage: state => state.global.globalPageBackgroundImage,
     pageBackgroundOverlay: state => state.global.globalPageBackgroundOverlay,
-    pageBackgroundOverlayOpactity: state => state.global.globalPageBackgroundOverlayOpactity,
+    pageBackgroundOverlayOpactity: state =>
+      state.global.globalPageBackgroundOverlayOpactity,
     pageBreadcrumb: state => state.global.globalPageBreadcrumb,
     pageShowBreadcrumb: state => state.global.globalPageShowBreadcrumb,
-    isAdminCollape: state => state.global.globalAdminCollape,
-
+    isAdminCollape: state => state.global.globalAdminCollape
   }),
   data() {
     return {
@@ -113,18 +204,21 @@ export default {
         }
       ],
       menuData: null,
+      menuMoblieShow: false,
       currentAuthed: false,
-      currentUserName: '',
-      currentUserHead: '',
-      currentUserLevel: '',
+      currentUserName: "",
+      currentUserHead: "",
+      currentUserLevel: "",
       currentUserMessageCount: 0,
+
+      
     };
   },
   mounted() {
     this.init();
   },
   methods: {
-    init(){
+    init() {
       this.reset();
     },
     isMenuActive(link) {
@@ -132,34 +226,41 @@ export default {
         ? "menu-active"
         : "";
     },
-    switchAdminCollape(){
+    switchAdminCollape() {
       this.$store.dispatch("global/switchAdminCollape");
     },
     addItem(menuItem) {
-      var newArr = this.Utils.mergeJsonArray(this.menuDataOrg, { 0:menuItem });
+      var newArr = this.Utils.mergeJsonArray(this.menuDataOrg, { 0: menuItem });
       this.menuData = newArr;
     },
-    reset(){
+    reset() {
       var newArr = this.Utils.mergeJsonArray(this.menuDataOrg, {});
       this.menuData = newArr;
     },
     getMenuRealUrl(link) {
       return this.NET.URL_PREFIX + link;
     },
-    gotToWriteArchive(){
-      location.href = this.getMenuRealUrl('/admin/write-archive/')
+    gotToWriteArchive() {
+      location.href = this.getMenuRealUrl("/admin/write-archive/");
     },
     initLoginInfo(authInfo) {
-      if(authInfo){
+      if (authInfo) {
         this.currentAuthed = true;
-        if(authInfo.friendlyName) this.currentUserName = authInfo.friendlyName;
+        if (authInfo.friendlyName) this.currentUserName = authInfo.friendlyName;
         else this.currentUserName = authInfo.name;
-        if(authInfo.headimg) this.currentUserHead = this.Utils.getImageUrlFormHash(authInfo.headimg);
-        else this.currentUserHead = require("../../assets/images/default/head-default.png");
-        if(authInfo.level==this.ServerConsts.UserLevels.admin) this.currentUserLevel = 'admin';
-        else if(authInfo.level==this.ServerConsts.UserLevels.writer) this.currentUserLevel = 'writer';
-        else if(authInfo.level==this.ServerConsts.UserLevels.guest) this.currentUserLevel = 'guest';
-      }else this.currentAuthed = false;
+        if (authInfo.headimg)
+          this.currentUserHead = this.Utils.getImageUrlFormHash(
+            authInfo.headimg
+          );
+        else
+          this.currentUserHead = require("../../assets/images/default/head-default.png");
+        if (authInfo.level == this.ServerConsts.UserLevels.admin)
+          this.currentUserLevel = "admin";
+        else if (authInfo.level == this.ServerConsts.UserLevels.writer)
+          this.currentUserLevel = "writer";
+        else if (authInfo.level == this.ServerConsts.UserLevels.guest)
+          this.currentUserLevel = "guest";
+      } else this.currentAuthed = false;
     },
     authInfoInited() {
       this.initLoginInfo(this.$store.getters["auth/authInfo"]);

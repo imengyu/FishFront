@@ -896,8 +896,9 @@
             
             @include size(15px, 15px);
 
-            background-size: 15px 15px;
+            background-size: 12px 12px;
             background-repeat: no-repeat;
+            background-position: center center;
             background-image: url(../images/icon/ico-close.svg)
         }
     }
@@ -992,7 +993,7 @@
                 &:before {
                     width: 36px;
                     height: 36px;
-                    left: 0px;
+                    left: 10px;
                 }
             }
             .modal-wrap {
@@ -1099,7 +1100,18 @@
     }
 }
 
+.sweetalert-content-box {
+    
+    font-size:14px;
+    text-align: left;
+    padding: 25px;
+    background-color: #f7f7f7;
+    border-radius: .3125em;
 
+    b {
+        font-weight: bold;
+    }
+}
 
 
 //

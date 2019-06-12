@@ -47,7 +47,7 @@
         <el-form-item>
           <br />
           <el-button type="primary" @click="submit()">保存修改</el-button>
-          <el-button @click="jump('/user/center/change-passwd/')">修改密码</el-button>
+          <el-button @click="jump('/user/center/change-password/')">修改密码</el-button>
         </el-form-item>
       </el-form>
     </el-main>
@@ -110,22 +110,22 @@ export default {
         html +=
           '<div class="tag-mgr-item bg-dark text-white cursor-pointer pt-0 pb-0 mt-0 pr-3">管理员拥有所有权限</div>';
       } else {
-        if (getUserHasPrivilege(user, serverConsts.UserPrivileges.manageAllArchives))
+        if (this.Utils.getUserHasPrivilege(user, serverConsts.UserPrivileges.manageAllArchives))
           html +=
             '<div class="tag-mgr-item bg-danger text-white cursor-pointer pt-0 pb-0 mt-0 pr-3">管理所有文章权限</div>';
-        if (getUserHasPrivilege(user, serverConsts.UserPrivileges.manageClassAndTags))
+        if (this.Utils.getUserHasPrivilege(user, serverConsts.UserPrivileges.manageClassAndTags))
           html +=
             '<div class="tag-mgr-item bg-primary text-white cursor-pointer pt-0 pb-0 mt-0 pr-3">管理分类标签权限</div>';
-        if (getUserHasPrivilege(user, serverConsts.UserPrivileges.manageMediaCenter))
+        if (this.Utils.getUserHasPrivilege(user, serverConsts.UserPrivileges.manageMediaCenter))
           html +=
             '<div class="tag-mgr-item bg-info text-white cursor-pointer pt-0 pb-0 mt-0 pr-3">管理媒体库权限</div>';
-        if (getUserHasPrivilege(user, serverConsts.UserPrivileges.manageUsers))
+        if (this.Utils.getUserHasPrivilege(user, serverConsts.UserPrivileges.manageUsers))
           html +=
             '<div class="tag-mgr-item bg-dark text-white cursor-pointer pt-0 pb-0 mt-0 pr-3">管理其他用户权限</div>';
-        if (getUserHasPrivilege(user, serverConsts.UserPrivileges.gaintPrivilege))
+        if (this.Utils.getUserHasPrivilege(user, serverConsts.UserPrivileges.gaintPrivilege))
           html +=
             '<div class="tag-mgr-item bg-primary text-white cursor-pointer pt-0 pb-0 mt-0 pr-3">授予用户权限权限</div>';
-        if (getUserHasPrivilege(user, serverConsts.UserPrivileges.globalSettings))
+        if (this.Utils.getUserHasPrivilege(user, serverConsts.UserPrivileges.globalSettings))
           html +=
             '<div class="tag-mgr-item bg-warning text-white cursor-pointer pt-0 pb-0 mt-0 pr-3">修改系统设置权限</div>';
       }
@@ -146,9 +146,10 @@ export default {
     uploadFile() {
       var avatar = document.getElementById("avatar");
       var fileObj = avatar.files[0]; // js 获取文件对象
-      var url = this.NET.API_URL + "/user/" + main.currentUser.id + "/head";
+      var url = this.NET.API_URL + "/user/" + this.currentUser.id + "/head";
       var main = this;
       var t = toast.toast("正在上传...", "loading", -1);
+      var xhr;
 
       //上传成功响应
       var uploadComplete = function(evt) {
@@ -157,10 +158,10 @@ export default {
         var data = JSON.parse(evt.target.responseText);
         if (data.success) {
           //设置 新返回的 图片 hash 值
-          main.currentUser.headimg = data.data;
+          this.currentUser.headimg = data.data;
           toast.toast("更换头像成功", "success", 5000);
         } else
-          toast.toast("上传头像失败！" + data.message + " ( " + data.extendCode + " )", "error",5000);
+          toast.toast("上传头像失败！" + data.message + " ( " + data.extendCode + " )", "error", 8000);
       };
       //上传失败
       var uploadFailed = function uploadFailed(evt) {
@@ -172,6 +173,7 @@ export default {
       form.append("file", fileObj); // 文件对象
 
       xhr = new XMLHttpRequest(); // XMLHttpRequest 对象
+      xhr.withCredentials = true;
       xhr.open("post", url, true); //post方式，url为服务器请求地址，true 该参数规定请求是否异步处理。
       xhr.onload = uploadComplete; //请求完成
       xhr.onerror = uploadFailed; //请求失

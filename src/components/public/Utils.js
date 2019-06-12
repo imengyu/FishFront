@@ -25,6 +25,7 @@ export default
     getCurrentFullHost,
     getPostPrefix,
     getPostStatusString,
+    getUserHasPrivilege,
   }
 
 // 对象操作
@@ -230,6 +231,10 @@ function getPostStatusString(statusString) {
     case serverConsts.ArchiveStatus.DRAFT: return '文章草稿';
   }
   return '';
+}
+function getUserHasPrivilege(userData, privilege){
+  if(!userData) return false;
+  return (userData.privilege & privilege) != 0;
 }
 
 // Cookie 操作

@@ -65,7 +65,7 @@
                   >
                   <div class="invalid-feedback text-left">{{ invalidText2 }}</div>
                   <div class="mt-2 logon-act">
-                    <a :href="getJumpRealUrl('/user/center/rec-passwd/')" class="logon-link float-left">忘记密码？</a>
+                    <a :href="getJumpRealUrl('/user/center/rec-password/')" class="logon-link float-left">忘记密码？</a>
                     <a :href="getJumpRealUrl('/sign-up/')" target="_blank" class="logon-link float-right">注册会员</a>
                   </div>
                 </div>
@@ -167,7 +167,8 @@ export default {
 			    case 'BadRequest': this.$swal('错误的登录请求', '请检查登录请求是否正确', 'error'); break;
 			    case 'SessionOut': this.$swal('您的登录信息已过期', '为了保证安全，您需要重新登录', 'warning'); break;
 			    case 'RequestLogin': this.$swal('请登录', '您需要登录才能访问该页面', 'warning'); break;
-			    case 'RequestMorPrivilege': this.$swal('请切换账号', '您当前没有权限进入控制台，请切换至更高级的账号', 'warning'); break;
+          case 'RequestMorPrivilege': this.$swal('请切换账号', '您当前没有权限进入控制台，请切换至更高级的账号', 'warning'); break;
+          case 'ChangePasswordNeedSignIn': this.$swal('请先登录', '修改密码需要登录，如果您忘记了密码，请选择”找回密码“。', 'warning'); break;
 		    }
 	    }
     },
@@ -557,7 +558,7 @@ export default {
     margin-top: 65px;
   }
   .logon-content {
-    top: 0;
+    top: 66px;
   }
   .logon-border {
     margin-top: 0;

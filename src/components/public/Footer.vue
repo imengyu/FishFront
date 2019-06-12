@@ -51,11 +51,9 @@
       </ul>
       <ul class="copyright copyright-line">
         <li>
-          <a
-            href="#"
-            target="_blank"
-            class="badge badge-pill badge-dark"
-          >推荐使用 Microsoft Edge 或 Chrome 浏览器浏览本页面</a>
+          <a href="javascript:void(0)" target="_blank" class="badge badge-pill badge-dark" @click="compatibilityDialogShow=true">
+            推荐使用 Microsoft Edge 或 Chrome 浏览器浏览本页面
+          </a>
         </li>
       </ul>
       <ul class="copyright">
@@ -75,7 +73,16 @@
         </li>
       </ul>
     </div>
-    <a href="javascript:;" @click="backToTop()" :class="'go-top' + (backToTopShow ? ' show' : '')" data-original-title="返回顶部" title="返回顶部"><i class="fa fa-angle-up"></i></a>
+    <el-tooltip class="item" effect="dark" content="返回顶部" placement="left">
+      <a href="javascript:;" @click="backToTop()" :class="'go-top' + (backToTopShow ? ' show' : '')" title="返回顶部"><i class="fa fa-angle-up"></i></a>
+    </el-tooltip>
+    <el-dialog title="浏览器兼容性说明" :visible.sync="compatibilityDialogShow" class="dialog-auto-width">
+      <span>我们网站的 CSS 和 JS 是基于最新的现代浏览器设计的。因此我们无法保证网页在低版本浏览器上能够正常显示运行，我们建议您升级到浏览器最新版本，以获得最佳的阅读体验。</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="compatibilityDialogShow = false">确 定</el-button>
+      </span>
+    </el-dialog>
+
   </footer>
 </template>
 
@@ -88,6 +95,7 @@ export default {
   data() {
     return {
       backToTopShow: false,
+      compatibilityDialogShow: false,
     };
   },
   computed: mapState({
@@ -103,11 +111,20 @@ export default {
     watchScroll () {
         var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
         this.backToTopShow = (scrollTop > 200)
-     }
+    }
 
   }
 };
 </script>
 
-<style scoped>
+<style>
+  .dialog-auto-width .el-dialog{
+    width: 40%;
+  }
+  @media (max-width: 425px){
+    .dialog-auto-width .el-dialog{
+      width: 90%;
+    }
+    
+  }
 </style>

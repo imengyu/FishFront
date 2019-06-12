@@ -6,7 +6,7 @@
         <el-breadcrumb-item>分类和标签</el-breadcrumb-item>
       </el-breadcrumb>
     </el-header>
-    <el-main class="better-scroll-white" style="padding:0 36px">
+    <el-main v-if="currentUserHasPrivilege" class="better-scroll-white" style="padding:0 36px">
       <el-tabs v-model="currentTab" @tab-click="handleTabClick">
         <el-tab-pane label="标签管理" name="tags">
           <div class="tags" v-if="contentTags && !tagsLoading">
@@ -147,6 +147,18 @@
         </span>
       </el-dialog>
     </el-main>
+    <el-main v-else>
+      <div class="container" style="height:450px">
+        <div class="box full text-center text-danger d-flex justify-content-center align-items-center flex-column">
+          <i class="fa fa-times-circle-o" aria-hidden="true" style="font-size: 3.5em"></i>
+          <p class="text-secondary mt-2">
+            <span class="h4">您当前无权访问此页面</span>
+            <br>您必须拥有 <span class="text-primary">管理分类和标签</span> 权限，才能查看此页面。
+          </p>
+          <el-button type="primary" round @click="jump('/admin/')">返回主页</el-button>
+        </div>
+      </div>
+    </el-main>
   </el-container>
 </template>
 
@@ -189,6 +201,7 @@ export default {
 
       currentUser: null,
       currentUserIsAdmin: false,
+      currentUserHasPrivilege: false,
 
       currentTab: "tags",
 
@@ -252,10 +265,13 @@ export default {
     getJumpRealUrl(link) {
       return this.NET.URL_PREFIX + link;
     },
-    authInfoInited() {
-      this.currentUser = this.$store.getters["auth/authInfo"];
-      if(this.currentUser) this.currentUserIsAdmin = this.currentUser.level == serverConsts.UserLevels.admin;
-      this.loadTags();
+    authInfoInited(authed) {
+      if(authed){ 
+        this.currentUser = this.$store.getters["auth/authInfo"];
+        if(this.currentUser) this.currentUserIsAdmin = this.currentUser.level == serverConsts.UserLevels.admin;
+        this.currentUserHasPrivilege = this.Utils.getUserHasPrivilege(this.currentUser, serverConsts.UserPrivileges.manageClassAndTags);
+        this.loadTags();
+      }
     },
 
     //Events

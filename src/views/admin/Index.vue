@@ -113,8 +113,8 @@ export default {
     getJumpRealUrl(link) {
       return this.NET.URL_PREFIX + link;
     },
-    authInfoInited() {
-      this.loadStatSimple();
+    authInfoInited(authed) {
+      if(authed) this.loadStatSimple();
     },
     loadStatSimple() {
       var main = this;

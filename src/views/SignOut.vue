@@ -15,7 +15,6 @@
 </template>
 
 <script>
-import jQuery from 'jquery'
 
 export default {
   name: "SignOut",
@@ -54,10 +53,10 @@ export default {
     jumpBack(){
       location.href = decodeURIComponent(this.logoutLastPage);
     },
-    authInfoInited(){
+    authInfoInited(authed){
       if(this.logoutFinish)
         return;
-      if (this.$store.getters["auth/authed"]) {
+      if (authed) {
         this.signOut();
         this.logoutFinish = true;
       }else{
@@ -67,30 +66,22 @@ export default {
       }
     },
     signOut(){
-        var main = this;
-        jQuery.ajax({
-            type: 'get',
-            url: main.NET.API_URL + "/auth/auth-end",
-            crossDomain: true,
-            xhrFields: { withCredentials: true },
-            success: function (rep) {
-                main.authInfo = rep.data;
-                if(rep.success){
-                    if(rep.data && rep.data.authTokenName)
-                        main.Utils.delCookie(rep.data.authTokenName);
-                }
-
-                main.logoutInfo = '退出登录成功';
-                main.logoutDetails = '您的账号已经安全退出';
-                main.logoutFinish = true;
-                main.$parent.publicHeaderReset();
-            },
-            error: function(jqXHR, errMsg) {
-                main.logoutFinish = false;
-                main.logoutInfo = '退出登录失败';
-                main.$swal("退出登录失败", "请求失败 : " + errMsg, "error");
-            }
-        })
+      this.axios.get(this.NET.API_URL + "/auth/auth-end").then((response) => {
+        if(response.data.success){
+          this.logoutInfo = '退出登录成功';
+          this.logoutDetails = '您的账号已经安全退出';
+          this.logoutFinish = true;
+          this.authInfo = null;        
+          if(response.data.data && response.data.data.authTokenName)
+            this.Utils.delCookie(response.data.data.authTokenName);
+          this.$store.dispatch("auth/setAuthed", false);
+          this.$store.dispatch("auth/setAuthInfo", null);
+        }
+      }).catch(response => {
+        this.logoutFinish = false;
+        this.logoutInfo = '退出登录失败';
+        this.$swal("退出登录失败", "错误信息：" + response, "error"); 
+      });
     },
     getJumpRealUrl(link){
       return this.NET.URL_PREFIX + link;

@@ -61,7 +61,8 @@
     }
 }
 #header-minimum {
-    height: 60px;
+	height: 60px;
+	min-height: 60px;
     
     .main-menu {
         background-color: rgba(90,90,90,0.9);

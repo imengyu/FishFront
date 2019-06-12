@@ -26,7 +26,6 @@ import Header from './components/public/Header'
 import Footer from './components/public/Footer'
 import AdminSideArea from './views/admin/SideArea'
 import serverConsts from './constants/serverConsts.js'
-import jQuery from 'jquery'
 import { mapState } from 'vuex';
 
 export default {
@@ -81,15 +80,15 @@ export default {
       init: function(){
         this.rePage(this.$route);
       },
-      sendLoginfoInited(){
+      sendLoginfoInited(authed){
         this.authInfoSended = true;
         for(var i = 0;i<this.$children.length;i++){
           if(typeof this.$children[i].authInfoInited != 'undefined')
-            this.$children[i].authInfoInited();
+            this.$children[i].authInfoInited(authed);
         }
         if(this.$refs.View){
           if(typeof this.$refs.View.authInfoInited != 'undefined')
-            this.$refs.View.authInfoInited();
+            this.$refs.View.authInfoInited(authed);
         }
 
       },
@@ -97,28 +96,32 @@ export default {
       initLoginInfo: function(notsend){
         var main = this;
         if(main.$store.getters["auth/authed"]) {
-          main.sendLoginfoInited();
+          main.sendLoginfoInited(true);
           return;
         }
         //请求服务器是否登录
         this.axios.get(main.NET.API_URL + "/auth/auth-test").then((response)=>{
+
           if(response.data.success){
             main.$store.dispatch("auth/setAuthInfo", response.data.data);
             main.$store.dispatch("auth/setAuthed", true);
             main.publicHeaderReset();
+            if(!notsend) main.sendLoginfoInited(true);
           }else{
             main.$store.dispatch("auth/setAuthed", false);
             main.$store.dispatch("auth/setAuthInfo", null);
             main.publicHeaderReset();
             if(main.$store.getters["global/adminPanel"])
               main.redirectToLogin(response.data.data.authCode);
+            else if(!notsend) main.sendLoginfoInited(false);
           }
-          if(!notsend) main.sendLoginfoInited();
+          
         }).catch((response)=>{
           main.$store.dispatch("auth/setAuthed", false);
           main.$store.dispatch("auth/setAuthInfo", null);
           main.publicHeaderReset();
-          if(!notsend) main.sendLoginfoInited();
+          console.log(response);
+          if(!notsend) main.sendLoginfoInited(false);
         })
       },
       //重定向到登录页面使用户登录
@@ -133,6 +136,7 @@ export default {
         if(errCode == authCode.FAIL_BAD_TOKEN || errCode == authCode.FAIL_BAD_IP) err='BadRequest';
         else if(errCode == authCode.FAIL_EXPIRED) err='SessionOut';
         else if(errCode == authCode.FAIL_NOT_LOGIN) err='RequestLogin';
+        else err='UnknowErr';
         this.Utils.jump('/sign-in/?error=' + err + '&redirect_url=' + encodeURIComponent(location.href));
       },
   }

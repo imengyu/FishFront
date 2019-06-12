@@ -3,7 +3,7 @@
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-12 col-sm-12 blog-list-col">
-          <div class="tags mt-4 pt-2 pb-2" v-if="blogTagList">
+          <div class="tags mt-4 p-2" v-if="blogTagList">
               <a v-for="(tag, index) in blogTagList" :key="index" class="tag-color tag-big"
                 v-on:click="switchTag(tag.id)" href="javascript:void(0);"
                   :id="'tag_'+tag.id"

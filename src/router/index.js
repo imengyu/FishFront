@@ -34,6 +34,9 @@ import AdminManageClassfication from '@/views/admin/ManageClassfication'
 import AdminWriteArchive from '@/views/admin/WriteArchive'
 import AdminUserCenter from '@/views/admin/UserCenter'
 import AdminManageUsers from '@/views/admin/ManageUsers'
+import AdminNewUser from '@/views/admin/NewUser'
+
+import UserCenterChangePassword from '@/views/user/ChangePassword'
 
 
 export default new Router({
@@ -186,8 +189,35 @@ export default new Router({
         index: 4,
       }
     },
-    
-    
+    {
+      path: '/admin/new-user/',
+      name: 'AdminNewUser',
+      component: AdminNewUser,
+      meta: {
+        title: '新建作者账号',
+        index: 4,
+      }
+    },
+
+    //User center
+    {
+      path: '/user/center/change-password/',
+      name: 'UserCenterChangePassword',
+      component: UserCenterChangePassword,
+      meta: {
+        title: '修改密码',
+        index: 4,
+      }
+    },
+    {
+      path: '/user/center/rec-password/',
+      name: 'UserCenterChangePassword',
+      component: UserCenterChangePassword,
+      meta: {
+        title: '找回密码',
+        index: 4,
+      }
+    },
 
     // 404page
     {

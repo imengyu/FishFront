@@ -29,6 +29,14 @@ export default {
         gaintPrivilege: 0x10,
         globalSettings: 0x20,
     },
+    UserPrivilegesName: {
+        manageAllArchives: '管理所有用户的文章',
+        manageClassAndTags: '管理分类和标签',
+        manageMediaCenter: '管理全局媒体库',
+        manageUsers: '管理其他用户',
+        gaintPrivilege: '可分配权限给其他用户',
+        globalSettings: '修改全局设置',
+    },
     ArchiveStatus: {
         PUBLISH: 1,
         PRIVATE: 0,
