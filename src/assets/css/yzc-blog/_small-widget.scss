@@ -674,24 +674,32 @@
         right: 0;
         bottom: 0;
         z-index: 2000;
+        height: auto!important;
         background-color: #fff;
     }
 
     .fish-editor-toolbar {
 
-        width: 100%;
-        min-height: 37px;
+        height: 37px;
         background: #fff;
-        position: relative;
+        position: absolute;
         display: block;
+        left: 0;
+        top: 0;
+        right: 0;
+        overflow: hidden;
+        
         border-bottom: 1px solid #ddd;
 
+        
         .fish-editor-menu {
 
             padding: 0 8px;
             min-height: 35px;
             margin-bottom: 0;
+            overflow-x: scroll;
 
+            @include pc-fix-scrollbar-white();
             @include prefix(user-select, none, webkit moz ms);
 
             > li{
@@ -700,7 +708,7 @@
                 display: inline-block;
                 position: relative;
 
-                + li > a {  margin-left: 3px; }
+                + li > a {  margin-left: 2px; }
 
                 > a {
                     outline: 0;
@@ -735,8 +743,11 @@
 
     .fish-editor-area{
 
-        position: relative;
-        min-height: 500px;
+        position: absolute;
+        left: 0;
+        top: 38px;
+        right: 0;
+        bottom: 0;
 
         .fish-editor-preview-area{
             padding: 15px;
@@ -847,7 +858,7 @@
     top: 0;
     left: 0;
     right: 0;
-    z-index: 2001;
+    z-index: 5001;
 
     .toast-alert {
 
@@ -1102,6 +1113,7 @@
 
 .sweetalert-content-box {
     
+    margin-top: 10px;
     font-size:14px;
     text-align: left;
     padding: 25px;

@@ -106,7 +106,7 @@
       <el-dialog
         :title="(currentEditingTag && currentEditingTag.new) ? '添加标签' : '编辑标签'"
         :visible.sync="editingTag"
-        width="30%">
+        class="dialog-auto-width-30">
         <el-form ref="fromTag" v-if="currentEditingTag" :model="currentEditingTag" label-position="right" :rules="editingTagRules" label-width="80px">
           <el-form-item label="标签名称" prop="name">
             <el-input v-model="currentEditingTag.name" placeholder=""></el-input>
@@ -126,8 +126,8 @@
       <el-dialog
         :title="(currentEditingClass && currentEditingClass.new) ? '添加分类' : '编辑分类'"
         :visible.sync="editingClass"
-        width="50%">
-        <el-form ref="fromClass" v-if="currentEditingClass" :model="currentEditingClass" label-position="right" :rules="editingClassRules" label-width="140px">
+        class="dialog-auto-width-50">
+        <el-form ref="fromClass" v-if="currentEditingClass" :model="currentEditingClass" label-position="right" :rules="editingClassRules" label-width="120px">
           <el-form-item label="分类名称" prop="title" >
             <el-input v-model="currentEditingClass.title"></el-input>
           </el-form-item>
@@ -297,10 +297,10 @@ export default {
         type: "warning",
         title: "您真的要删除这个分类吗?",
         html:
-          "<h5>注意，此操作不能恢复！</h5><b>标题：</b>" +
+          "<h5>注意，此操作不能恢复！</h5><div class='sweetalert-content-box'><b>标题：</b>" +
           category.title +
           "<br /><b>ID：</b>" +
-          category.id,
+          category.id + "</div>",
         confirmButtonColor: "#d33",
         confirmButtonText: "确定删除",
         showCancelButton: true,
@@ -351,7 +351,7 @@ export default {
       this.$swal({
         type: "warning",
         title: "您真的要删除这个标签吗?",
-        html: "<h5>注意，此操作不能恢复！</h5><b>ID：</b>" + tagid,
+        html: "<h5>注意，此操作不能恢复！</h5><div class='sweetalert-content-box'><b>ID：</b>" + tagid + "</div>",
         confirmButtonColor: "#d33",
         confirmButtonText: "确定删除",
         showCancelButton: true,
@@ -512,3 +512,18 @@ export default {
   }
 };
 </script>
+
+<style>
+.dialog-auto-width-30 .el-dialog {
+  width: 30%;
+}
+.dialog-auto-width-50 .el-dialog {
+  width: 50%;
+}
+@media (max-width: 425px) {
+  .dialog-auto-width-50 .el-dialog,
+  .dialog-auto-width-30 .el-dialog {
+    width: 90%;
+  }
+}
+</style>

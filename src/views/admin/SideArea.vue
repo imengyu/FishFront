@@ -1,6 +1,7 @@
 <template>
-  <el-aside :width="isAdminCollape ? '65px' : '300px'" style="background-color: rgb(238, 241, 246)" class="better-scroll-white">
-    <el-menu :default-active="getDefaultPath()" :collapse="isAdminCollape" :unique-opened="true" :router="true"> 
+  <el-aside :width="(isAdminCollape&&!isSideFloated) ? '65px' : '300px'" style="background-color: rgb(238, 241, 246)" 
+    :class="'better-scroll-white el-aside-fix' + (isAdminCollape ? ' collape' : '')">
+    <el-menu :default-active="getDefaultPath()" :collapse="isAdminCollape&&!isSideFloated" :unique-opened="true" :router="true"> 
       <el-menu-item index="/admin/"><i class="el-icon-data-analysis"></i><span slot="title">仪表盘</span></el-menu-item>
       <el-submenu index="archives">
         <template slot="title"><i class="el-icon-notebook-2"></i><span slot="title">文章管理</span></template>
@@ -36,11 +37,16 @@ export default {
   },
   computed: mapState({  
     isAdminCollape: state => state.global.globalAdminCollape,
+    isSideFloated: function(){
+      return document.body.clientWidth < 768;
+    },
   }),
   methods: {
     init: function() {
       this.$store.dispatch("global/resetHeader");
       this.$store.dispatch("global/setAdminPanel", true);
+      if(document.body.clientWidth < 768)
+        this.$store.dispatch("global/setAdminCollape", true);
     },
     jump(link) {
       location.href = this.getJumpRealUrl(link);
@@ -54,3 +60,27 @@ export default {
   }
 };
 </script>
+
+<style>
+/*扩展 el-aside 在移动端*/
+.el-aside-fix {
+
+}
+
+@media (max-width: 768px) {
+  .el-aside-fix {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 90%;
+    transition: left ease-in-out .8s;
+    background-color: #fff;
+    z-index: 3100;
+  }
+  .el-aside-fix.collape {
+    left: calc(-90%);
+  }
+}
+
+</style>

@@ -50,7 +50,7 @@
       </div>
       <div class="box p-4 mt-5">
         <el-row>
-          <el-col :span="12">
+          <el-col :sm="24" :lg="12">
             <h5>TOP 10 浏览文章</h5>
             <el-table :data="topTenArchives" style="width: 100%">
               <el-table-column prop="title" label="名称"></el-table-column>
@@ -63,7 +63,7 @@
               </el-table-column>
             </el-table>
           </el-col>
-          <el-col :span="12">
+          <el-col :sm="24" :lg="12">
             <h5>今日 TOP 10 访问页面</h5>
             <el-table :data="topTenPage" style="width: 100%">
               <el-table-column prop="url" label="URL"></el-table-column>

@@ -10,8 +10,12 @@ import 'element-ui/lib/theme-chalk/index.css';
 import store from './store'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import mavonEditor from 'mavon-editor'
 
-Vue.use(VueAxios,axios);
+import 'mavon-editor/dist/css/index.css'
+
+Vue.use(mavonEditor)
+Vue.use(VueAxios, axios);
 Vue.use(ElementUI);
 Vue.use(VueSweetalert2, options)
 

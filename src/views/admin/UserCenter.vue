@@ -8,7 +8,7 @@
       </el-breadcrumb>
     </el-header>
     <el-main class="better-scroll-white" style="padding:30px 56px 30px 36px">
-      <el-form v-if="currentUser" label-position="right" label-width="200px" size="medium" :model="currentUser">
+      <el-form v-if="currentUser" :label-position="isMobileView ? 'top' : 'right'" label-width="200px" size="medium" :model="currentUser">
         <el-form-item>
           <div class="btn-inline text-center">
             <img style="width:80px;height:80px;border-radius:50%;padding:10px" :src="getUserHead()">
@@ -68,6 +68,11 @@ export default {
   },
   mounted() {
     this.init();
+  },
+  computed: {
+    isMobileView: function(){
+      return document.body.clientWidth < 768;
+    },
   },
   methods: {
     init: function() {
@@ -183,8 +188,10 @@ export default {
     },
     //Submit
     submit() {
-      this.currentStartValid = true;
-      if (this.Utils.isNullOrEmpty(this.currentUser.friendlyName)) return;
+      if (this.Utils.isNullOrEmpty(this.currentUser.friendlyName)){
+        toast.toast("您必须填写您的用户名字", "error", 5000);
+        return;
+      }
 
       var t = toast.toast("正在提交中...", "loading", -1);
       this.axios.put(this.NET.API_URL + "/user/" + this.currentUser.id, this.currentUser).then(response => {

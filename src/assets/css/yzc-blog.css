@@ -902,15 +902,20 @@ input[type="text"].flat, input[type="password"].flat, input[type="email"].flat, 
 /* Fish editor */
 .fish-editor { position: relative; min-height: 37px; border: 1px solid #ddd; }
 
-.fish-editor.fullscreen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 2000; background-color: #fff; }
+.fish-editor.fullscreen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 2000; height: auto !important; background-color: #fff; }
 
-.fish-editor .fish-editor-toolbar { width: 100%; min-height: 37px; background: #fff; position: relative; display: block; border-bottom: 1px solid #ddd; }
+.fish-editor .fish-editor-toolbar { height: 37px; background: #fff; position: absolute; display: block; left: 0; top: 0; right: 0; overflow: hidden; border-bottom: 1px solid #ddd; }
 
-.fish-editor .fish-editor-toolbar .fish-editor-menu { padding: 0 8px; min-height: 35px; margin-bottom: 0; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; }
+.fish-editor .fish-editor-toolbar .fish-editor-menu { padding: 0 8px; min-height: 35px; margin-bottom: 0; overflow-x: scroll; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; }
+
+@media (min-width: 768px) { .fish-editor .fish-editor-toolbar .fish-editor-menu::-webkit-scrollbar { width: 5px; height: 5px; }
+  .fish-editor .fish-editor-toolbar .fish-editor-menu::-webkit-scrollbar-thumb { background: #909090; opacity: .7; border-radius: 3px; }
+  .fish-editor .fish-editor-toolbar .fish-editor-menu::-webkit-scrollbar-thumb:hover { background: #707070; }
+  .fish-editor .fish-editor-toolbar .fish-editor-menu::-webkit-scrollbar-track { background: transparent; } }
 
 .fish-editor .fish-editor-toolbar .fish-editor-menu > li { margin: 0; padding: 5px 0px; display: inline-block; position: relative; }
 
-.fish-editor .fish-editor-toolbar .fish-editor-menu > li + li > a { margin-left: 3px; }
+.fish-editor .fish-editor-toolbar .fish-editor-menu > li + li > a { margin-left: 2px; }
 
 .fish-editor .fish-editor-toolbar .fish-editor-menu > li > a { outline: 0; color: #666; display: inline-block; min-width: 24px; font-size: 16px; text-decoration: none; text-align: center; border-radius: 2px; -webkit-border-radius: 2px; -moz-border-radius: 2px; -ms-border-radius: 2px; transition: all 300ms ease-out; -webkit-transition: all 300ms ease-out; -moz-transition: all 300ms ease-out; -ms-transition: all 300ms ease-out; border-radius: 2px; border: 1px solid #fff; }
 
@@ -918,7 +923,7 @@ input[type="text"].flat, input[type="password"].flat, input[type="email"].flat, 
 
 .fish-editor .fish-editor-toolbar .fish-editor-menu > li > a > .fa { text-align: center; display: block; }
 
-.fish-editor .fish-editor-area { position: relative; min-height: 500px; }
+.fish-editor .fish-editor-area { position: absolute; left: 0; top: 38px; right: 0; bottom: 0; }
 
 .fish-editor .fish-editor-area .fish-editor-preview-area { padding: 15px; width: 50%; position: absolute; left: 50%; top: 0; right: 0; bottom: 0; overflow: scroll; border-left: 1px solid #ddd; }
 
@@ -966,7 +971,7 @@ input[type="text"].flat, input[type="password"].flat, input[type="email"].flat, 
   .fish-editor .fish-editor-area .fish-editor-code-area { width: 100%; height: 50%; top: 0; left: 0; right: 0; bottom: 50%; } }
 
 /*Toast*/
-.toast-overlay-wrapper { position: fixed; top: 0; left: 0; right: 0; z-index: 2001; }
+.toast-overlay-wrapper { position: fixed; top: 0; left: 0; right: 0; z-index: 5001; }
 
 .toast-overlay-wrapper .toast-alert { position: absolute; display: inline-block; transition: all 0.2s; -webkit-transition: all 0.2s; -moz-transition: all 0.2s; animation: swal2-show 0.3s; -webkit-animation: swal2-show 0.3s; max-width: 75%; padding: 12px; background-color: #fff; border-color: #fff; border-radius: 3px; box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12); -webkit-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12); z-index: 2002; border-style: solid; }
 
@@ -1045,7 +1050,7 @@ input[type="text"].flat, input[type="password"].flat, input[type="email"].flat, 
 
 .message-list .message-item a { font-size: 16px; margin-left: 5px; }
 
-.sweetalert-content-box { font-size: 14px; text-align: left; padding: 25px; background-color: #f7f7f7; border-radius: .3125em; }
+.sweetalert-content-box { margin-top: 10px; font-size: 14px; text-align: left; padding: 25px; background-color: #f7f7f7; border-radius: .3125em; }
 
 .sweetalert-content-box b { font-weight: bold; }
 

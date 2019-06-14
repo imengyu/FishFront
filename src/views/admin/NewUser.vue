@@ -8,7 +8,7 @@
       </el-breadcrumb>
     </el-header>
     <el-main v-if="currentUserIsAdmin && !currentAddUserSuccess" class="better-scroll-white" style="padding:30px 56px 30px 36px">
-      <el-form v-if="currentAddUser" ref="fromNewUser" label-position="right" label-width="200px" size="medium" :rules="currentAddUserRules" :model="currentAddUser">
+      <el-form v-if="currentAddUser" ref="fromNewUser" :label-position="isMobileView ? 'top' : 'right'" label-width="200px" size="medium" :rules="currentAddUserRules" :model="currentAddUser">
         <el-form-item>
           <span class="text-secondary">新建一个用户组为 <span class="text-primary">作者</span> 的账号</span>
         </el-form-item>
@@ -68,6 +68,11 @@ import toast from "../../assets/lib/toast/toast.simply.js";
 
 export default {
   name: "NewUser",
+  computed: {
+    isMobileView: function(){
+      return document.body.clientWidth < 768;
+    },
+  },
   data() {
     var validatePass2 = (rule, value, callback) => {
       if (value === '') {

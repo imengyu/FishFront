@@ -398,7 +398,7 @@ export default {
       this.$swal({
         type: "warning",
         title: "您真的要删除这一篇文章吗?",
-        html: "<h5>注意，此操作不能恢复！</h5><b>标题：</b>" + post.title + "<br /><b>ID：</b>" + post.id,
+        html: "<h5>注意，此操作不能恢复！</h5><div class='sweetalert-content-box'><b>标题：</b>" + post.title + "<br /><b>ID：</b>" + post.id + '</div>',
         confirmButtonColor: "#d33",
         confirmButtonText: "确定删除",
         showCancelButton: true,

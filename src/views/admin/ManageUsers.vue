@@ -94,7 +94,7 @@
     <el-dialog
         title="编辑用户信息"
         :visible.sync="editingUser"
-        width="50%">
+        class="dialog-auto-width-50">
         <el-form ref="fromUser" v-if="currentEditingUser" :model="currentEditingUser" label-position="right" :rules="editingUserRules" label-width="80px">
           <el-form-item label="用户名" prop="name" size="mini">
             {{ currentEditingUser.name }}
@@ -440,6 +440,14 @@ export default {
 </script>
 
 <style>
+.dialog-auto-width-50 .el-dialog {
+  width: 50%;
+}
+@media (max-width: 425px) {
+  .dialog-auto-width-50 .el-dialog {
+    width: 90%;
+  }
+}
 .el-form-item.el-form-item.el-form-item--medium {
   margin-bottom: 15px;
 }
