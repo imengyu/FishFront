@@ -60,6 +60,23 @@ input[type="text"].flat, input[type="password"].flat, input[type="email"].flat, 
 	height: 2.5rem;
 }
 
+.form-group.with-input-button{
+    position: relative;
+}
+.input-button {
+    position: absolute;
+    top: 0;
+    right: 30px;
+    opacity: .7;
+    display: inline-block;
+    background: none;
+    border: none;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
 //Logon area
 .logon-content{
     input.flat {

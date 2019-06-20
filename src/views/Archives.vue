@@ -49,7 +49,7 @@
             <div
               v-else-if="blogDataListLoadStatus=='loaded'"
               class="text-center text-secondary no-more"
-            >没有更多文章了</div>
+            >{{ blogDataListEmpty ? '博主真懒，居然一篇文章也没写...(*￣０￣)ノ' : '没有更多文章了'}}</div>
           </div>
         </div>
       </div>
@@ -70,6 +70,7 @@ export default {
       blogDataList: null,
       blogDataListLoadStatus: "",
       blogDataListLoadError: null,
+      blogDataListEmpty: false,
       blogDataListPageSize: 15,
       blogDataListPageCount: 0,
       blogDataListPageCurrent: 0,
@@ -117,54 +118,36 @@ export default {
     authInfoInited() {},
 
     loadArchiveTop(){
-      var main = this;
-      jQuery.ajax({
-        type: "get",
-        url: main.NET.API_URL + "/posts/?maxCount=6&sortBy=date",
-        crossDomain: true,
-        xhrFields: { withCredentials: true },
-        success: function(response) {
-          if (response.success) {
-            main.blogDataListSlider = response.data;
-          }
-        },
+      this.axios.get(this.NET.API_URL + "/posts/?maxCount=6&sortBy=date").then((response) => {
+        if (response.data.success)
+            this.blogDataListSlider = response.data.data;
       });
     },
     loadArchivePage() {
-      var main = this;
+
       if (this.blogDataListLoadStatus == "loading") return;
       this.blogDataListLoadStatus = "loading";
-      jQuery.ajax({
-        type: "get",
-        url:
-          main.NET.API_URL +
+      this.axios.get(this.NET.API_URL +
           "/posts/page/" +
-          main.blogDataListPageCurrent +
-          "/15?sortBy=date",
-        crossDomain: true,
-        xhrFields: { withCredentials: true },
-        success: function(response) {
-          if (response.success) {
-            main.blogDataListPageCount = response.data.totalPages;
-            if (main.blogDataList == null)
-              main.blogDataList = response.data.content;
+          this.blogDataListPageCurrent +
+          "/15?sortBy=date").then((response) => {
+        if (response.data.success){
+            this.blogDataListPageCount = response.data.data.totalPages;
+            this.blogDataListEmpty = response.data.data.empty;
+            if (this.blogDataList == null)
+              this.blogDataList = response.data.data.content;
             else
-              main.blogDataList = main.Utils.mergeJsonArray(
-                main.blogDataList,
-                response.data.content
-              );
-            main.reloadPostStats();
-            main.blogDataListPageCurrent++;
-            main.blogDataListLoadStatus = "loaded";
-          } else {
-            main.blogDataListLoadError = response.message;
-            main.blogDataListLoadStatus = "error";
-          }
-        },
-        error(xhr, err, e) {
-          main.blogDataListLoadError = err;
-          main.blogDataListLoadStatus = "error";
+              this.blogDataList = this.Utils.mergeJsonArray(this.blogDataList,response.data.data.content);
+            this.reloadPostStats();
+            this.blogDataListPageCurrent++;
+            this.blogDataListLoadStatus = "loaded";
+        }else{
+          this.blogDataListLoadError = response.data.message;
+          this.blogDataListLoadStatus = "error";
         }
+      }).catch((err)=>{
+        this.blogDataListLoadError = err;
+        this.blogDataListLoadStatus = "error";
       });
     },
     reloadPostStats: function() {
@@ -190,17 +173,9 @@ export default {
         }
       };
 
-      $.ajax({
-        url: main.NET.API_URL + "/posts/stat",
-        type: "post",
-        data: JSON.stringify(getPosts),
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: function(response) {
-          if (response.success) reloadPostsStat(response.data);
-        },
-        error: function(xhr, err) {}
-      });
+      this.axios.get(main.NET.API_URL + "/posts/stat").then((response)=>{
+        if (response.data.success) reloadPostsStat(response.data.data);
+      })
     }
   }
 };

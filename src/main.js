@@ -11,9 +11,12 @@ import store from './store'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import mavonEditor from 'mavon-editor'
+import VueClipboard from 'vue-clipboard2'
+ 
 
 import 'mavon-editor/dist/css/index.css'
 
+Vue.use(VueClipboard)
 Vue.use(mavonEditor)
 Vue.use(VueAxios, axios);
 Vue.use(ElementUI);

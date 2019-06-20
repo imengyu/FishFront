@@ -44,34 +44,12 @@
               </div>
             </div>
           
-          <div v-else class="container" :style="'height:' + getBestEditorHeight() + 'px'">
-            <div class="box full text-center text-danger d-flex justify-content-center align-items-center flex-column">
-              <i class="fa fa-times-circle-o" aria-hidden="true" style="font-size: 3.5em"></i>
-              <p class="text-secondary mt-2">
-                <span class="h4">加载文章失败</span>
-                <br>{{ currentArchiveLoadError }}
-              </p>
-              <div class="btn-inline">
-                <el-button round @click="jump('/admin/manage-archives/')">返回主页</el-button>&nbsp;
-                <el-button v-if="currentArchiveErrorCanRetry" type="primary" round @click="jump('/admin/')">重试</el-button>
-              </div>
-            </div>
-          </div>
+          
+          
+          <error-page v-else v-bind:error="commentListLoadStatus" v-bind:height="getBestEditorHeight() + 'px'"></error-page>
         </el-tab-pane>
         <el-tab-pane label="评论管理" name="comments">
-          <div v-if="commentListLoadStatus.indexOf('error')==0" class="box">
-            <div class="container" style="height:450px">
-              <div class="box full text-center text-danger d-flex justify-content-center align-items-center flex-column">
-                <i class="fa fa-times-circle-o" aria-hidden="true" style="font-size: 3.5em"></i>
-                <p class="text-secondary mt-2">
-                  <span class="h4">加载失败</span>
-                  <br>
-                  {{ commentListLoadStatus.split(':')[1] }}
-                </p>
-                <el-button type="primary" round @click="loadComments">重试</el-button>
-              </div>
-            </div>
-          </div>
+          <error-page v-if="commentListLoadStatus.indexOf('error')==0" v-bind:error="commentListLoadStatus"></error-page>
           <el-table v-else ref="commentsTable" :data="commentListData" tooltip-effect="dark" style="width: 100%" empty-text="这篇文章还没有评论哦！" @selection-change="handleCommentListSelectionChange">
             <el-table-column type="selection" width="55"></el-table-column>
             <el-table-column label="用户名/IP" width="120">
@@ -114,9 +92,98 @@
             <el-button size="small" type="danger" @click="handleCommentDeleteSelect">删除选中项</el-button>
           </div>
         </el-tab-pane>
-        <el-tab-pane label="媒体库" name="media-center"></el-tab-pane>
+        <el-tab-pane label="媒体库" name="media-center">
+          <!--媒体库标签页-->
+          <el-tabs tabPosition="left" v-model="currentTabMedia" @tab-click="handleTabMediaCenterClick">
+            <el-tab-pane label="图片库" name="image">
+              <error-page v-if="mediaImageLoadStatus.indexOf('error:')==0" v-bind:error="mediaImageLoadStatus" v-bind:height="getBestEditorHeight() + 'px'"></error-page>
+              <image-list v-else ref="mediaImageList" 
+                v-bind:items="mediaImageData" 
+                v-bind:loaded-status="mediaImageLoadStatus"
+                null-text="这里还没有图片，您可以点击下方按钮上传"
+                @item-click="handleMediaImageItemClick"></image-list>
+              <div style="margin-left: 15px;margin-top: 20px">
+                每页显示：<el-pagination
+                  class="btn-inline float-right"
+                  background
+                  layout="prev, pager, next"
+                  :page-count="mediaImagePageCount"
+                  :current-page="mediaImagePageCurrent"
+                  v-on:current-change="handleMediaImageListPage"
+                ></el-pagination>
+                <el-select style="width:90px" v-model="mediaImagePageSize" placeholder="请选择" @change="loadMediaImages(1)" size="small">
+                  <el-option
+                    v-for="item in commentListSizeOpinions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
+                &nbsp;
+                <el-button size="small" type="success" @click="handleMediaImageItemClick('add')"><i class="fa fa-plus mr-2"></i>添加图片</el-button>
+              </div>
+            </el-tab-pane>
+            <el-tab-pane label="视频库" name="video">
+              <error-page v-if="mediaVideoLoadStatus.indexOf('error:')==0" v-bind:error="mediaVideoLoadStatus" v-bind:height="getBestEditorHeight() + 'px'"></error-page>
+              <video-list v-else ref="mediaVideoList" 
+                v-bind:items="mediaVideoData" 
+                v-bind:loaded-status="mediaVideoLoadStatus"
+                null-text="这里还没有视频，您可以点击下方按钮上传"
+                @item-click="handleMediaVideoItemClick"></video-list>
+              <div style="margin-left: 15px;margin-top: 20px">
+                每页显示：<el-pagination
+                  class="btn-inline float-right"
+                  background
+                  layout="prev, pager, next"
+                  :page-count="mediaVideoPageCount"
+                  :current-page="mediaVideoPageCurrent"
+                  v-on:current-change="handleMediaVideoListPage"
+                ></el-pagination>
+                <el-select style="width:90px" v-model="mediaVideoPageSize" placeholder="请选择" @change="loadMediaVideos(1)" size="small">
+                  <el-option
+                    v-for="item in commentListSizeOpinions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
+                &nbsp;
+                <el-button size="small" type="success" @click="handleMediaVideoItemClick('add')"><i class="fa fa-plus mr-2"></i>添加视频</el-button>
+              </div>
+            </el-tab-pane>
+            <el-tab-pane label="附件库" name="files">
+              <error-page v-if="mediaFilesLoadStatus.indexOf('error:')==0" v-bind:error="mediaFilesLoadStatus" v-bind:height="getBestEditorHeight() + 'px'"></error-page>
+              <file-list v-else ref="mediaFilesList" 
+                v-bind:items="mediaFilesData" 
+                v-bind:loaded-status="mediaFilesLoadStatus"
+                null-text="这里还没有附件，您可以点击下方按钮上传"
+                @item-click="handleMediaFilesItemClick"></file-list>
+              <div style="margin-left: 15px;margin-top: 20px">
+                每页显示：<el-pagination
+                  class="btn-inline float-right"
+                  background
+                  layout="prev, pager, next"
+                  :page-count="mediaFilesPageCount"
+                  :current-page="mediaFilesPageCurrent"
+                  v-on:current-change="handleMediaFilesListPage"
+                ></el-pagination>
+                <el-select style="width:90px" v-model="mediaFilesPageSize" placeholder="请选择" @change="loadMediaFiles(1)" size="small">
+                  <el-option
+                    v-for="item in commentListSizeOpinions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
+                &nbsp;
+                <el-button size="small" type="success" @click="handleMediaFilesItemClick('add')"><i class="fa fa-plus mr-2"></i>添加附件</el-button>
+              </div>
+            </el-tab-pane>
+          </el-tabs>      
+        </el-tab-pane>
       </el-tabs>
     </el-main>
+    <!--文章信息对话框-->
     <el-dialog
       title="文章设置"
       :visible.sync="editingBasicObject"
@@ -179,7 +246,44 @@
         <el-button type="primary" @click="editingBasicObject=false">确定</el-button>
       </span>
     </el-dialog>
-  </el-container>
+    <!--上传对话框-->
+    <el-dialog
+      title="上传图片"
+      :visible.sync="mediaImageUploading"
+      class="dialog-auto-width-50">
+      <uploading-list v-bind:items="mediaImageUploadingFileList" accept="image/*" @delete="handleUploadImageCancel" @select-file="handleUploadImage" ref="uploadMediaImages" name="uploadMediaImages"></uploading-list>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="success" @click="handleUploadAddImage" round><i class="fa fa-plus mr-2"></i>添加图片</el-button>
+        <el-button type="primary" @click="handleUploadImageClearFinish" round>清空已完成</el-button>
+        <el-button @click="handleUploadImageClose" round>确定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog
+      title="上传视频"
+      :visible.sync="mediaVideoUploading"
+      class="dialog-auto-width-50">
+      <el-alert title="为了保证上传成功，请不要关闭本页面" type="warning" close-text="知道了"></el-alert>
+      <uploading-list v-bind:items="mediaVideoUploadingFileList" @delete="handleUploadVideoCancel" @select-file="handleUploadVideo" ref="uploadMediaVideos" accept="video/*" name="uploadMediaVideos"></uploading-list>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="success" @click="handleUploadAddVideo" round><i class="fa fa-plus mr-2"></i>添加视频</el-button>
+        <el-button type="primary" @click="handleUploadVideoClearFinish" round>清空已完成</el-button>
+        <el-button @click="handleUploadVideoClose" round>确定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog
+      title="上传附件"
+      :visible.sync="mediaFilesUploading"
+      class="dialog-auto-width-50">
+      <el-alert title="为了保证上传成功，请不要关闭本页面" type="warning" close-text="知道了"></el-alert>
+      <el-alert title="我们不建议在您自己的服务器上存储大文件，因为这是不经济的做法。我们建议您在其他网盘服务商存储大文件，然后在您的文章中粘贴分享链接。" type="info" close-text="好的"></el-alert>
+      <uploading-list v-bind:items="mediaFilesUploadingFileList"  @delete="handleUploadFilesCancel" @select-file="handleUploadFiles" ref="uploadMediaFiles" name="uploadMediaFiles"></uploading-list>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="success" @click="handleUploadAddFiles" round><i class="fa fa-plus mr-2"></i>添加文件</el-button>
+        <el-button type="primary" @click="handleUploadFilesClearFinish" round>清空已完成</el-button>
+        <el-button @click="handleUploadFilesClose" round>确定</el-button>
+      </span>
+    </el-dialog>
+  </el-container> 
 </template>
 
 <script>
@@ -189,6 +293,12 @@ import serverConsts from "../../constants/serverConsts.js";
 import toast from "../../assets/lib/toast/toast.simply.js";
 import base64 from "../../assets/lib/base64/base64.min.js";
 import FishEditor from '../../components/FishEditor'
+import ImageList from '../../components/ImageList'
+import VideoList from '../../components/VideoList'
+import FileList from '../../components/FileList'
+import UploadingList from '../../components/UploadingList'
+import ErrorPage from '../../components/ErrorPage'
+import SparkMD5 from 'spark-md5'
 
 export default {
   name: "WriteArchive",
@@ -199,6 +309,7 @@ export default {
       currentUserCanManageClassfications: false,
 
       currentTab: "write",
+      currentTabMedia: 'image',
 
       currentArchiveLoadError: '',
       currentArchiveErrorCanRetry: false,
@@ -255,6 +366,35 @@ export default {
           label: "50条"
         }
       ],
+
+      mediaImageData: null,
+      mediaImageLoadStatus: 'notload',
+      mediaImagePageSize: 20,
+      mediaImagePageCount: 0,
+      mediaImagePageCurrent: 1,
+
+      mediaVideoData: null,
+      mediaVideoLoadStatus: 'notload',
+      mediaVideoPageSize: 20,
+      mediaVideoPageCount: 0,
+      mediaVideoPageCurrent: 1,
+
+      mediaFilesData: null,
+      mediaFilesLoadStatus: 'notload',
+      mediaFilesPageSize: 20,
+      mediaFilesPageCount: 0,
+      mediaFilesPageCurrent: 1,
+
+      mediaImageUploading: false,
+      mediaImageUploadAnySuccess: false,
+      mediaImageUploadingFileList: [],
+      mediaVideoUploading: false,
+      mediaVideoUploadAnySuccess: false,
+      mediaVideoUploadingFileList: [],
+      mediaFilesUploading: false,
+      mediaFilesUploadAnySuccess: false,
+      mediaFilesUploadingFileList: [],
+
     };
   },
   computed: {
@@ -266,7 +406,12 @@ export default {
     this.init();
   },
   components: {
-    'fish-editor': FishEditor
+    'fish-editor': FishEditor,
+    'image-list': ImageList,
+    'error-page': ErrorPage,
+    'video-list': VideoList,
+    'file-list': FileList,
+    'uploading-list': UploadingList
   },
   methods: {
     init: function() {
@@ -293,11 +438,10 @@ export default {
 
         //Load
         var archive = this.$route.query.archive;
-        if (archive) this.loadPostObject(archive);
-        else this.loadNewPostObject();
+        if (archive) this.loadPostObject(archive, () => { this.loadPartReset(); });
+        else this.loadNewPostObject(() => { this.loadPartReset(); });
         this.loadTags();
         this.loadCategories();
-        this.handleTabClick();
       }
     },
 
@@ -331,6 +475,16 @@ export default {
     handleTabClick(tab) {
       if(this.currentTab == 'comments' && this.commentListLoadStatus == 'notload')
         this.loadComments();
+      else if(this.currentTab == 'media-center')
+        this.handleTabMediaCenterClick(null); 
+    },
+    handleTabMediaCenterClick(tab) {
+      if(this.currentTabMedia == 'image' && this.mediaImageLoadStatus == 'notload')
+        this.loadMediaImages(1); 
+      if(this.currentTabMedia == 'video' && this.mediaVideoLoadStatus == 'notload')
+        this.loadMediaVideos(1); 
+      if(this.currentTabMedia == 'files' && this.mediaFilesLoadStatus == 'notload')
+        this.loadMediaFiles(1); 
     },
     handleArcType(type) {
       this.$swal({
@@ -432,8 +586,234 @@ export default {
       this.commentListSelection = val;
     },
 
+    //Media click
+
+    handleMediaImageItemClick(act, item){
+      if(act=='add'){ this.mediaImageUploading = true; }
+      else if(act=='del'){
+        this.$confirm('此操作将删除该图片，已插入文章的图片将无法显示, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.axios.delete(this.NET.API_URL + '/media/' + item.id).then((response) => {
+            if(response.data.success){
+              toast.toast('删除图片成功！', 'success')
+              this.loadMediaImages();
+            }else{
+              toast.toast('删除图片失败！' + response.data.message, 'error', 5000);
+            }
+          })
+        })
+      }
+    },
+    handleMediaImageListPage(p){ this.loadMediaImages(1); },
+    handleMediaVideoItemClick(act, item){
+      if(act=='add'){ this.mediaVideoUploading = true; }
+      else if(act=='del'){
+        this.$confirm('此操作将删除该视频，已插入文章的视频将无法显示, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.axios.delete(this.NET.API_URL + '/media/' + item.id).then((response) => {
+            if(response.data.success){
+              toast.toast('删除视频成功！', 'success')
+              this.loadMediaVideos();
+            }else{
+              toast.toast('删除视频失败！' + response.data.message, 'error', 5000);
+            }
+          })
+        })
+      }
+    },
+    handleMediaVideoListPage(p){ this.loadMediaVideos(1); },
+    handleMediaFilesItemClick(act, item){
+      if(act=='add'){ this.mediaFilesUploading = true; }
+      else if(act=='del'){
+        this.$confirm('此确定删除此附件?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.axios.delete(this.NET.API_URL + '/media/' + item.id).then((response) => {
+            if(response.data.success){
+              toast.toast('删除附件成功！', 'success')
+              this.loadMediaFiles();
+            }else{
+              toast.toast('删除附件失败！' + response.data.message, 'error', 5000);
+            }
+          })
+        })
+      }
+    },
+    handleMediaFilesListPage(p){ this.loadMediaFiles(1); },
+
+    //Uploader
+
+    //Image
+    handleUploadAddImage(){ this.$refs.uploadMediaImages.selectFiles(); },
+    handleUploadImage(files){
+      var arr = this.mediaImageUploadingFileList,
+        successCallback = this.handleUploadImageSuccess;
+      for(var i=0;i<files.length;i++){
+        var newItem = {
+          file: files[i],
+          media: {
+            postId: this.currentArchiveObject.id,
+            title: files[i].name,
+            resourceType: 'image',
+            hash: '',
+          },
+          text: files[i].name,
+          status: null,
+          percentage: 0,
+          uploading: false,
+          reading: false,
+          successCallback: successCallback,
+        }
+        arr.push(newItem);
+        //计算MD5值
+        this.calcFileMd5(newItem, (hash, item) => { 
+          console.log('file ' + item.text + ' : ' + hash);
+          this.startUpload(item, hash);
+        })
+      }
+    },
+    handleUploadImageSuccess(item){
+      this.mediaImageUploadAnySuccess = true;
+    },
+    handleUploadImageCancel(item){
+      if(item.uploading) this.abortUpload(item);
+      this.mediaImageUploadingFileList.pop(item);
+    },
+    handleUploadImageClearFinish(){
+      var arr = [], oldArr = this.mediaImageUploadingFileList;
+      for (var i=0;i<oldArr.length;i++){
+        if(oldArr[i].status != 'success')
+          arr.push(oldArr[i]);
+      }
+      this.mediaImageUploadingFileList = arr;
+    },
+    handleUploadImageClose(){
+      this.mediaImageUploading = false;
+      if(this.mediaImageUploadAnySuccess){
+        this.mediaImageUploadAnySuccess = false;
+        this.loadMediaImages(1);
+        this.$refs.uploadImageFiles.clearSelectFiles();
+      }
+    },
+    //Video
+    handleUploadAddVideo(){ this.$refs.uploadMediaVideos.selectFiles(); },
+    handleUploadVideo(files){
+      var arr = this.mediaVideoUploadingFileList,
+        successCallback = this.handleUploadVideoSuccess;
+      for(var i=0;i<files.length;i++){
+        var newItem = {
+          file: files[i],
+          media: {
+            postId: this.currentArchiveObject.id,
+            title: files[i].name,
+            resourceType: 'video',
+            hash: '',
+          },
+          text: files[i].name,
+          status: null,
+          percentage: 0,
+          uploading: false,
+          reading: true,
+          successCallback: successCallback,
+        }
+        arr.push(newItem);
+        //计算MD5值
+        this.calcFileMd5(newItem, (hash, item) => { 
+          console.log('file ' + item.text + ' : ' + hash);
+          this.startUpload(item, hash);
+        })
+      }
+    },
+    handleUploadVideoSuccess(item){
+      this.mediaVideoUploadAnySuccess = true;
+    },
+    handleUploadVideoCancel(item){
+      if(item.uploading) this.abortUpload(item);
+      this.mediaVideoUploadingFileList.pop(item);
+    },
+    handleUploadVideoClearFinish(){
+      var arr = [], oldArr = this.mediaVideoUploadingFileList;
+      for (var i=0;i<oldArr.length;i++){
+        if(oldArr[i].status != 'success')
+          arr.push(oldArr[i]);
+      }
+      this.mediaVideoUploadingFileList = arr;
+    },
+    handleUploadVideoClose(){
+      this.mediaVideoUploading = false;
+      if(this.mediaVideoUploadAnySuccess){
+        this.mediaVideoUploadAnySuccess = false;
+        this.loadMediaVideos(1);
+        this.$refs.uploadVideoFiles.clearSelectFiles();
+      }
+    },
+    //Files
+    handleUploadAddFiles(){ this.$refs.uploadMediaFiles.selectFiles(); },
+    handleUploadFiles(files){
+      var arr = this.mediaFilesUploadingFileList,
+        successCallback = this.handleUploadFilesSuccess;
+      for(var i=0;i<files.length;i++){
+        var newItem = {
+          file: files[i],
+          media: {
+            postId: this.currentArchiveObject.id,
+            title: files[i].name,
+            resourceType: 'file',
+            hash: '',
+          },
+          text: files[i].name,
+          status: null,
+          percentage: 0,
+          uploading: false,
+          reading: true,
+          successCallback: successCallback,
+        }
+        arr.push(newItem);
+        //计算MD5值
+        this.calcFileMd5(newItem, (hash, item) => { 
+          console.log('file ' + item.text + ' : ' + hash);
+          this.startUpload(item, hash);
+        })
+      }
+    },
+    handleUploadFilesSuccess(item){
+      this.mediaFilesUploadAnySuccess = true;
+    },
+    handleUploadFilesCancel(item){
+      if(item.uploading) this.abortUpload(item);
+      this.mediaFilesUploadingFileList.pop(item);
+    },
+    handleUploadFilesClearFinish(){
+      var arr = [], oldArr = this.mediaFilesUploadingFileList;
+      for (var i=0;i<oldArr.length;i++){
+        if(oldArr[i].status != 'success')
+          arr.push(oldArr[i]);
+      }
+      this.mediaFilesUploadingFileList = arr;
+    },
+    handleUploadFilesClose(){
+      this.mediaFilesUploading = false;
+      if(this.mediaFilesUploadAnySuccess){
+        this.mediaFilesUploadAnySuccess = false;
+        this.loadMediaFiles(1);
+        this.$refs.uploadMediaFiles.clearSelectFiles();
+      }
+    },
+
+    //
+    // 数据加载方法
+    //
+
     //Data
-    loadPostObject(idOrUrlName) {
+    loadPostObject(idOrUrlName, callback) {
       this.currentIsNew = false;
       this.axios.get(this.NET.API_URL + "/post/" + idOrUrlName + "?authPrivate=true").then(response => {
         if(response.data.success){
@@ -446,12 +826,14 @@ export default {
           this.currentArchiveLoadError = response.data.message;
           this.currentArchiveErrorCanRetry = false;
         }
+        callback();
       }).catch(response => {
         this.currentArchiveLoadError = response;
         this.currentArchiveErrorCanRetry = true;
+        callback();
       });
     },
-    loadNewPostObject() {
+    loadNewPostObject(callback) {
       this.currentIsNew = true;
       this.currentArchiveObject = {
         author: this.currentUser.friendlyName ? this.currentUser.friendlyName : this.currentUser.name ,
@@ -471,7 +853,7 @@ export default {
         postTagNames: [],
         previewImage: "",
         previewText: "",
-        status: 1,
+        status: 2,
         tags: "",
         title: "",
         type: "markdown",
@@ -480,6 +862,9 @@ export default {
         showInList: true,
         showCatalog: true
       };
+      this.currentArchiveType = this.currentArchiveObject.type;
+      this.loadPDataStart();
+      callback();
     },
     loadTags(t){
       this.axios.get(this.NET.API_URL + '/tags').then((response) => {
@@ -520,9 +905,9 @@ export default {
     loadPDataStart(){
       this.currentArchiveShowLastModifyDate = !this.Utils.isNullOrEmpty(this.currentArchiveObject.lastmodifyDate);
       this.currentArchiveCategory = this.currentArchiveObject.postClass ? this.currentArchiveObject.postClass.split(':')[0] : 'nonez';
+      this.currentArchiveTags = [];
       if(!this.Utils.isNullOrEmpty(this.currentArchiveObject.tags)){
         var arr =  this.currentArchiveObject.tags.split('-');
-        this.currentArchiveTags = [];
         for(var key in arr) {
           if(!this.Utils.isNullOrEmpty(arr[key])){
             this.currentArchiveTags.push(arr[key]);
@@ -532,6 +917,17 @@ export default {
       if(this.currentArchiveObject.content)
         this.currentArchiveContent = base64.decode(this.currentArchiveObject.content);
       else this.currentArchiveContent = '';
+    },
+    loadPartReset(){
+      this.commentListLoadStatus = 'notload';
+      this.commentListData = null;
+      this.mediaImageLoadStatus = 'notload';
+      this.mediaImageData = null;
+      this.mediaVideoLoadStatus = 'notload';
+      this.mediaVideoData = null;
+      this.mediaFilesLoadStatus = 'notload';
+      this.mediaFilesData = null;
+      this.handleTabClick(null);
     },
     loadComments(){
       this.commentListLoadStatus = "loading";
@@ -554,7 +950,262 @@ export default {
           this.commentListLoadStatus = "error:" + response;
         });
     },
+    loadMediaImages(page){
+      if(typeof page != 'undefined')
+        this.mediaImagePageCurrent = page;
+      this.mediaImageLoadStatus = "loading";
+      var url =
+        this.NET.API_URL +
+        "/post/" + this.currentArchiveObject.id + '/media/' +
+        (this.mediaImagePageCurrent - 1) +
+        "/" +
+        this.mediaImagePageSize + '?type=image';
+      this.axios
+        .get(url)
+        .then(response => {
+          if (response.data.success) {
+            this.mediaImageData = response.data.data.content;
+            this.mediaImagePageCount = response.data.data.totalPages;
+            this.mediaImageLoadStatus = "loaded";
+          } else this.mediaImageLoadStatus = "error:" + response.data.message;
+        })
+        .catch(response => {
+          this.mediaImageLoadStatus = "error:" + response;
+        });
+    },
+    loadMediaVideos(page){
+      if(typeof page != 'undefined')
+        this.mediaVideoPageCurrent = page;
+      this.mediaVideoLoadStatus = "loading";
+      var url =
+        this.NET.API_URL +
+        "/post/" + this.currentArchiveObject.id + '/media/' +
+        (this.mediaVideoPageCurrent - 1) +
+        "/" +
+        this.mediaVideoPageSize + '?type=video';
+      this.axios
+        .get(url)
+        .then(response => {
+          if (response.data.success) {
+            this.mediaVideoData = response.data.data.content;
+            this.mediaVideoPageCount = response.data.data.totalPages;
+            this.mediaVideoLoadStatus = "loaded";
+          } else this.mediaVideoLoadStatus = "error:" + response.data.message;
+        })
+        .catch(response => {
+          this.mediaVideoLoadStatus = "error:" + response;
+        });
+    },
+    loadMediaFiles(page){
+      if(typeof page != 'undefined')
+        this.mediaFilesPageCurrent = page;
+      this.mediaFilesLoadStatus = "loading";
+      var url =
+        this.NET.API_URL +
+        "/post/" + this.currentArchiveObject.id + '/media/' +
+        (this.mediaFilesPageCurrent - 1) +
+        "/" +
+        this.mediaFilesPageSize + '?type=file';
+      this.axios
+        .get(url)
+        .then(response => {
+          if (response.data.success) {
+            this.mediaFilesData = response.data.data.content;
+            this.mediaFilesPageCount = response.data.data.totalPages;
+            this.mediaFilesLoadStatus = "loaded";
+          } else this.mediaFilesLoadStatus = "error:" + response.data.message;
+        })
+        .catch(response => {
+          this.mediaFilesLoadStatus = "error:" + response;
+        });
+    },
 
+    //
+    // 文件上传方法
+    //
+
+    //计算文件的MD5
+    calcFileMd5(item, end){
+      item.reading = true;
+      var file = item.file;
+      var blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
+        chunkSize = 2097152,                             // Read in chunks of 2MB
+        chunks = Math.ceil(file.size / chunkSize),
+        currentChunk = 0,
+        spark = new SparkMD5.ArrayBuffer(),
+        fileReader = new FileReader();
+  
+      fileReader.onload = function (e) {
+          console.log('read chunk nr', currentChunk + 1, 'of', chunks);
+          spark.append(e.target.result);                   // Append array buffer
+          currentChunk++;
+  
+          if (currentChunk < chunks) {
+              loadNext();
+          } else end(spark.end(), item);  // Compute hash
+      };
+  
+      fileReader.onerror = function () {};
+  
+      function loadNext() {
+          var start = currentChunk * chunkSize,
+              end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
+          fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
+      }
+      loadNext();
+    },
+    //上传文件
+    startUpload(uploadingItem, hash){
+      uploadingItem.reading = false;
+      uploadingItem.media.hash = hash;
+      this.requestFileShouldMultiPartUpload(uploadingItem, (should, data) => {
+        console.log('uploading : ' + uploadingItem.text + ' ' + (should ? '[single]' : '[multipart]'));
+        should ? this.uploadMultipart(uploadingItem, data.chunkCount, 
+          data.chunkSize, data.chunkLastSize, data.uploadMultiToken) : this.uploadSingle(uploadingItem)
+      });
+    },
+    failUpload(uploadingItem, err){
+      uploadingItem.exception = err;
+      uploadingItem.status = 'exception';
+      uploadingItem.uploading = false;
+    },
+    finishUpload(uploadingItem){
+      console.log('upload finished : ' + uploadingItem.text);
+      uploadingItem.uploading = false;
+      uploadingItem.percentage = 100;
+      uploadingItem.status = 'success';
+      uploadingItem.successCallback(uploadingItem);
+    },
+    abortUpload(uploadingItem) {
+       console.log('upload aborted : ' + uploadingItem.text);
+      if(uploadingItem.uploading) {
+        uploadingItem.uploading = false;
+        if(uploadingItem.xhr){
+          uploadingItem.markedCancel = false;
+          uploadingItem.xhr.abort();
+        }
+      }
+    },
+    progressUpload(uploadingItem, percent){
+      uploadingItem.percentage = percent;
+    },
+    //获取文件是否需要分片上传
+    requestFileShouldMultiPartUpload(uploadingItem, callback){
+      var size = uploadingItem.file.size, media = uploadingItem.media;
+      this.axios.post(this.NET.API_URL + '/media/uploadSize?size=' + size, media).then((response) => {
+        if(response.data.success) callback(response.data.data.multipart, response.data.data);
+        else this.failUpload(uploadingItem, response.message);
+      }).catch((response) => { this.failUpload(uploadingItem, response); });
+    },
+    //单文件上传
+    uploadSingle(uploadingItem){
+      uploadingItem.uploading = true;
+      uploadingItem.isSingle = true;
+      uploadingItem.xhr = new XMLHttpRequest();
+
+      var form = new FormData();
+      form.append('file', uploadingItem.file);
+      form.append('media', JSON.stringify(uploadingItem.media));
+
+      var xhr = uploadingItem.xhr;
+      xhr.withCredentials = true;
+      xhr.open("post", this.NET.API_URL + '/media', true);
+      xhr.onload = () => {
+        var result = xhr;
+        var response = null;
+        try { response = eval("(" + result.response + ")"); }
+        catch (e) { this.failUpload(uploadingItem, e); }
+        if(!uploadingItem.markedCancel) response.success ? this.finishUpload(uploadingItem) : this.failUpload(uploadingItem, response.message);
+      }
+      xhr.onerror = () => { if(!uploadingItem.markedCancel) this.failUpload(uploadingItem, xhr.statusText); }; //请求失败
+      xhr.upload.onprogress = (result) => {
+          if (result.lengthComputable) {
+              var percent = (result.loaded / result.total * 100).toFixed(2);
+              this.progressUpload(uploadingItem, parseInt(percent));
+          }
+      };
+      xhr.send(form);
+    },
+    //分片上传
+    uploadMultipart(uploadingItem, chunkCount, chunkSize, chunkLastSize, uploadMultiToken){
+      uploadingItem.isMultipart = true;
+      uploadingItem.uploading = true;
+      uploadingItem.uploadBlobs = new Array();
+      uploadingItem.uploadBlobCurrent = 0;
+      uploadingItem.uploadBlobAll = chunkCount;
+
+      //文件切片
+
+      var start = 0;
+      var end;
+      var index = 0;
+      var filesize = uploadingItem.file.size;
+      var blob = uploadingItem.file;
+      var filename = uploadingItem.file.name;
+      var media = JSON.stringify(uploadingItem.media);
+
+      while (start < filesize) {
+          end = start + chunkSize;
+
+          var chunk = null;
+          chunk = end > filesize?  blob.slice(start) : chunk = blob.slice(start, end);
+         
+          var formData = new FormData();
+
+          formData.append("file", chunk);
+          formData.append("media", media);
+          formData.append("blob", index);
+          formData.append("filename", filename);
+          formData.append("token", uploadMultiToken);
+
+          uploadingItem.uploadBlobs.push(formData);
+
+          start = end;
+          index++;
+      }
+
+      //开始上传
+      this.uploadMultipartBlob(uploadingItem, uploadMultiToken);
+    },
+    uploadMultipartBlob(uploadingItem, uploadMultiToken){
+      if(uploadingItem.uploadBlobCurrent < uploadingItem.uploadBlobAll){
+        console.log('uploading : ' + uploadingItem.text + ' (' + uploadingItem.uploadBlobCurrent + '/' + uploadingItem.uploadBlobAll + ')');
+        var xhr = new XMLHttpRequest();
+        uploadingItem.xhr = xhr;
+        xhr.withCredentials = true;
+        xhr.open("post", this.NET.API_URL + '/media/blob', true);
+        xhr.onload = () => {
+          var result = xhr;
+          var response = null;
+          try { response = eval("(" + result.response + ")"); }
+          catch (e) { this.failUpload(uploadingItem, e); }
+          if(response.success) { 
+            if(!uploadingItem.markedCancel) {
+              uploadingItem.uploadBlobCurrent++;
+              this.uploadMultipartBlob(uploadingItem, uploadMultiToken);
+            }
+          } else this.failUpload(uploadingItem, response.message);
+        }
+        xhr.onerror = () => { if(!uploadingItem.markedCancel) this.failUpload(uploadingItem, xhr.statusText); }; //请求失败
+        xhr.upload.onprogress = (result) => {
+            if (result.lengthComputable) {
+
+              //整体进度
+              var percent0 = 100 / uploadingItem.uploadBlobAll;
+              var percent1 = parseInt(result.loaded / result.total * percent0);
+              var percent = parseInt(uploadingItem.uploadBlobCurrent * percent0 + percent1);
+
+              this.progressUpload(uploadingItem, percent);
+            }
+        };
+        xhr.send(uploadingItem.uploadBlobs[uploadingItem.uploadBlobCurrent]);
+      }else
+        this.finishUpload(uploadingItem);
+    },
+
+    //
+    // 文章操作方法
+    //
 
     //参数验证
     saveValidate(){
@@ -760,4 +1411,5 @@ export default {
 .comment-preview p{
   margin: 0;
 }
+
 </style>

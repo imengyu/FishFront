@@ -44,6 +44,10 @@ function toastRemove(toast, $alert){
     toasts.pop(toasts[toasts.length-1]);
     toastCount--;
 }
+/**
+ * 通过ID关闭 Tosat
+ * @param {*} uidz 
+ */
 function toastCloseById(uidz){
     for(var k in toasts){
         if(toasts[k].uidz == uidz){
@@ -52,6 +56,11 @@ function toastCloseById(uidz){
         }
     }
 }
+/**
+ * 关闭 Tosat
+ * @param {*} toast 
+ * @param {*} anim 
+ */
 function toastClose(toast, anim){
     if(!toast.closed){
         var $alert = toast.alert;
@@ -63,6 +72,13 @@ function toastClose(toast, anim){
 function toastClear(time, toast){
     setTimeout(function(){toastClose(toast)},time)
 }
+/**
+ * 显示 Tosat
+ * @param {String} str 文字
+ * @param {String} type 类型
+ * @param {*} time 时间（秒）
+ * @param {boolean} noclose 是否取消关闭
+ */
 function toast(str, type, time, noclose){
     uidz += parseInt(Math.random() * 10);
     if(!time) time = 2500;

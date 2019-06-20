@@ -1,7 +1,7 @@
 <template>
-  <el-aside :width="(isAdminCollape&&!isSideFloated) ? '65px' : '300px'" style="background-color: rgb(238, 241, 246)" 
+  <el-aside :width="(isAdminCollape&&!isSideFloated) ? '65px' : '300px'"
     :class="'better-scroll-white el-aside-fix' + (isAdminCollape ? ' collape' : '')">
-    <el-menu :default-active="getDefaultPath()" :collapse="isAdminCollape&&!isSideFloated" :unique-opened="true" :router="true"> 
+    <el-menu :default-active="currentPath" :collapse="isAdminCollape&&!isSideFloated" :unique-opened="true" :router="true"> 
       <el-menu-item index="/admin/"><i class="el-icon-data-analysis"></i><span slot="title">仪表盘</span></el-menu-item>
       <el-submenu index="archives">
         <template slot="title"><i class="el-icon-notebook-2"></i><span slot="title">文章管理</span></template>
@@ -40,6 +40,9 @@ export default {
     isSideFloated: function(){
       return document.body.clientWidth < 768;
     },
+    currentPath: function(){
+      return this.$router.path ? this.$router.path : '/admin/'
+    },
   }),
   methods: {
     init: function() {
@@ -54,17 +57,47 @@ export default {
     getJumpRealUrl(link) {
       return this.NET.URL_PREFIX + link;
     },
-    getDefaultPath(){
-      return this.$router.path;
-    },
   }
 };
 </script>
 
 <style>
-/*扩展 el-aside 在移动端*/
+/*扩展 el-aside 在移动端 以及样式修改*/
 .el-aside-fix {
-
+  background-color: #121f3e;
+}
+.el-aside-fix .el-menu{
+  background: transparent;
+  border: none;
+}
+.el-aside-fix .el-menu-item {
+  background-color: transparent;
+  font-size: 14px;
+  color: #fff;
+  padding: 0 20px;
+  cursor: pointer;
+}
+.el-aside-fix .el-menu-item i,
+.el-aside-fix .el-menu--inline,
+.el-aside-fix .el-submenu__title,
+.el-aside-fix .el-submenu__title i {
+  color: #fff;
+}
+.el-aside-fix .el-submenu__title:hover {
+    background-color: rgba(255, 255, 255, .1);
+}
+.el-aside-fix .el-menu-item:hover,.el-aside-fix .el-menu-item.is-active {
+  background-color: rgba(255, 255, 255, .1);
+}
+.el-aside-fix .el-menu-item.is-active::after {
+  position: absolute;
+  content: "";
+  top: calc(50% - 8px);
+  left: 0px;
+  width: 3px;
+  height: 20px;
+  border-radius: 1.5px;
+  background-color: #55a8fd;
 }
 
 @media (max-width: 768px) {

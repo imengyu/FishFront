@@ -7,81 +7,94 @@
       </el-breadcrumb>
     </el-header>
     <el-main class="better-scroll-white">
-      <div class="box">
+      <div>
         <div class="row">
           <div class="col-sm-6 col-md-3 col-lg-3 number">
-            <p class="text-secondary">今日 PV / 昨日 PV</p>
-            <span
-              v-if="statData"
-              class="text-black"
-            >{{ statData.pvToday + ' / ' + statData.pvYesterday }}</span>
-            <span v-else class="text-warning">无数据</span>
+            <el-card class="box-card" shadow="never">
+              <p class="text-secondary">今日 PV / 昨日 PV</p>
+              <span
+                v-if="statData"
+                class="text-black"
+              >{{ statData.pvToday + ' / ' + statData.pvYesterday }}</span>
+              <span v-else class="text-warning">无数据</span>
+            </el-card>
           </div>
           <div class="col-sm-6 col-md-3 col-lg-3 number">
-            <p class="text-secondary">今日 IP / 昨日 IP</p>
-            <span
-              v-if="statData"
-              class="text-black"
-            >{{ statData.ipToday + ' / ' + statData.ipYesterday }}</span>
-            <span v-else class="text-warning">无数据</span>
+            <el-card class="box-card" shadow="never">
+              <p class="text-secondary">今日 IP / 昨日 IP</p>
+              <span
+                v-if="statData"
+                class="text-black"
+              >{{ statData.ipToday + ' / ' + statData.ipYesterday }}</span>
+              <span v-else class="text-warning">无数据</span>
+            </el-card>
           </div>
           <div class="col-sm-6 col-md-3 col-lg-3 number">
-            <p class="text-secondary">新评论 / 昨日评论</p>
-            <span
-              v-if="statData"
-              class="text-black"
-            >{{ statData.commentToday + ' / ' + statData.commentYesterday }}</span>
-            <span v-else class="text-warning">无数据</span>
+            <el-card class="box-card" shadow="never">
+              <p class="text-secondary">新评论 / 昨日评论</p>
+              <span
+                v-if="statData"
+                class="text-black"
+              >{{ statData.commentToday + ' / ' + statData.commentYesterday }}</span>
+              <span v-else class="text-warning">无数据</span>
+            </el-card>
           </div>
           <div class="col-sm-6 col-md-3 col-lg-3 number">
-            <p class="text-secondary">用户数 / 作者数</p>
-            <span
-              v-if="statData"
-              class="text-black"
-            >{{ statData.visitorCount + ' / ' + statData.authorCount }}</span>
-            <span v-else class="text-warning">无数据</span>
+            <el-card class="box-card" shadow="never">
+              <p class="text-secondary">用户数 / 作者数</p>
+              <span
+                v-if="statData"
+                class="text-black"
+              >{{ statData.visitorCount + ' / ' + statData.authorCount }}</span>
+              <span v-else class="text-warning">无数据</span>
+            </el-card>
           </div>
         </div>
       </div>
-      <div class="box p-4 mt-5">
-        <h5 class="box-title no-underline">近一月浏览量走势</h5>
+      <el-card class="box-card mt-4">
+        <div slot="header" class="clearfix"><span>近一月浏览量走势</span></div>
         <canvas v-if="dayLog" id="chartDayLog" style="width:100%; height:200px;"></canvas>
         <div v-else class="text-secondary text-center mt2 mb-2">无数据</div>
-      </div>
-      <div class="box p-4 mt-5">
-        <el-row>
-          <el-col :sm="24" :lg="12">
-            <h5>TOP 10 浏览文章</h5>
-            <el-table :data="topTenArchives" style="width: 100%">
-              <el-table-column prop="title" label="名称"></el-table-column>
-              <el-table-column prop="viewCount" label="查看数" width="70"></el-table-column>
-              <el-table-column label="操作">
-                <template slot-scope="scope">
-                  <el-button size="mini" @click="handleTopArcEdit(scope.$index, scope.row)">编辑</el-button>
-                  <el-button size="mini" @click="handleTopArcView(scope.$index, scope.row)">查看</el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-col>
-          <el-col :sm="24" :lg="12">
-            <h5>今日 TOP 10 访问页面</h5>
-            <el-table :data="topTenPage" style="width: 100%">
-              <el-table-column prop="url" label="URL"></el-table-column>
-              <el-table-column prop="count" label="查看数" width="70"></el-table-column>
-            </el-table>
-          </el-col>
-        </el-row>
+      </el-card>
+      <div class="mt-4">
+        <div class="row">
+          <div class="col-sm-12 col-lg-6">
+            <el-card class="box-card">
+              <div slot="header" class="clearfix">
+                <span>TOP 10 浏览文章</span>
+              </div>
+              <el-table :data="topTenArchives" style="width: 100%">
+                <el-table-column prop="title" label="名称"></el-table-column>
+                <el-table-column prop="viewCount" label="查看数" width="70"></el-table-column>
+                <el-table-column label="操作">
+                  <template slot-scope="scope">
+                    <el-button size="mini" @click="handleTopArcEdit(scope.$index, scope.row)">编辑</el-button>
+                    <el-button size="mini" @click="handleTopArcView(scope.$index, scope.row)">查看</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </el-card>
+          </div>
+          <div class="col-sm-12 col-lg-6">
+            <el-card class="box-card">
+              <div slot="header" class="clearfix">
+                <span>今日 TOP 10 访问页面</span>
+              </div>
+              <el-table :data="topTenPage" style="width: 100%">
+                <el-table-column prop="url" label="URL"></el-table-column>
+                <el-table-column prop="count" label="查看数" width="70"></el-table-column>
+              </el-table>
+            </el-card>
+          </div>
+        </div>
       </div>
     </el-main>
   </el-container>
 </template>
 
 <script>
-import jQuery from "jquery";
 import Chart from "chart.js";
 import serverConsts from '../../constants/serverConsts.js'
-
-var $ = jQuery;
 
 export default {
   name: "AdminIndex",
@@ -117,47 +130,22 @@ export default {
       if(authed) this.loadStatSimple();
     },
     loadStatSimple() {
-      var main = this;
-      if (main.statLoad) return;
-      main.statLoad = true;
-      jQuery.ajax({
-        type: "get",
-        url: main.NET.API_URL + "/stat",
-        crossDomain: true,
-        xhrFields: { withCredentials: true },
-        success: function(response) {
-          if (response.success) main.statData = response.data;
+      if (this.statLoad) return;
+      this.statLoad = true;
+      this.axios.get(this.NET.API_URL + "/stat").then((response) => {
+        if (response.data.success) this.statData = response.data.data;
+      });
+      this.axios.get(this.NET.API_URL + "/stat/daylog").then((response) => {
+        if (response.data.success) {
+          this.dayLog = response.data.data;
+          setTimeout(this.loadStatDayLogChart, 1000);
         }
       });
-      jQuery.ajax({
-        type: "get",
-        url: main.NET.API_URL + "/stat/daylog",
-        crossDomain: true,
-        xhrFields: { withCredentials: true },
-        success: function(response) {
-          if (response.success) {
-            main.dayLog = response.data;
-            setTimeout(main.loadStatDayLogChart, 1000);
-          }
-        }
+      this.axios.get(this.NET.API_URL + "/stat/topPage?maxCount=10").then((response) => {
+        if (response.data.success) this.topTenPage = response.data.data;
       });
-      jQuery.ajax({
-        type: "get",
-        url: main.NET.API_URL + "/stat/topPage?maxCount=10",
-        crossDomain: true,
-        xhrFields: { withCredentials: true },
-        success: function(response) {
-          if (response.success) main.topTenPage = response.data;
-        }
-      });
-      jQuery.ajax({
-        type: "get",
-        url: main.NET.API_URL + "/stat/topPost?maxCount=10",
-        crossDomain: true,
-        xhrFields: { withCredentials: true },
-        success: function(response) {
-          if (response.success) main.topTenArchives = response.data;
-        }
+      this.axios.get(this.NET.API_URL + "/stat/topPost?maxCount=10").then((response) => {
+        if (response.data.success) this.topTenArchives = response.data.data;
       });
     },
     loadStatDayLogChart() {
@@ -206,7 +194,7 @@ export default {
       });
     },
     handleTopArcEdit(index, row) {
-      var newUrl = this.Utils.getJumpRealUrl(serverConsts.PartPositions.editArchive + '?post=' + row.id);
+      var newUrl = this.Utils.getJumpRealUrl(serverConsts.PartPositions.editArchive + '?archive=' + row.id);
       window.open(newUrl);
     },
     handleTopArcView(index, row) {

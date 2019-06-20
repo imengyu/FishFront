@@ -2,7 +2,7 @@
   <div id="app">
     <app-header ref="Header" v-if="isHeaderShow" v-bind:is-admin="isAdminPanel"></app-header>
     <div v-if="isAdminPanel">
-      <el-container class="admin-area">
+      <el-container class="admin-area" v-show="authInfoLoaded">
         <app-admin-sidearea></app-admin-sidearea>
         <el-container>
           <transition name="fade">
@@ -24,7 +24,7 @@
 <script>
 import Header from './components/public/Header'
 import Footer from './components/public/Footer'
-import AdminSideArea from './views/admin/SideArea'
+import AdminSideArea from './views/admin/AdminSideArea'
 import serverConsts from './constants/serverConsts.js'
 import { mapState } from 'vuex';
 
@@ -97,17 +97,20 @@ export default {
         var main = this;
         if(main.$store.getters["auth/authed"]) {
           main.sendLoginfoInited(true);
+          main.authInfoLoaded = true;
           return;
         }
         //请求服务器是否登录
         this.axios.get(main.NET.API_URL + "/auth/auth-test").then((response)=>{
 
           if(response.data.success){
+            main.authInfoLoaded = true;
             main.$store.dispatch("auth/setAuthInfo", response.data.data);
             main.$store.dispatch("auth/setAuthed", true);
             main.publicHeaderReset();
             if(!notsend) main.sendLoginfoInited(true);
           }else{
+            main.authInfoLoaded = true;
             main.$store.dispatch("auth/setAuthed", false);
             main.$store.dispatch("auth/setAuthInfo", null);
             main.publicHeaderReset();
@@ -166,6 +169,7 @@ export default {
   max-height: 100%;
   overflow: hidden;
   font-family: Arial, Helvetica, sans-serif;
+  background: rgba(88, 115, 254, 0.02);
 }
 .better-footer{
   position: relative;

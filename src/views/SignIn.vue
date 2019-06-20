@@ -47,22 +47,28 @@
                 </div>
               </div>
               <form v-else id="logon_form" method="post">
-                <div class="form-group">
+                <div class="form-group with-input-button">
                   <input
                     :class="getValid1()"
                     type="text"
                     placeholder="用户名"
                     v-model="currentUserName"
                   >
+                  <button type="button" class="input-button" style="top:9px;right:11px">
+                    <i class="fa fa-user" aria-hidden="true"></i>
+                  </button>
                   <div class="invalid-feedback text-left">用户名不可为空！</div>
                 </div>
-                <div class="form-group">
+                <div class="form-group with-input-button">
                   <input
                     :class="getValid2()"
-                    type="password"
+                    :type="passwordVisible?'text':'password'"
                     placeholder="密码"
                     v-model="currentPassword"
                   >
+                  <button type="button" class="input-button" style="top:7px;right:8px" @mousedown="passwordVisible=true" @mouseup="passwordVisible=false">
+                    <i class="fa fa-eye" aria-hidden="true"></i>
+                  </button>
                   <div class="invalid-feedback text-left">{{ invalidText2 }}</div>
                   <div class="mt-2 logon-act">
                     <a :href="getJumpRealUrl('/user/center/rec-password/')" class="logon-link float-left">忘记密码？</a>
@@ -122,6 +128,7 @@ export default {
       currentTab: "guest",
       currentUserName: "",
       currentPassword: "",
+      passwordVisible: false,
       invalidText2: "请输入密码 ！",
       logSending: false,
       verifyInited: false,
