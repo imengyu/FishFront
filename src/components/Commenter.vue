@@ -65,7 +65,7 @@
                             <div class="comment-one">
                                 <div class="comment-head">
                                     <img class="rounded-circle"
-                                        :src="currentPreviewItem.authorHead?getImageUrl(currentPreviewItem.authorHead):require('../assets/images/default/head-default.png')"
+                                        :src="currentPreviewItem.authorHead?currentPreviewItem.authorHead:require('../assets/images/default/head-default.png')"
                                         :alt="currentPreviewItem.authorName">
                                     <br>
                                     <a v-if="currentPreviewItem.authorId>0" :href="getJumpRealUrl('/user/' + currentPreviewItem.authorId + '/')" target="_blank">{{ currentPreviewItem.authorName }}</a>
@@ -136,7 +136,7 @@
                             <span v-else-if="comment.authorLevel && comment.authorLevel==2"
                                 class="comment-user-tag user">作者</span>
                             <img class="rounded-circle"
-                                :src="comment.authorHead?getImageUrl(comment.authorHead):require('../assets/images/default/head-default.png')"
+                                :src="comment.authorHead?comment.authorHead:require('../assets/images/default/head-default.png')"
                                 :alt="comment.authorName">
                             <br>
                             <a v-if="comment.authorId>0" :href="getJumpRealUrl('/user/' + comment.authorId + '/')" target="_blank">{{ comment.authorName }}</a>
@@ -317,10 +317,7 @@ export default {
           $("#comment_email_static").text(main.authedUserInfo.email);
           $("#comment_website").val(main.authedUserInfo.home);
           $("#comment-user-head").show();
-          $("#comment-user-head").attr(
-            "src",
-            this.Utils.getImageUrlFormHash(main.authedUserInfo.headimg)
-          );
+          $("#comment-user-head").attr("src", main.authedUserInfo.headimg);
         }
     },
     loadPostComment() {
@@ -387,10 +384,6 @@ export default {
         
       }
       return "";
-    },
-    //Image Url
-    getImageUrl(str) {
-      return this.Utils.getImageUrlFormHash(str);
     },
     calcDatePast(date) {
       //计算过去的时间

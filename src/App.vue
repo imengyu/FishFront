@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div v-loading.fullscreen.lock="appLoading" id="app">
     <app-header ref="Header" v-if="isHeaderShow" v-bind:is-admin="isAdminPanel"></app-header>
     <div v-if="isAdminPanel">
       <el-container class="admin-area" v-show="authInfoLoaded">
@@ -8,7 +8,7 @@
           <transition name="fade">
             <router-view ref="View" @publicHeaderAdd="publicHeaderAdd"></router-view>
           </transition>
-          <el-footer class="better-footer"><span>&copy; 2019 FishBlog. UI Powered by <a href="https://element.eleme.cn">element-ui</a>.</span></el-footer>
+          <el-footer class="better-footer"><span>&copy; 2019 FishBlog</span></el-footer>
         </el-container>
       </el-container>
     </div>
@@ -34,6 +34,7 @@ export default {
     return {
       authInfoLoaded: false,
       authInfoSended: false,
+      appLoading: false,
     }
   },
   computed: mapState({  
@@ -53,8 +54,14 @@ export default {
   watch:{
     $route(to,from){
       this.rePage(to);
+      this.appLoading = true;
       console.log(to.path);
-    }
+    },
+    appLoading(to,from){
+      if(to){
+        setTimeout(()=>{this.appLoading = false;}, 666);
+      }
+    },
   },
   methods:{
 
@@ -74,6 +81,21 @@ export default {
           else document.title = serverConsts.SiteTitle;
           this.publicHeaderReset();
           this.initLoginInfo(false);
+          if(serverConsts.CollectVisitorStat)
+            this.sendVisitroStat();
+          setTimeout(() => {
+            //控制台添加菜单项
+            var b = this.$store.getters["global/adminPanel"];
+            console.log("global/adminPanel : " + b);
+            if(b){
+              this.publicHeaderAdd({
+                name: "管理后台",
+                link: "/admin/",
+                forceActive: true
+              });
+            }
+          }, 1000)
+          
         });　
       },
       //初始化
@@ -141,6 +163,17 @@ export default {
         else if(errCode == authCode.FAIL_NOT_LOGIN) err='RequestLogin';
         else err='UnknowErr';
         this.Utils.jump('/sign-in/?error=' + err + '&redirect_url=' + encodeURIComponent(location.href));
+      },
+      //发送页面浏览记录
+      sendVisitroStat(){
+        var currentPath = this.$route.path;
+        for(var key in serverConsts.CollectVisitorStatExclude){
+           if(serverConsts.CollectVisitorStatExclude[key] == currentPath 
+            || currentPath.indexOf(serverConsts.CollectVisitorStatExclude[key]) == 0)
+              return;
+        }
+       
+        this.axios.post(this.NET.API_URL + '/stat', { url: location.href });
       },
   }
 

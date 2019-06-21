@@ -1,5 +1,6 @@
 <template>
   <div :class="'fish-editor' + (fullEditor ? ' fullscreen' : ' ')">
+    
     <div class="fish-editor-toolbar">
       <ul class="fish-editor-menu">
         <li>
@@ -106,8 +107,8 @@
             <i class="fa fa-link" name="link" unselectable="on"></i>
           </a>
         </li>
-        <li>
-          <a href="javascript:;" v-on:click="addImage()" title="添加图片" unselectable="on">
+        <li id="image-dropdown">
+          <a href="javascript:;" role="button" title="添加图片" @click="showImageDropDown(true)">
             <i class="fa fa-picture-o" name="image" unselectable="on"></i>
           </a>
         </li>
@@ -201,6 +202,11 @@
       >
         <textarea id="fish-editor-code-area" class="full" v-model="value"></textarea>
       </div>
+    </div>
+    <div v-if="imageDropdownShow" :style="'display:inline-block;position:absolute;top:40px;left:'+imageDropdownLeft+'px'" class="dropdown-menu" aria-labelledby="dropdownMenuButton" @blur="showImageDropDown(false)" @click="showImageDropDown(false)">
+      <a class="dropdown-item" v-on:click="addImage()" href="javascript:;">从链接添加图片</a>
+      <a class="dropdown-item" v-on:click="addImageMediaCenter()" href="javascript:;">从媒体库选择图片</a>
+      <a class="dropdown-item" v-on:click="addImageUpload()" href="javascript:;">上传图片</a>
     </div>
     <!-- Modal -->
     <div
@@ -355,7 +361,11 @@ export default {
       currentAddText: "",
       currentAddLink: "",
 
-      htmlEditor: null
+      htmlEditor: null,
+      
+      imageDropdownShow: false,
+      imageDropdownLeft: 0,
+
     };
   },
   components: {
@@ -372,6 +382,14 @@ export default {
   },
   methods: {
     m() {},
+    showImageDropDown(s){
+      if(s){
+        var image_dropdown = document.getElementById('image-dropdown');
+        image_dropdown.focus();
+        this.imageDropdownLeft = image_dropdown.offsetLeft;
+        this.imageDropdownShow = true;
+      }else this.imageDropdownShow = false;
+    },
     init() {
       var main = this;
       main.htmlEditor = CodeMirror.fromTextArea(
@@ -448,7 +466,7 @@ export default {
       this.insertOrReplace("<b>", "</b>", true, true);
     },
     addDel() {
-      this.insertOrReplace("<del>", "</codelde>", true, true);
+      this.insertOrReplace("<del>", "</deL>", true, true);
     },
     addItalic() {
       this.insertOrReplace("<b>", "</b>", true, true);
@@ -510,19 +528,25 @@ export default {
         );
       });
     },
+    addImageMediaCenter(){
+      this.$emit('insert-image', 'select-in-media-center');
+    },
+    addImageUpload(){
+      this.$emit('insert-image', 'upload');
+    },
     addInlineCode() {
       this.insertOrReplace("<code>", "</code>", true, true);
     },
     addPre() {
-      this.insertOrReplace("<pre>\n", "</pre>", true, true);
+      this.insertOrReplace("\n<pre>\n", "\n</pre>\n", true, true);
     },
     addCode() {
-      this.insertOrReplace("<pre>\n<code>", "</code>\n</pre>", true, true);
+      this.insertOrReplace("\n<pre>\n<code>\n", "\n</code>\n</pre>\n", true, true);
     },
     addTable() {
       this.insertOrReplace(
-        "<table>\n<thread>",
-        "</thread>\n<tbody>\n</tbody>\n</table>",
+        "\n<table>\n<thread\n>",
+        "\n</thread>\n<tbody>\n</tbody>\n</table\n>",
         false,
         true
       );
@@ -536,10 +560,10 @@ export default {
       );
     },
     addOl() {
-      this.insertOrReplace("<ol>", "</ol>", true, true);
+      this.insertOrReplace("\n<ol>", "\n</ol>", true, true);
     },
     addUl() {
-      this.insertOrReplace("<ul>", "</ul>", true, true);
+      this.insertOrReplace("\n<ul>", "\n</ul>", true, true);
     },
     addHr() {
       this.insertOrReplace("<hr>", null, false, true);

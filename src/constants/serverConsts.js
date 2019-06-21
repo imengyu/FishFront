@@ -1,6 +1,11 @@
 export default {
     SiteTitle: 'ALONE SPACE',
     AnonymousComment: true,
+    CollectVisitorStat: true,
+    CollectVisitorStatExclude: [
+        '/admin/',
+        '/user/'
+    ],
     PartPositions: {
         viewPost: '/archives/post/',
         viewClass: '/archives/categories/',
@@ -14,6 +19,13 @@ export default {
         reprint: 2,
         album: 3,
         video: 4
+    },
+    PostPrefixName: {
+        none: '(不设置)',
+        original: '原创',
+        reprint: '转载',
+        album: '相册',
+        video: '视频'
     },
     UserLevels: {
         baned: 0,

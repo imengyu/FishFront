@@ -125,7 +125,7 @@ export default {
   name: "SignIn",
   data() {
     return {
-      currentTab: "guest",
+      currentTab: "admin",
       currentUserName: "",
       currentPassword: "",
       passwordVisible: false,
@@ -165,6 +165,9 @@ export default {
       var v = window.localStorage.getItem("last_user");
       if(!this.Utils.isNullOrEmpty(v)) 
         this.currentUserName = v;
+      if(!this.Utils.isNullOrEmpty(v)) 
+      if(this.currentTab=='admin')
+        this.initVerifyCode();
       this.showErrorInfo();
     },
     showErrorInfo(){
@@ -184,7 +187,7 @@ export default {
     },
     initVerifyCode: function() {
       if (this.verifyInited) return;
-
+      this.verifyInited = true;
       var main = this;
       setTimeout(function() {
         $("#valid_panel").slideVerify({

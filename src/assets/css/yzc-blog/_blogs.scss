@@ -850,6 +850,7 @@ $blog-nav-titles: (
     }
     .bd-clipboard {
         float: none;
+        display: block;
     }
     pre {
         display: block;
@@ -1720,10 +1721,6 @@ $blog-nav-titles: (
     .catalog-toggle-title {
         display: none;
     }
-    .bd-clipboard {
-        display: block;
-        top: .87em;
-    }
 }
 @media (min-width: 992px) {
     .side-catalog-switch {
@@ -1731,8 +1728,5 @@ $blog-nav-titles: (
     }
     .side-catalog-close {
         display: none;
-    }
-    .bd-clipboard:hover{
-        display: block;
     }
 }

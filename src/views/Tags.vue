@@ -122,9 +122,6 @@ export default {
     getJumpRealUrl(link) {
       return this.NET.URL_PREFIX + link;
     },
-    getBlogImageRealUrl(hashorurl) {
-      return this.Utils.getImageUrlFormHash(hashorurl);
-    },
     getBlogLinkRealUrl(item) {
       return this.Utils.getPostRealUrl(item);
     },

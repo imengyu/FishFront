@@ -6,7 +6,7 @@
                 <img :src="item.resourcePreviewImage" />
             </div>
             <div class="image-box" :style="'width:' + (imageWidth?imageWidth:'auto') + ';'">
-                <label>{{ item.title }}<span v-if="item.reading" class="text-info">正在读取...</span></label>
+                <label>{{ item.title }}</label>
                 <a href="javascript:;" v-on:click="onDelVideo(item)" title="删除该视频"><i class="fa fa-times"></i></a>
                 <a href="javascript:;" v-on:click="onInsertVideo(item)" title="插入视频到文章光标位置"><i class="fa fa-hand-o-up"></i></a>
                 <a href="javascript:;" v-on:click="onEditVideo(item)" title="编辑"><i class="fa fa-pencil"></i></a>

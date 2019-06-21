@@ -1,16 +1,28 @@
 <template>
-    <div v-if="items && loadedStatus == 'loaded'" class="image-list">
+    <div v-if="items && type == 'manage-list' && loadedStatus == 'loaded'" class="image-list">
         <!--<div class="image-item add" title="添加图片" @click="onAddImage" :style="'width:' + (imageWidth?imageWidth:'auto') + ';height:' + (imageHeight?imageHeight:'auto')"> 
             <i class="fa fa-plus"></i>
         </div>-->
         <div v-for="(item, index) in items" :key="index" class="image-item">
             <div class="image-host" :style="'width:' + (imageWidth?imageWidth:'auto') + ';height:' + (imageHeight?imageHeight:'auto')"  v-on:click="onShowImage(index, item)"><img :id="'common-image-list-image-' + index" :src="item.resourcePath" /></div>
             <div class="image-box" :style="'width:' + (imageWidth?imageWidth:'auto') + ';'">
-                <label>{{ item.title }} <span v-if="item.reading" class="text-info">正在处理中...</span></label>
+                <label>{{ item.title }}</label>
                 <a href="javascript:;" v-on:click="onDelImage(item)" title="删除该图片"><i class="fa fa-times"></i></a>
                 <a href="javascript:;" v-on:click="onInsertImage(item)" title="插入到文章光标位置"><i class="fa fa-hand-o-up"></i></a>
                 <a href="javascript:;" v-on:click="onCopyImageLink(item)" title="复制图片链接"><i class="fa fa-link"></i></a>
-                <a href="javascript:;" v-on:click="onEditImage(item)" title="编辑"><i class="fa fa-pencil"></i></a>
+                <a href="javascript:;" v-on:click="onEditImage(item)" title="编辑图片描述"><i class="fa fa-pencil"></i></a>
+            </div>
+        </div>
+        <div v-if="nullText && (!items || items.length == 0) && loadedStatus == 'loaded'">
+            <div class="text-secondary text-center mt-3 mb-3">{{ nullText }}</div>
+        </div>
+    </div>
+    <div v-else-if="items && type == 'select-list' && loadedStatus == 'loaded'" class="image-list">
+        <div v-for="(item, index) in items" :key="index" class="image-item">
+            <div class="image-host" :style="'width:' + (imageWidth?imageWidth:'auto') + ';height:' + (imageHeight?imageHeight:'auto')"  v-on:click="onShowImage(index, item)"><img :id="'common-image-list-image-' + index" :src="item.resourcePath" /></div>
+            <div class="image-box" :style="'width:' + (imageWidth?imageWidth:'auto') + ';'">
+                <label>{{ item.title }}</label>
+                <a class="image-select" title="选择该图片"><el-checkbox v-if="multiple" style="width:21px" v-model="item.checked"></el-checkbox><el-radio v-else style="width:21px" :label="item.id" v-model="radioSelectItem"></el-radio></a>
             </div>
         </div>
         <div v-if="nullText && (!items || items.length == 0) && loadedStatus == 'loaded'">
@@ -42,14 +54,21 @@ export default {
             default: 'notload'
         }, 
         imageWidth: {
-            default: '215px'
+            default: '210px'
         }, 
         imageHeight:{
             default: null
+        },
+        type: {
+            default: 'manage-list'
+        },
+        multiple: {
+            default: true
         }
     },
     data(){
         return {
+            radioSelectItem: 0,
         }
     },
     methods: {
@@ -85,7 +104,19 @@ export default {
         onEditImage(item){
             this.$emit('item-click', 'edit', item);
         },
-
+        getSelectedItems(){
+            if(this.multiple){
+                var arr = [], arrO = this.items;
+                for (var key in arrO)
+                    if(arrO[key].checked)arr.push(arrO[key]);
+                return arr;
+            }else{
+                var arr = this.items;
+                for (var key in arr)
+                    if(arr[key].id == this.radioSelectItem)
+                        return arr[key];
+            }
+        },
     },
 }
 </script>

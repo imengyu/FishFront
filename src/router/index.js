@@ -35,6 +35,8 @@ import AdminWriteArchive from '@/views/admin/WriteArchive'
 import AdminUserCenter from '@/views/admin/UserCenter'
 import AdminManageUsers from '@/views/admin/ManageUsers'
 import AdminNewUser from '@/views/admin/NewUser'
+import AdminSystemSettings from '@/views/admin/SystemSettings'
+import AdminSystemSkin from '@/views/admin/SystemSkin'
 
 import UserCenterChangePassword from '@/views/user/ChangePassword'
 
@@ -196,6 +198,24 @@ export default new Router({
       meta: {
         title: '新建作者账号',
         index: 4,
+      }
+    },
+    {
+      path: '/admin/settings/',
+      name: 'AdminSystemSettings',
+      component: AdminSystemSettings,
+      meta: {
+        title: '修改系统设置',
+        index: 2,
+      }
+    },
+    {
+      path: '/admin/skin/',
+      name: 'AdminSystemSkin',
+      component: AdminSystemSkin,
+      meta: {
+        title: '博客主题',
+        index: 2,
       }
     },
 

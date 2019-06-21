@@ -3,8 +3,10 @@ const state = {
     //Footer and headers
     globalFooterShow: true,
     globalHeaderShow: true,
+    globalHeaderColWidth: null,
     globalHeaderStyle: 'header-minimum',
     globalHeaderMenuStyle: 'main-menu-white',
+    globalHeaderRowClass: '',
     globalFooterStyle: 'normal',
     globalPageBackgroundImage: null,
     globalPageBackgroundOverlay: true,
@@ -20,6 +22,8 @@ const getters = {
     headerShow(state) { return state.globalFooterShow },
     headerStyle(state) { return state.globalHeaderStyle },
     headerMenuStyle(state) { return state.globalHeaderMenuStyle },
+    headerColWidth(state) { return state.globalHeaderColWidth },
+    headerRowClass(state) { return state.globalHeaderRowClass },
     pageBackgroundImage(state) { return state.globalPageBackgroundImage },
     pageBackgroundOverlay(state) { return state.globalPageBackgroundOverlay },
     pageShowBreadcrumb(state) { return state.globalPageShowBreadcrumb },
@@ -34,6 +38,8 @@ const mutations = {
     switchHeader(state, show) { state.globalFooterShow = show; },
     setHeaderStyle(state, style) { state.globalHeaderStyle = style; },
     setHeaderMenuStyle(state, style) { state.globalHeaderMenuStyle = style; },
+    setHeaderColWidth(state, style) { return state.globalHeaderColWidth = style; },
+    setHeaderRowClass(state, style) { return state.globalHeaderRowClass = style; },
     setPageBackgroundImage(state, image) { state.globalPageBackgroundImage = image; },
     setPageBackgroundOverlay(state, show) { state.globalPageBackgroundOverlay = show; },
     setPageShowBreadcrumb(state, show) { state.globalPageShowBreadcrumb = show; },
@@ -57,6 +63,8 @@ const actions = {
     setPageBackgroundOverlayOpactity(context, op) { context.commit('setPageBackgroundOverlayOpactity', op); },
     setAdminCollape(state, collape) { state.commit('setAdminCollape', collape); },
     setAdminPanel(context, is) { context.commit('setAdminPanel', is); },
+    setHeaderColWidth(context, is) { context.commit('setHeaderColWidth', is); },
+    setHeaderRowClass(context, is) { context.commit('setHeaderRowClass', is); },
     resetHeader(context){
         context.commit('switchFooter', true);
         context.commit('switchHeader', true);
@@ -66,6 +74,8 @@ const actions = {
         context.commit('setPageBackgroundImage', null);
         context.commit('setPageShowBreadcrumb', false);
         context.commit('setAdminPanel', false);
+        context.commit('setHeaderColWidth', null);
+        context.commit('setHeaderRowClass', '');
     },
     switchAdminCollape(context){
         context.commit('switchAdminCollape');

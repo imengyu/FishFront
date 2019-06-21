@@ -1,12 +1,10 @@
 <template>
     <div v-if="items && loadedStatus == 'loaded'" class="image-list">
-        <div v-for="(item, index) in items" :key="index" class="image-item">
-            <div class="image-host" :style="'width:' + (imageWidth?imageWidth:'auto') + ';height:' + (imageHeight?imageHeight:'auto')"  v-on:click="onShow(index, item)"><img :id="'common-image-list-image-' + index" :src="getFileTypeIcon(item.resourcePath)" /></div>
-            <div class="image-box" :style="'width:' + (imageWidth?imageWidth:'auto') + ';'">
-                <label>{{ item.title }} <span v-if="item.reading" class="text-info">正在处理中...</span></label>
-                <a href="javascript:;" v-on:click="onDel(item)" title="删除"><i class="fa fa-times"></i></a>
-                <a href="javascript:;" v-on:click="onCopyLink(item)" title="复制外链"><i class="fa fa-link"></i></a>
-            </div>
+        <div v-for="(item, index) in items" :key="index" class="image-item file-item" :style="'width:' + imageWidth">
+            <img :src="getFileTypeIcon(item.resourcePath)" />
+            <label>{{ item.title }}</label>
+            <a href="javascript:;" v-on:click="onDel(item)" title="删除"><i class="fa fa-times"></i></a>
+            <a href="javascript:;" v-on:click="onCopyLink(item)" title="复制外链"><i class="fa fa-link"></i></a>
         </div>
         <div v-if="nullText && (!items || items.length == 0) && loadedStatus == 'loaded'">
             <div class="text-secondary text-center mt-3 mb-3">{{ nullText }}</div>
@@ -37,7 +35,7 @@ export default {
             default: 'notload'
         }, 
         imageWidth: {
-            default: '215px'
+            default: '405px'
         }, 
         imageHeight:{
             default: null
@@ -54,7 +52,7 @@ export default {
         onShow(index, item){
             window.open(item.resourcePath);
         },
-        onCopyImage(item){
+        onCopyLink(item){
             this.$copyText(item.resourcePath).then((e) => {
                 toast.toast('链接已复制','success');
             }, (e) => {
@@ -86,4 +84,27 @@ export default {
     },
 }
 </script>
+
+<style scoped>
+.file-item img{
+    width: 32px;
+    height: 32px;
+}
+.file-item label{
+    position: absolute;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    top: 3px;
+    bottom: 3px;
+    left: 45px;
+    right: 50px;
+    margin: 0;
+}
+.file-item a{
+    float: right;
+    margin-right: 8px;
+    margin-top: 3px;
+}
+</style>
+
 

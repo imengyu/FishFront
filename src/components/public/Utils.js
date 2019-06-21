@@ -13,8 +13,6 @@ export default
     mergeJSON,
     mergeJsonArray,
     getInputCursorPosition,
-    getImageUrlFormHash,
-    getImageUrlFormHashWithType,
     setCookie,
     getCookie,
     delCookie,
@@ -193,17 +191,6 @@ function getInputCursorPosition(input) {
     pos = Sel.text.length - SelLength;
   }
   return pos;
-}
-function getImageUrlFormHash(str) {
-  if (str && str.indexOf('http') == 0) return str;
-  else if (str) return net.IMAGES_URL + '/' + str + ".jpg";
-  else return str;
-}
-function getImageUrlFormHashWithType(hash, type) {
-  var ftype = type ? type : 'jpg';
-  if (hash && hash.indexOf('http') == 0) return hash;
-  else if (hash) return net.IMAGES_URL + '/' + hash + "." + ftype;
-  else return hash;
 }
 function getPostRealUrl(post) {
   return getJumpRealUrl(serverConsts.PartPositions.viewPost + (post.urlName ? post.urlName.replace(/\+/g, ' ') : post.id) + '/')

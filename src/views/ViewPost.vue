@@ -251,6 +251,8 @@ export default {
   methods: {
     init: function() {
       this.$store.dispatch("global/resetHeader");
+      this.$store.dispatch("global/setHeaderColWidth", '12 col-lg-11 col-md-12 pl-0 ');
+      this.$store.dispatch("global/setHeaderRowClass", 'justify-content-end');
       if (this.$route.params.post)
         this.postIdOrUrlName = this.$route.params.post;
       this.loadPostObject();
@@ -419,6 +421,8 @@ export default {
         var showdown = require("showdown"),
           a = base64.decode(this.postObject.content);
         var b = new showdown.Converter();
+        //这里需要处理一些不支持的特性
+        //生成html
         a = b.makeHtml(a);
       } else if (this.postObject.type == "txt") a = this.postObject.content;
       this.postHtmlContent = a;
@@ -608,29 +612,35 @@ export default {
       //前期代码处理
       //高亮代码
       $("#post_content pre code").each(function(i, block) {
+        $(this).attr('id', 'post-code-block-' + i);
         $(this).html(main.replaceBlockBadChr($(this).html()));
         $(this)
           .parent()
           .before(
-            $(
-              '<div class="bd-clipboard"><button class="btn-clipboard" title data-original-title="复制到剪贴板">复制</button></div>'
-            )
+            $('<div class="bd-clipboard"><button class="btn-clipboard" title data-original-title="复制到剪贴板" data-target="post-code-block-' + i + '">复制</button></div>')
           );
         hljs.highlightBlock(block);
       });
       //剪贴板提示
       $(".btn-clipboard").tooltip();
+      $(".btn-clipboard").click(function(){
+        var content = $('data-target').text();
+        this.$copyText(item.resourcePath).then((e) => { toast.toast('已复制代码','success'); }, (e) => {
+          this.$msgbox({
+            title: '消息',
+            message: h('p', null, [
+              h('span', null, '您的浏览器不支持复制功能，需要您手动复制 '),
+              h('i', { style: 'color: teal' }, item.resourcePath)
+            ]),
+            confirmButtonText: '确定'
+          })
+        })
+      });
       //加载图片
       $("#post_content img").each(function(i, block) {
         var dsrc = $(this).attr("data-src");
         if (!main.Utils.isNullOrEmpty(dsrc))
-          $(this).attr(
-            "src",
-            main.Utils.getImageUrlFormHashWithType(
-              dsrc,
-              $(this).attr("data-image-type")
-            )
-          );
+          $(this).attr("src", dsrc);
         //图片加载失败处理
         if (
           !this.complete ||

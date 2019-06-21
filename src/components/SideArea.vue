@@ -6,7 +6,7 @@
           class="author"
           :style="'background: url('+getUserCardBackground()+') center center no-repeat;'"
         >
-          <img class="img-responsive mt-3" :src="getBlogImageRealUrl(bloggerInfo.headimg)" alt="head-img">
+          <img class="img-responsive mt-3" :src="bloggerInfo.headimg" alt="head-img">
         </div>
         <div class="author_name">
           <a :href="bloggerInfo.hone" :title="bloggerInfo.friendlyName">
@@ -124,9 +124,6 @@ export default {
     },
     getBlogLinkRealUrl() {
       return this.Utils.getPostRealUrl(this.blogData);
-    },
-    getBlogImageRealUrl(u) {
-      return this.Utils.getImageUrlFormHash(u);
     },
     loadAll() {
       var main = this;
@@ -268,7 +265,7 @@ export default {
     getUserCardBackground() {
       if (!this.bloggerInfo || this.Utils.isNullOrEmpty(this.bloggerInfo.cardBackground))
         return require("../assets/images/background/mebg.jpg");
-      else return this.getBlogImageRealUrl(this.bloggerInfo.cardBackground);
+      else return this.bloggerInfo.cardBackground;
     }
   }
 };

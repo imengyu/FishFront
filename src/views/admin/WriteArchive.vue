@@ -14,8 +14,8 @@
         <el-tab-pane label="写作" name="write">
           <div v-if="currentArchiveObject" class="blog-editor-container">
             <el-input type="text" v-model="currentArchiveObject.title" placeholder="请输入文章标题" maxlength="100" show-word-limit class="btn-block mb-2"></el-input>
-            <mavon-editor v-if="currentArchiveObject.type=='markdown'" v-model="currentArchiveContent" @save="saveChange()" :style="'height:' + getBestEditorHeight() + 'px;border: 1px solid #ddd;'"/>
-            <fish-editor v-if="currentArchiveObject.type=='html'" v-model="currentArchiveContent" @save="saveChange()" :style="'height:' + getBestEditorHeight() + 'px'" v-bind:height="getBestEditorHeight()"></fish-editor>
+            <mavon-editor ref="editorMarkdown" v-if="currentArchiveObject.type=='markdown'" v-model="currentArchiveContent" @insert-image="handleInsertImage" @save="saveChange()" :style="'height:' + getBestEditorHeight() + 'px;border: 1px solid #ddd;'" :boxShadow="false"/>
+            <fish-editor ref="editorHtml" v-if="currentArchiveObject.type=='html'" v-model="currentArchiveContent" @insert-image="handleInsertImage" @save="saveChange()" :style="'height:' + getBestEditorHeight() + 'px'" v-bind:height="getBestEditorHeight()"></fish-editor>
           </div>
           <div v-if="currentArchiveObject" style="margin-top: 20px">
               文章格式：<el-select v-model="currentArchiveType" placeholder="请选择" style="width: 120px" @change="handleArcType">
@@ -31,26 +31,26 @@
                 <el-tooltip class="item" effect="dark" content="编辑文章基本信息" placement="left">
                   <el-button icon="el-icon-edit" circle @click="editingBasicObject=true"></el-button>
                 </el-tooltip>
-                <el-button v-if="getArchiveCanUnPublish()" round @click="jump('/post/' + currentArchiveObject.id)"><i class="fa fa-eye mr-2"></i>转到文章页面</el-button>
+                <el-button v-if="getArchiveCanUnPublish()" round @click="jump('/archives/post/' + currentArchiveObject.id)"><i class="fa fa-eye mr-2"></i>转到文章页面</el-button>
                 
-                <el-button v-if="getArchiveCanPublish()" round ><i class="fa fa-paper-plane-o mr-2" @click="publish"></i>发布文章</el-button>
-                <el-button v-if="getArchiveCanUnPublish()" type="info" round @click="unPublish">撤回文章</el-button>
+                <el-button v-if="getArchiveCanPublish()" @click="publish()" round ><i class="fa fa-paper-plane-o mr-2"></i>发布文章</el-button>
+                <el-button v-if="getArchiveCanUnPublish()" type="info" @click="unPublish()" round>撤回文章</el-button>
                 
-                <el-button v-if="getArchiveCanPublish()" round @click="saveChange('draft')"><i class="fa fa-pencil-square-o mr-2"></i>保存到草稿</el-button>
-                <el-button v-else type="success" round @click="saveChange"><i class="fa fa-floppy-o mr-2"></i>保存更改</el-button>
+                <el-button v-if="getArchiveCanPublish()" @click="saveChange('draft')" round><i class="fa fa-pencil-square-o mr-2"></i>保存到草稿</el-button>
+                <el-button v-else type="success" @click="saveChange()" round><i class="fa fa-floppy-o mr-2"></i>保存更改</el-button>
                 
-                <el-button v-if="getArchiveCanUnChange()" type="danger" round @click="cancelChange">放弃更改</el-button>
+                <el-button v-if="getArchiveCanUnChange()" type="danger" @click="cancelChange()" round>放弃更改</el-button>
                 <el-button v-else type="danger" round disabled>放弃更改</el-button>
               </div>
             </div>
           
           
-          
-          <error-page v-else v-bind:error="commentListLoadStatus" v-bind:height="getBestEditorHeight() + 'px'"></error-page>
+          <error-page v-else v-bind:error="currentArchiveLoadError" v-bind:height="getBestEditorHeight() + 'px'"></error-page>
         </el-tab-pane>
         <el-tab-pane label="评论管理" name="comments">
-          <error-page v-if="commentListLoadStatus.indexOf('error')==0" v-bind:error="commentListLoadStatus"></error-page>
-          <el-table v-else ref="commentsTable" :data="commentListData" tooltip-effect="dark" style="width: 100%" empty-text="这篇文章还没有评论哦！" @selection-change="handleCommentListSelectionChange">
+          <error-page v-if="currentIsNew" v-bind:title="'您必须发布文章以后才能管理评论'" :can-retry="false"></error-page>
+          <error-page v-else-if="commentListLoadStatus.indexOf('error')==0" v-bind:error="commentListLoadStatus"></error-page>
+          <el-table v-else ref="commentsTable" :data="commentListData" tooltip-effect="dark" style="width: 100%" empty-text="这篇文章还没有评论哦！" @selection-change="handleCommentListSelectionChange" v-loading="commentListLoadStatus=='loading'">
             <el-table-column type="selection" width="55"></el-table-column>
             <el-table-column label="用户名/IP" width="120">
               <template slot-scope="scope">
@@ -94,7 +94,8 @@
         </el-tab-pane>
         <el-tab-pane label="媒体库" name="media-center">
           <!--媒体库标签页-->
-          <el-tabs tabPosition="left" v-model="currentTabMedia" @tab-click="handleTabMediaCenterClick">
+          <error-page v-if="currentIsNew" v-bind:title="'您需要保存文章以后才能使用媒体库功能'" v-bind:error="'您也可以先保存至草稿'" :can-retry="false"></error-page>
+          <el-tabs v-else tabPosition="left" v-model="currentTabMedia" @tab-click="handleTabMediaCenterClick">
             <el-tab-pane label="图片库" name="image">
               <error-page v-if="mediaImageLoadStatus.indexOf('error:')==0" v-bind:error="mediaImageLoadStatus" v-bind:height="getBestEditorHeight() + 'px'"></error-page>
               <image-list v-else ref="mediaImageList" 
@@ -198,13 +199,29 @@
           <span class="text-secondary">/post/{postUrlName}</span>
         </el-form-item>
         <el-form-item>
+          <el-checkbox v-model="currentArchiveObject.topMost">文章置顶</el-checkbox>
           <el-checkbox v-model="currentArchiveObject.enableComment">允许评论</el-checkbox>
+          <el-checkbox v-model="currentArchiveObject.showCatalog">显示目录</el-checkbox>
+          <el-checkbox v-model="currentArchiveObject.showInList">显示在文章列表中</el-checkbox>
           <el-checkbox v-model="currentArchiveShowLastModifyDate">自动添加修改日期</el-checkbox>
+        </el-form-item>
+        <el-form-item label="文章类型">
+          <el-select v-model="currentArchiveObject.postPrefix" placeholder="请选择">
+            <el-option v-for="item in archivePrefix" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
+          </el-select><br/>
+          <span class="text-secondary ml-3">此选项目前仅用作标记文章</span>
         </el-form-item>
         <el-form-item label="摘要">
           <el-input type="textarea" placeholder="请输入文章摘要" v-model="currentArchiveObject.previewText"></el-input>
         </el-form-item>
         <el-form-item label="文章缩略图">
+          <el-image
+            style="width:100%;max-width:200px;height:auto;border:1px solid #cdcdcd;border-radius:5px;"
+            :src="getArchivePreviewImage()" :fit="'contain'"></el-image>
+          <br/>
+          <el-button type="text" @click="handleChoosePrewImage">更换缩略图</el-button>
+          <el-button type="text" @click="handleClearPrewImage">清除缩略图</el-button>
         </el-form-item>
         <el-form-item>
           <b>分类和标签</b>
@@ -240,6 +257,20 @@
         <el-form-item>
           <span v-if="currentUserCanManageClassfications" class="text-secondary">请前往 <a :href="getJumpRealUrl('/admin/manage-classfication/')" target="_blank">分类和标签页面</a> 管理分类和标签。</span>
           <span v-else class="text-secondary">您必须拥有 <span class="text-primary">管理分类和标签</span> 权限，才能添加分类和标签。</span>
+        </el-form-item>
+        <hr>
+        <el-form-item label="上一篇/下一篇文章ID">
+          
+          <el-row :gutter="20">
+            <el-col :span="10">
+              <el-input placeholder="输入上一篇文章ID" v-model="currentArchiveObject.postNextId"></el-input>
+            </el-col>
+            <el-col :span="10">
+              <el-input placeholder="输入下一篇文章ID" v-model="currentArchiveObject.postPrvId"></el-input>
+            </el-col>
+          </el-row>
+          <span class="text-secondary">您可以自定义此文章的上一篇/下一篇对应哪篇文章的ID，填写0则认为没有上一篇/下一篇文章。</span>
+          
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -283,16 +314,39 @@
         <el-button @click="handleUploadFilesClose" round>确定</el-button>
       </span>
     </el-dialog>
+    <!--快速插入图片和选择文章缩略图对话框-->
+    <el-dialog
+      :title="mediaImageChoosingPrewImage?'选择文章缩略图':'插入图片'"
+      :visible.sync="mediaImageInserting"
+      class="dialog-auto-width-70">
+      <error-page v-if="mediaImageLoadStatus.indexOf('error:')==0" v-bind:error="mediaImageLoadStatus" v-bind:height="getBestEditorHeight() + 'px'"></error-page>
+      <image-list v-else ref="mediaImageListFastInsert" 
+        v-bind:items="mediaImageData" 
+        v-bind:loaded-status="mediaImageLoadStatus"
+        v-bind:multiple="!mediaImageChoosingPrewImage"
+        null-text="这里还没有图片，您可以前往媒体库上传图片"
+        type="select-list"></image-list>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="text" @click="mediaImageInserting=false;currentTab='media-center';currentTabMedia='image'" round>前往媒体库管理文章图片</el-button>
+        每页显示：<el-pagination class="btn-inline float-left" background layout="prev, pager, next" :page-count="mediaImagePageCount" :current-page="mediaImagePageCurrent" v-on:current-change="handleMediaImageListPage"></el-pagination>
+        <el-select style="width:90px;margin-right:10px" v-model="mediaImagePageSize" placeholder="请选择" @change="loadMediaImages(1)" size="small">
+          <el-option v-for="item in commentListSizeOpinions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+        </el-select>
+        <el-button @click="mediaImageInserting=false" round>取消</el-button>
+        <el-button type="primary" @click="mediaImageInserting=false;mediaImageChoosingPrewImage?handleMediaImageChoosePrewImage():handleMediaImageFasterInsertDoInsert()" round>确定</el-button>
+      </span>
+    </el-dialog>
   </el-container> 
 </template>
 
 <script>
-import $ from "jquery";
+
 import Chart from "chart.js";
 import serverConsts from "../../constants/serverConsts.js";
 import toast from "../../assets/lib/toast/toast.simply.js";
 import base64 from "../../assets/lib/base64/base64.min.js";
 import FishEditor from '../../components/FishEditor'
+import MavonEditor from '../../components/mavon-editor/mavon-editor.vue'
 import ImageList from '../../components/ImageList'
 import VideoList from '../../components/VideoList'
 import FileList from '../../components/FileList'
@@ -311,6 +365,7 @@ export default {
       currentTab: "write",
       currentTabMedia: 'image',
 
+      currentArchiveLoading: true,
       currentArchiveLoadError: '',
       currentArchiveErrorCanRetry: false,
       currentIsNew: true,
@@ -338,6 +393,7 @@ export default {
           text: '以纯 HTML 格式解析文章'
         }
       ],
+      archivePrefix: [],
 
 
       commentListData: null,
@@ -386,6 +442,9 @@ export default {
       mediaFilesPageCurrent: 1,
 
       mediaImageUploading: false,
+      mediaImageInserting: false,
+      mediaImageChoosingPrewImage: false,
+      mediaImageUploadShouldInset: false,
       mediaImageUploadAnySuccess: false,
       mediaImageUploadingFileList: [],
       mediaVideoUploading: false,
@@ -406,6 +465,7 @@ export default {
     this.init();
   },
   components: {
+    'mavon-editor': MavonEditor,
     'fish-editor': FishEditor,
     'image-list': ImageList,
     'error-page': ErrorPage,
@@ -428,7 +488,7 @@ export default {
       return this.NET.URL_PREFIX + link;
     },
     getBestEditorHeight(){
-      return document.body.clientHeight - 165 -55
+      return document.body.clientHeight - 330
     },
     authInfoInited(authed) {
       if (authed) {
@@ -470,6 +530,11 @@ export default {
       }
       return "";
     },
+    getArchivePreviewImage(){
+      var src = this.Utils.isNullOrEmpty(this.currentArchiveObject.previewImage) ? 
+        require('../../assets/images/default/images-default.png') : this.currentArchiveObject.previewImage;
+      return src
+    },
 
     //Events
     handleTabClick(tab) {
@@ -479,12 +544,21 @@ export default {
         this.handleTabMediaCenterClick(null); 
     },
     handleTabMediaCenterClick(tab) {
+      if(this.currentIsNew) return;
       if(this.currentTabMedia == 'image' && this.mediaImageLoadStatus == 'notload')
         this.loadMediaImages(1); 
       if(this.currentTabMedia == 'video' && this.mediaVideoLoadStatus == 'notload')
         this.loadMediaVideos(1); 
       if(this.currentTabMedia == 'files' && this.mediaFilesLoadStatus == 'notload')
         this.loadMediaFiles(1); 
+    },
+    handleInsertImage(type){
+      if(type=='upload'){
+        this.mediaImageUploadShouldInset = true;
+        this.mediaImageUploading = true;
+      }else if(type=='select-in-media-center'){
+        this.handleMediaImageShowFasterInsert()
+      }
     },
     handleArcType(type) {
       this.$swal({
@@ -508,60 +582,43 @@ export default {
       });
     },
     handleCommentDelete(index, comment){
-      this.$swal({
-        type: "warning",
-        title: "删除这一条评论吗?",
-        html: "<h5>注意，此操作不能恢复！</h5><div class='sweetalert-content-box'><b>ID：</b>" + comment.id + '</div>',
-        confirmButtonColor: "#d33",
-        confirmButtonText: "确定删除",
-        showCancelButton: true,
-        cancelButtonColor: "#3085d6",
-        cancelButtonText: "取消",
-        focusCancel: true,
-        reverseButtons: true
-      }).then(isConfirm => {
-        if (isConfirm.value) {
-          this.axios.delete(this.NET.API_URL + "/post/" + this.currentArchiveObject.id + '/comments/' + comment.id).then(response => {
-            if (response.data.success) {
-              toast.toast("成功删除 1 条评论", "success");
-              this.loadComments();
-            }
-            else this.$swal("删除失败", response.message, "error");
-          }).catch(response => { this.$swal("删除失败", "错误信息：" + response, "error"); });
-        }
-      })
+      this.$confirm("删除这一条评论吗?", '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.axios.delete(this.NET.API_URL + "/post/" + this.currentArchiveObject.id + '/comments/' + comment.id).then(response => {
+          if (response.data.success) {
+            toast.toast("成功删除 1 条评论", "success");
+            this.loadComments();
+          }
+          else this.$swal("删除失败", response.message, "error");
+        }).catch(response => { this.$swal("删除失败", "错误信息：" + response, "error"); });
+      });
     },
     handleCommentDeleteSelect(){
       if(this.commentListSelection.length==0){
         this.$swal('请选中一个条目','','info');
         return;
       }
-      this.$swal({
-        type: "warning",
-        title: "删除选中的 " + this.commentListSelection.length + " 条评论吗?",
-        confirmButtonColor: "#d33",
-        confirmButtonText: "确定删除",
-        showCancelButton: true,
-        cancelButtonColor: "#3085d6",
-        cancelButtonText: "取消",
-        focusCancel: true,
-        reverseButtons: true
-      }).then(isConfirm => {
-        if (isConfirm.value) {
-          var delPosts = { comments: [] };
-          var i = 0;
-          for(var key in this.commentListSelection) {
-            delPosts.comments[i] = this.commentListSelection[key].id;
-            i++;
-          }
-          this.axios.delete(this.NET.API_URL + "/post/" + this.currentArchiveObject.id + '/comments', delPosts).then(response => {
-            if (response.data.success) {
-              toast.toast("成功删除 " + this.commentListSelection.length + " 条评论", "success");
-              this.loadComments();
-            }
-            else this.$swal("删除失败", response.message, "error");
-          }).catch(response => { this.$swal("删除失败", "错误信息：" + response, "error"); });
+      this.$confirm("确定删除选中的 " + this.commentListSelection.length + " 条评论吗?", '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        var delPosts = { comments: [] };
+        var i = 0;
+        for(var key in this.commentListSelection) {
+          delPosts.comments[i] = this.commentListSelection[key].id;
+          i++;
         }
+        this.axios.delete(this.NET.API_URL + "/post/" + this.currentArchiveObject.id + '/comments', delPosts).then(response => {
+          if (response.data.success) {
+            toast.toast("成功删除 " + this.commentListSelection.length + " 条评论", "success");
+            this.loadComments();
+          }
+          else this.$swal("删除失败", response.message, "error");
+        }).catch(response => { this.$swal("删除失败", "错误信息：" + response, "error"); });
       })
     },
     handleCommentMoreInfo(index, comment){
@@ -588,6 +645,31 @@ export default {
 
     //Media click
 
+    handleChoosePrewImage(){
+      this.mediaImageChoosingPrewImage=true;
+      this.handleMediaImageShowFasterInsert()
+    },
+    handleClearPrewImage(){
+      this.currentArchiveObject.previewImage = '';
+    },
+    handleMediaImageChoosePrewImage(){
+      this.mediaImageChoosingPrewImage=false;
+      var selectImage = this.$refs.mediaImageListFastInsert.getSelectedItems();
+      if(selectImage){
+        this.currentArchiveObject.previewImage = selectImage.resourcePath;
+        toast.toast('修改文章缩略图成功','success');
+      }
+    },
+    handleMediaImageFasterInsertDoInsert(){
+      var selectImages = this.$refs.mediaImageListFastInsert.getSelectedItems();
+      for (var key in selectImages)
+        this.insertImage(selectImages[key]);
+    },
+    handleMediaImageShowFasterInsert(){
+      if(this.mediaImageLoadStatus == 'notload')
+        this.loadMediaImages();
+      this.mediaImageInserting = true;
+    },
     handleMediaImageItemClick(act, item){
       if(act=='add'){ this.mediaImageUploading = true; }
       else if(act=='del'){
@@ -604,7 +686,21 @@ export default {
               toast.toast('删除图片失败！' + response.data.message, 'error', 5000);
             }
           })
-        })
+        }).catch(() => {});
+      }else if(act=='edit'){
+        this.$prompt('修改图片标题', '提示', {
+          confirmButtonText: '保存',
+          cancelButtonText: '取消',
+        }).then(({ value }) => {
+          item.title = value;
+          this.axios.put(this.NET.API_URL + '/media/' + item.id, item).then((response) => {
+            if(response.data.success){
+              toast.toast('更新图片标题成功！', 'success')
+            }else{
+              toast.toast('更新图片标题失败！' + response.data.message, 'error', 5000);
+            }
+          })
+        }).catch(() => {});
       }
     },
     handleMediaImageListPage(p){ this.loadMediaImages(1); },
@@ -624,8 +720,8 @@ export default {
               toast.toast('删除视频失败！' + response.data.message, 'error', 5000);
             }
           })
-        })
-      }
+        }).catch(() => {});
+      }else if(act=='insert') this.insertVideo(item);
     },
     handleMediaVideoListPage(p){ this.loadMediaVideos(1); },
     handleMediaFilesItemClick(act, item){
@@ -644,7 +740,7 @@ export default {
               toast.toast('删除附件失败！' + response.data.message, 'error', 5000);
             }
           })
-        })
+        }).catch(() => {});
       }
     },
     handleMediaFilesListPage(p){ this.loadMediaFiles(1); },
@@ -654,8 +750,9 @@ export default {
     //Image
     handleUploadAddImage(){ this.$refs.uploadMediaImages.selectFiles(); },
     handleUploadImage(files){
-      var arr = this.mediaImageUploadingFileList,
-        successCallback = this.handleUploadImageSuccess;
+      var arr = this.mediaImageUploadingFileList;
+      var successCallback = this.mediaImageUploadShouldInset ? this.handleUploadImageSuccess : this.handleUploadImageSuccessAndInsert;
+      if(this.mediaImageUploadShouldInset) this.mediaImageUploadShouldInset = false;
       for(var i=0;i<files.length;i++){
         var newItem = {
           file: files[i],
@@ -680,8 +777,10 @@ export default {
         })
       }
     },
-    handleUploadImageSuccess(item){
+    handleUploadImageSuccess(item){ this.mediaImageUploadAnySuccess = true; },
+    handleUploadImageSuccessAndInsert(item){
       this.mediaImageUploadAnySuccess = true;
+      this.insertImage(item);
     },
     handleUploadImageCancel(item){
       if(item.uploading) this.abortUpload(item);
@@ -817,17 +916,20 @@ export default {
       this.currentIsNew = false;
       this.axios.get(this.NET.API_URL + "/post/" + idOrUrlName + "?authPrivate=true").then(response => {
         if(response.data.success){
+          this.currentArchiveLoading = false;
           this.currentArchiveObject = response.data.data;
           this.currentArchiveType = response.data.data.type;
           this.currentArchiveObjectBackup = this.Utils.clone(this.currentArchiveObject);
           this.loadPDataStart();
         }else{
+          this.currentArchiveLoading = false;
           this.currentArchiveObject = null;
           this.currentArchiveLoadError = response.data.message;
           this.currentArchiveErrorCanRetry = false;
         }
         callback();
       }).catch(response => {
+        this.currentArchiveLoading = false;
         this.currentArchiveLoadError = response;
         this.currentArchiveErrorCanRetry = true;
         callback();
@@ -917,6 +1019,14 @@ export default {
       if(this.currentArchiveObject.content)
         this.currentArchiveContent = base64.decode(this.currentArchiveObject.content);
       else this.currentArchiveContent = '';
+      this.archivePrefix = [];
+      var arr = serverConsts.PostPrefix;
+      for(var key in arr) {
+        this.archivePrefix.push({
+          value: arr[key],
+          label: serverConsts.PostPrefixName[key]
+        });
+      }
     },
     loadPartReset(){
       this.commentListLoadStatus = 'notload';
@@ -930,6 +1040,7 @@ export default {
       this.handleTabClick(null);
     },
     loadComments(){
+      if(this.currentIsNew) return;
       this.commentListLoadStatus = "loading";
       var url =
         this.NET.API_URL +
@@ -1204,17 +1315,44 @@ export default {
     },
 
     //
+    // 文章写方法
+    //
+
+    insertImage(imageItem){
+      if(this.currentArchiveType == 'markdown'){
+        this.$refs.editorMarkdown.insertText(this.$refs.editorMarkdown.getTextareaDom(), 
+        {
+          prefix: '![' + imageItem.title + '](' + imageItem.resourcePath + ')',
+          subfix: '',
+          str: ''
+        })
+      }else if(this.currentArchiveType == 'html')
+        this.$refs.editorHtml.insertOrReplace('<img src="' + imageItem.resourcePath + '" alt="' + imageItem.title + '"/>','',false,true);
+    },
+    insertVideo(videoItem){
+      if(this.currentArchiveType == 'markdown'){
+        this.$refs.editorMarkdown.insertText(this.$refs.editorMarkdown.getTextareaDom(), 
+        {
+          prefix: '<video src="' + imageItem.resourcePath + '" controls>',
+          subfix: '</video>',
+          str: ''
+        })
+      }else if(this.currentArchiveType == 'html')
+        this.$refs.editorHtml.insertOrReplace('<video src="' + imageItem.resourcePath + '" controls>','</video>',false,true);
+    },
+
+    //
     // 文章操作方法
     //
 
     //参数验证
     saveValidate(){
       if(this.Utils.isNullOrEmpty(this.currentArchiveObject.title)) {
-        this.$swal('您正在提交没有标题的文章', '您必须输入文章的标题才能保存文章哦', 'warning');
+        this.$alert('您正在提交没有标题的文章, 必须输入文章的标题才能保存文章哦', '提交失败', { confirmButtonText: '我知道了' });
         return true;
       }
       if(this.Utils.isNullOrEmpty(this.currentArchiveContent)) {
-        this.$swal('您正在提交一篇空的文章', '您必须写一些文章内容才能保存文章哦', 'warning');
+        this.$alert('您正在提交一篇空的文章, 必须写一些文章内容才能保存文章哦', '提交失败', { confirmButtonText: '我知道了' });
         return true;
       }
     },
@@ -1305,66 +1443,64 @@ export default {
 
     //放弃修改
     cancelChange() {
-      this.$swal({
-        type: 'warning', title: '真的要放弃修改吗', text: "注意，您的未保存修改将会丢失！", confirmButtonColor: '#d33', confirmButtonText: '确定',
-        showCancelButton: true, cancelButtonColor: '#3085d6',
-        cancelButtonText: "取消", focusCancel: true, reverseButtons: true
-      }).then((isConfirm) => {
-        if (isConfirm.value) {
-          this.Utils.cloneValue(this.currentArchiveObject, this.currentArchiveObjectBackup);
-          this.this.loadPDataStart();
-          toast.toast('已将文章恢复为修改前状态', 'success')
-        }
-      });
+      this.$confirm('真的要放弃修改吗? 注意，您的未保存修改将会丢失！', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.Utils.cloneValue(this.currentArchiveObject, this.currentArchiveObjectBackup);
+        this.this.loadPDataStart();
+        toast.toast('已将文章恢复为修改前状态', 'success')
+      }).catch(() => {});;
     },
     //保存修改
     saveChange(st) {
-      this.$swal({
-        type: 'question', title: '您真的要现在保存修改吗', text: "", confirmButtonColor: '#3085d6', confirmButtonText: '保存',
-        showCancelButton: true, cancelButtonColor: '#999', cancelButtonText: "再改改", focusCancel: true, reverseButtons: true
-      }).then((isConfirm) => {
-        if (isConfirm.value) {
-          var targetStatus = -1;
-          var t = toast.toast('正在提交文章', 'loading', -1);
-          if (st=='draft') targetStatus = serverConsts.ArchiveStatus.DRAFT;
-          else if(st=='private') targetStatus = serverConsts.ArchiveStatus.PRIVATE;
-          else if(st=='publish') targetStatus = serverConsts.ArchiveStatus.PUBLISH;
-          this.saveSubmit(targetStatus, (success) => {
-            toast.toastClose(t);
-            if(success) this.$swal('文章修改提交成功！', '', 'success')
-          });
-        }
-      });
+      this.$confirm('您真的要现在保存修改吗? ', '提示', {
+        confirmButtonText: '确定保存',
+        cancelButtonText: '再改改',
+        type: 'warning'
+      }).then(() => {
+        var targetStatus = -1;
+        var t = toast.toast('正在提交文章', 'loading', -1);
+        if (st=='draft') targetStatus = serverConsts.ArchiveStatus.DRAFT;
+        else if(st=='private') targetStatus = serverConsts.ArchiveStatus.PRIVATE;
+        else if(st=='publish') targetStatus = serverConsts.ArchiveStatus.PUBLISH;
+        this.saveSubmit(targetStatus, (success) => {
+          toast.toastClose(t);
+          if(success) this.$swal('文章修改提交成功！', '', 'success')
+        });
+      }).catch(() => {});;
     },
     //发布
     publish() {
-      this.$swal({
-        type: 'warning', title: '真的要发布文章吗', text: "您的文章将会被发布", confirmButtonColor: '#3085d6', confirmButtonText: '立即发布',
-        showCancelButton: true, cancelButtonColor: '#999', cancelButtonText: "再改改", focusCancel: true, reverseButtons: true
-      }).then((isConfirm) => {
-        if (isConfirm.value) {
-          var t = toast('正在提交文章', 'loading', -1);
-          this.saveSubmit(serverConsts.ArchiveStatus.PUBLISH, (success) => {
-            toast.toastClose(t);
-            if(success) swal('文章发布成功！', '', 'success')
-          });                  
-        }
+
+      this.$confirm('您真的要现在发布文章吗? ', '提示', {
+        confirmButtonText: '确定保存',
+        cancelButtonText: '再改改',
+        type: 'warning'
+      }).then(() => {
+        var t = toast.toast('正在提交文章', 'loading', -1);
+        this.saveSubmit(serverConsts.ArchiveStatus.PUBLISH, (success) => {
+          toast.toastClose(t);
+          if(success) swal('文章发布成功！', '', 'success')
+        });                  
+      }).catch((e) => {
+        console.log(e);
       });
     },
     //撤回
     unPublish() {
-      this.$swal({
-        type: 'warning', title: '真的要撤回文章吗', text: "撤回后您的文章只有您自己能看到（它将被保存在草稿箱中）", confirmButtonColor: '#3085d6', confirmButtonText: '确定撤回',
-        showCancelButton: true, cancelButtonColor: '#999', cancelButtonText: "取消", focusCancel: true, reverseButtons: true
-      }).then((isConfirm) => {
-        if (isConfirm.value) {
-          var t = toast('正在撤回文章', 'loading', -1);
-          this.saveSubmit(serverConsts.ArchiveStatus.DRAFT, (success) => {
-            toast.toastClose(t);
-            if(success) toast.toast('成功将文章撤回到草稿箱', 'success');
-          });                  
-        }
-      });
+      this.$confirm('真的要撤回文章吗? 撤回后您的文章只有您自己能看到（它将被保存在草稿箱中）', '提示', {
+        confirmButtonText: '确定保存',
+        cancelButtonText: '再改改',
+        type: 'warning'
+      }).then(() => {
+        var t = toast.toast('正在撤回文章', 'loading', -1);
+        this.saveSubmit(serverConsts.ArchiveStatus.DRAFT, (success) => {
+          toast.toastClose(t);
+          if(success) toast.toast('成功将文章撤回到草稿箱', 'success');
+        })  
+      }).catch(() => {});
     },
 
   }
@@ -1381,9 +1517,13 @@ export default {
 .dialog-auto-width-50 .el-dialog {
   width: 50%;
 }
+.dialog-auto-width-70 .el-dialog {
+  width: 70%;
+}
 @media (max-width: 425px) {
   .dialog-auto-width-50 .el-dialog,
-  .dialog-auto-width-30 .el-dialog {
+  .dialog-auto-width-30 .el-dialog,
+  .dialog-auto-width-70 .el-dialog {
     width: 90%;
   }
 }

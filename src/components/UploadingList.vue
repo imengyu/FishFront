@@ -1,7 +1,7 @@
 <template>
     <div class="upload-list">
         <div v-for="(item, index) in items" :key="index" class="upload-item">
-            <h5>{{ item.text }} <br><span v-if="item.exception" class="text-danger">{{item.exception}}</span></h5>
+            <h5>{{ item.text }} <span v-if="item.reading" class="text-info">正在处理中...</span><br><span v-if="item.exception" class="text-danger">{{item.exception}}</span></h5>
             <el-progress :percentage="item.percentage" :status="item.status"></el-progress>
             <div class="upload-control">
                 <el-button type="danger" icon="el-icon-delete" @click="onDelete(item)" circle size="mini"></el-button>

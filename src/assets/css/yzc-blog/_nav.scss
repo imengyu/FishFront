@@ -94,15 +94,22 @@
 .main-breadcrumb {
     
     position: absolute;
-    margin-top: 10px;
     top: 60px;
 
     .breadcrumb {
         padding: 8px 0 4px 0;
-        border-top: 1px solid #f3f3f3;
         background-color: transparent;
         font-size: 12px;
         margin: 0;
+
+        .breadcrumb-item {
+            font-size: 12px;
+
+            a {
+                font-size: 12px;
+            }
+        }
+
     }
 
     .breadcrumb-item+.breadcrumb-item::before {
@@ -494,7 +501,7 @@
     align-items: center;
     //font-family:'AbductionII';
 
-    a {
+    > a {
         
         font-size: 23px;
         color: $white;

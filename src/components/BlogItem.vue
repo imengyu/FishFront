@@ -3,8 +3,8 @@
         <h3><a :href="getBlogLinkRealUrl()" target="_blank">{{ blogData.title }}</a></h3>
         <p v-if="blogData.previewText">{{ blogData.previewText }}</p>
         <div v-if="blogData.previewImage" class="flat-blog-imghost">
-            <img :src="getBlogImageRealUrl()" />
-            <img class="holder" :src="getBlogImageRealUrl()" />
+            <img :src="blogData.previewImage" />
+            <img class="holder" :src="blogData.previewImage" />
         </div>
         <ul class="flat-blog-meta">
             <li v-if="blogData.topMost" class="mr-2"><span class="tag-post-prefix original"><i class="fa fa-thumb-tack text-white"></i> 置顶</span></li>
@@ -41,9 +41,6 @@ export default {
     },
     getBlogLinkRealUrl(){
       return this.Utils.getPostRealUrl(this.blogData);
-    },
-    getBlogImageRealUrl(){
-      return this.Utils.getImageUrlFormHash(this.blogData.previewImage);
     },
     getBlogPrefix(){
       return this.Utils.getPostPrefix(this.blogData.postPrefix)

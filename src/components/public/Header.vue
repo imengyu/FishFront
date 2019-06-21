@@ -5,18 +5,30 @@
     </div>
     <div :class="'container main-menu ' + headerMenuStyle">
       <div class="container">
-        <div class="row">
-          <div class="col nav-title d-flex align-items-center justify-content-between">
+        <div :class="'row ' + headerRowClass">
+          <div :class="'col' + (headerColWidth?'-'+headerColWidth:'') + ' nav-title d-flex align-items-center justify-content-between'">
             <div class="nav-header-text d-flex align-items-center justify-content-between">
               <span class="logo" id="header-logo"></span>
               <a href="/" id="header-title">ALONE SPACE</a>
               <el-button v-if="isAdmin" :icon="isAdminCollape ? 'el-icon-s-unfold' : 'el-icon-s-fold'" circle @click="switchAdminCollape()" style="margin-left: 13px;"></el-button>
+              <nav v-if="pageBreadcrumb && pageShowBreadcrumb" class="main-breadcrumb main-menu-breadcrumb" aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li
+                    v-for="(item, index) in pageBreadcrumb"
+                    :key="index"
+                    :class="'breadcrumb-item' + (item.active ? ' active' : '')"
+                  >
+                    <span v-if="item.active">{{ item.title }}</span>
+                    <a v-else :href="item.link">{{ item.title }}</a>
+                  </li>
+                </ol>
+              </nav>
             </div>
             <button type="button" :class="menuMoblieShow ? 'flat-icon-close' : 'flat-icon-menu'" id="mobile-nav-toggle" @click="menuMoblieShow=!menuMoblieShow"></button>
             <nav id="nav-menu-container" class="nav-menu-container">
               <ul class="nav-menu sf-js-enabled sf-arrows" style="touch-action: auto;" id="header-menu">
-                <li v-for="(menu, index) in menuData" :key="index" :class="isMenuActive(menu.link)">
-                  <a v-if="isMenuActive(menu.link)=='menu-active'">{{ menu.name }}</a>
+                <li v-for="(menu, index) in menuData" :key="index" :class="isMenuActive(menu)">
+                  <a v-if="isMenuActive(menu)=='menu-active'">{{ menu.name }}</a>
                   <a v-else :href="getMenuRealUrl(menu.link)">{{ menu.name }}</a>
                 </li>
                 <li v-if="currentAuthed" class="nav-user">
@@ -80,24 +92,7 @@
         </div>
       </div>
     </div>
-    <div v-if="pageShowBreadcrumb" class="container main-menu-breadcrumb">
-      <div v-if="pageBreadcrumb" class="row justify-content-start main-breadcrumb">
-        <div class="col">
-          <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-              <li
-                v-for="(item, index) in pageBreadcrumb"
-                :key="index"
-                :class="'breadcrumb-item' + (item.active ? ' active' : '')"
-              >
-                <span v-if="item.active">{{ item.title }}</span>
-                <a v-else :href="item.link">{{ item.title }}</a>
-              </li>
-            </ol>
-          </nav>
-        </div>
-      </div>
-    </div>
+    <div v-if="pageBreadcrumb && pageShowBreadcrumb" class="main-breadcrumb-tile"></div>
     <!-- Mobile nav -->
     <nav id="mobile-nav" :class="'nav-menu-container' + (menuMoblieShow ? ' show' : '')">
       <li v-if="currentAuthed" class="nav-user">
@@ -156,8 +151,8 @@
                   </div>
                 </li>                  
       <ul class="" style="touch-action: auto;" id="">
-        <li v-for="(menu, index) in menuData" :key="index" :class="isMenuActive(menu.link)">
-          <a v-if="isMenuActive(menu.link)=='menu-active'">{{ menu.name }}</a>
+        <li v-for="(menu, index) in menuData" :key="index" :class="isMenuActive(menu)">
+          <a v-if="isMenuActive(menu)=='menu-active'">{{ menu.name }}</a>
           <a v-else :href="getMenuRealUrl(menu.link)" @click="menuMoblieShow=false">{{ menu.name }}</a>
         </li>
       </ul>
@@ -181,7 +176,9 @@ export default {
       state.global.globalPageBackgroundOverlayOpactity,
     pageBreadcrumb: state => state.global.globalPageBreadcrumb,
     pageShowBreadcrumb: state => state.global.globalPageShowBreadcrumb,
-    isAdminCollape: state => state.global.globalAdminCollape
+    isAdminCollape: state => state.global.globalAdminCollape,
+    headerColWidth: state => state.global.globalHeaderColWidth,
+    headerRowClass: state => state.global.globalHeaderRowClass,
   }),
   data() {
     return {
@@ -221,8 +218,8 @@ export default {
     init() {
       this.reset();
     },
-    isMenuActive(link) {
-      return this.$route.path + "/" == link || this.$route.path == link
+    isMenuActive(menu) {
+      return menu.forceActive || this.$route.path + "/" == menu.link || this.$route.path == menu.link
         ? "menu-active"
         : "";
     },
@@ -249,9 +246,7 @@ export default {
         if (authInfo.friendlyName) this.currentUserName = authInfo.friendlyName;
         else this.currentUserName = authInfo.name;
         if (authInfo.headimg)
-          this.currentUserHead = this.Utils.getImageUrlFormHash(
-            authInfo.headimg
-          );
+          this.currentUserHead = authInfo.headimg;
         else
           this.currentUserHead = require("../../assets/images/default/head-default.png");
         if (authInfo.level == this.ServerConsts.UserLevels.admin)
@@ -273,4 +268,17 @@ export default {
 </script>
 
 <style scoped>
+.main-menu-breadcrumb{
+  position: absolute;
+  top: 60px;
+}
+.main-breadcrumb-tile{
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  height: 50px;
+  z-index: 1;
+}
 </style>

@@ -8,7 +8,7 @@
             <!-- slideritem wrapped package with the components you need -->
             <slideritem v-for="(item,index) in blogDataListSlider" :key="index" class="flat-blog-slider-item">
               <a class="flat-blog-slider-inner" :href="getBlogLinkRealUrl(item)"
-              :style="(item.previewImage ? ('background-image: url(' + getBlogImageRealUrl(item.previewImage) +  ');') : '')">
+              :style="(item.previewImage ? ('background-image: url(' + item.previewImage +  ');') : '')">
                
                 <h2>{{ item.title }}</h2>
                 <p>{{ item.previewText }}</p>
@@ -109,9 +109,6 @@ export default {
     getJumpRealUrl(link) {
       return this.NET.URL_PREFIX + link;
     },
-    getBlogImageRealUrl(hashorurl){
-      return this.Utils.getImageUrlFormHash(hashorurl);
-    },
     getBlogLinkRealUrl(item){
       return this.Utils.getPostRealUrl(item);
     },
@@ -172,10 +169,14 @@ export default {
           }
         }
       };
-
-      this.axios.get(main.NET.API_URL + "/posts/stat").then((response)=>{
-        if (response.data.success) reloadPostsStat(response.data.data);
-      })
+      this.axios
+        .post(this.NET.API_URL + "/posts/stat", getPosts)
+        .then(response => {
+          if (response.data.success) reloadPostsStat(response.data.data);
+        })
+        .catch(response => {
+          console.log(response);
+        });
     }
   }
 };

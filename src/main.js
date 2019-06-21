@@ -10,14 +10,9 @@ import 'element-ui/lib/theme-chalk/index.css';
 import store from './store'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-import mavonEditor from 'mavon-editor'
 import VueClipboard from 'vue-clipboard2'
- 
-
-import 'mavon-editor/dist/css/index.css'
 
 Vue.use(VueClipboard)
-Vue.use(mavonEditor)
 Vue.use(VueAxios, axios);
 Vue.use(ElementUI);
 Vue.use(VueSweetalert2, options)
@@ -49,15 +44,15 @@ var main = new Vue({
 //当路由进入前
 router.beforeEach((to, from , next) => {
   // 每次切换页面时，调用进度条
+  main.$children[0].appLoading = true;
   NProgress.start();
   next();
 });
 //当路由进入后：关闭进度条
 router.afterEach(() => {  
-
-
   // 在即将进入新的页面组件前，关闭掉进度条
   NProgress.done();
+  main.$children[0].appLoading = false;
 })
 
 

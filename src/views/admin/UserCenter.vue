@@ -139,7 +139,7 @@ export default {
     getUserHead() {
       if (this.Utils.isNullOrEmpty(this.currentUser.headimg))
         return require("../../assets/images/default/head-default.png");
-      else return this.Utils.getImageUrlFormHash(this.currentUser.headimg);
+      else return this.currentUser.headimg;
     },
 
 
@@ -157,7 +157,7 @@ export default {
       var xhr;
 
       //上传成功响应
-      var uploadComplete = function(evt) {
+      var uploadComplete = (evt) => {
         toast.toastClose(t);
         //服务断接收完文件返回的结果
         var data = JSON.parse(evt.target.responseText);

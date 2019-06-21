@@ -316,12 +316,12 @@ export default {
     getUserHead() {
       if (this.Utils.isNullOrEmpty(this.currentUser.headimg))
         return require("../assets/images/default/head-default.png");
-      else return this.Utils.getImageUrlFormHash(this.currentUser.headimg);
+      else return this.currentUser.headimg;
     },
     getUserCardBackground() {
       if (this.Utils.isNullOrEmpty(this.currentUser.cardBackground))
         return require("../assets/images/background/mebg.jpg");
-      else return this.Utils.getImageUrlFormHash(this.currentUser.cardBackground);
+      else return this.currentUser.cardBackground;
     },
   }
 };

@@ -248,7 +248,7 @@ export default {
     getUserHead(user) {
       if (this.Utils.isNullOrEmpty(user.headimg))
         return require("../../assets/images/default/head-default.png");
-      else return this.Utils.getImageUrlFormHash(user.headimg);
+      else return user.headimg;
     },
     getUserLevelItem(user){
       var html = '';

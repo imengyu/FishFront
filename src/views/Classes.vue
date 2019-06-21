@@ -9,7 +9,7 @@
               v-on:click="switchCategory(category.urlName ? category.urlName : category.id)" 
               href="javascript:void(0);" 
               :class="'flat-tag-color ' + ((blogCategoryCurrent == category.urlName || blogCategoryCurrent == blogCategoryCurrent.id) ? 'bg-primary' : 'bg-secondary') + ' btn-block text-center'" 
-              :style="(index==0?'margin-top: 25px;':'') + (category.previewImage ? 'background-image:url(' + getBlogImageRealUrl(category.previewImage) + ')' : '')"
+              :style="(index==0?'margin-top: 25px;':'') + (category.previewImage ? 'background-image:url(' + category.previewImage + ')' : '')"
               :title="category.previewText">
                 <h5 style="font-size: 16px; font-weight: bold;margin-bottom: 0">{{ category.title }} </h5>
                 {{ category.previewText }}
@@ -155,9 +155,6 @@ export default {
     },
     getBlogPrefix(item) {
       return this.Utils.getPostPrefix(item.postPrefix);
-    },
-    getBlogImageRealUrl(url) {
-      return this.Utils.getImageUrlFormHash(url);
     },
     authInfoInited() {
       

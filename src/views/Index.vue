@@ -78,6 +78,9 @@
           </div>
         </div>
       </div>
+      <div :class="'visitor-count' + (statCurrentVisitor &gt; 0 ? '' : ' hidden')">
+        你好！您是今天第 <span>{{ statCurrentVisitor }}</span> 个访问者！
+      </div>
     </div>
     <div class="main-footer">
       <ul>
@@ -94,8 +97,6 @@
 </template>
 
 <script>
-import jQuery from 'jquery'
-
 export default {
   name: "Index",
   data() {
@@ -106,6 +107,7 @@ export default {
       statPv: '-',
       statIp: '-',
       statSiteLive: '-',
+      statCurrentVisitor: -1,
     };
   },
   mounted() {
@@ -133,43 +135,57 @@ export default {
       this.isDetailsView = !this.isDetailsView;
     },
     loadStats(){
-      var a = new Date, b, c = this.df(a, new Date("2018-11-29")), d = this.df(a, new Date("2000-09-29"));
+      var df = function(a, e) {
+        var c, b, d;
+        return a = Date.parse(a),
+        c = (e = Date.parse(e)) - a,
+        c = Math.abs(c),
+        d = Math.floor(c / 864e5)
+      };
+      var a = new Date, b, c = df(a, new Date("2018-11-29")), d = df(a, new Date("2000-09-29"));
       this.statYear = parseInt(d / 365) + " 岁";
       if(c<365) this.statSiteLive = c + " 天"
       else {
         var e = parseInt(c / 365), f = c - (e * 365);
         this.statSiteLive = e + ' 年 ' + f + " 天"
       }
-      var url = this.NET.API_URL + "/stat/today";
-      var main = this;
-      jQuery.ajax({
-        url: url,
-        type: "get",
-        success: function(r) {
-            try {
-                if (r.success) {
-                    var d = r.data;
-                    main.statPv = d.pv;
-                    main.statIp = d.ip;
-                    main.statArchiveCount = d.count + " 篇";
-                    console.log("%c 你好！您是今天第 %c " + d.ip + " %c 个访问者！ ", "color:white;background-color:black;padding:5px 0", "color:white;background-color:#6195FF;padding:5px 0", "color:white;background-color:black;padding:5px 0")
-                }
-            } catch (e) {}
+      this.axios.get(this.NET.API_URL + "/stat/today").then((response) => {
+        if (response.data.success) {
+          var d = response.data.data;
+          this.statPv = d.pv;
+          this.statIp = d.ip;
+          this.statArchiveCount = d.count + " 篇";
+          this.statCurrentVisitor = d.ip;
+          setTimeout(() => {  this.statCurrentVisitor = 0; }, 6000);
+          console.log("%c 你好！您是今天第 %c " + d.ip + " %c 个访问者！ ", "color:white;background-color:black;padding:5px 0", "color:white;background-color:#6195FF;padding:5px 0", "color:white;background-color:black;padding:5px 0")
         }
       })
     },
-    df(a, e) {
-      var c, b, d;
-      return a = Date.parse(a),
-      c = (e = Date.parse(e)) - a,
-      c = Math.abs(c),
-      d = Math.floor(c / 864e5)
-    }
+    
   }
 };
 </script>
 
 <style scoped>
+.visitor-count{
+  color:white;
+  background-color:black;
+  padding: 5px 5px;
+  display: inline-block;
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  opacity: 1;
+  transition: opacity linear 1s;
+}
+.visitor-count.hidden{
+  opacity: 0;
+}
+.visitor-count span{
+  color:white;
+  background-color:#6195FF;
+  padding: 5px 8px
+}
 .main-head {
   position: relative;
 }
