@@ -6,7 +6,7 @@
       <div class="container">
         <!-- Post Title -->
         <div v-if="postObjectLoadStatus=='loaded' && postObject" class="row justify-content-end">
-          <div class="col-lg-8 col-md-10">
+          <div class="col-lg-8 col-md-12">
             <h2 style="font-weight: bold;" class="no-anchor">{{ postObject.title }}</h2>
             <p class="blog-meta">
               <span v-if="postObject.postPrefix" v-html="getBlogPrefix()" class="mr-2"></span>
@@ -32,7 +32,7 @@
           class="row justify-content-end mt-3"
         >
           <!-- Post Content -->
-          <div class="col-lg-8 col-md-10 post-container">
+          <div class="col-lg-8 col-md-12 post-container">
             <div
               v-if="postHtmlContent"
               v-html="postHtmlContent"
@@ -160,7 +160,7 @@
     <article v-if="postCanComment" id="comment" class="sm-padding bg-grey-no-border">
       <div class="container">
         <div class="row justify-content-end">
-          <div class="col-lg-8 col-md-10 col-sm-12">
+          <div class="col-lg-8 col-md-12 col-sm-12">
             <commenter
               ref="postComment"
               v-if="postObjectLoadStatus == 'loaded' && postObject"
@@ -251,7 +251,7 @@ export default {
   methods: {
     init: function() {
       this.$store.dispatch("global/resetHeader");
-      this.$store.dispatch("global/setHeaderColWidth", '12 col-lg-11 col-md-12 pl-0 ');
+      this.$store.dispatch("global/setHeaderColWidth", '12 col-lg-11 col-md-12 no-padding-left-md ');
       this.$store.dispatch("global/setHeaderRowClass", 'justify-content-end');
       if (this.$route.params.post)
         this.postIdOrUrlName = this.$route.params.post;

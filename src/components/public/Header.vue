@@ -10,7 +10,9 @@
             <div class="nav-header-text d-flex align-items-center justify-content-between">
               <span class="logo" id="header-logo"></span>
               <a href="/" id="header-title">{{ menuTilte }}</a>
-              <el-button v-if="isAdmin" :icon="isAdminCollape ? 'el-icon-s-unfold' : 'el-icon-s-fold'" circle @click="switchAdminCollape()" style="margin-left: 13px;"></el-button>
+              <el-tooltip class="item" effect="dark" :content="isAdminCollape ? '显示菜单' : '折叠菜单'" placement="bottom">
+                <el-button v-if="isAdmin" :icon="isAdminCollape ? 'el-icon-s-unfold' : 'el-icon-s-fold'" circle @click="switchAdminCollape()" style="margin-left: 13px;" size="small"></el-button>
+              </el-tooltip>
               <nav v-if="pageBreadcrumb && pageShowBreadcrumb" class="main-breadcrumb main-menu-breadcrumb" aria-label="breadcrumb">
                 <ol class="breadcrumb">
                   <li
@@ -35,6 +37,7 @@
                 <header-user-menu v-if="currentAuthed" 
                   :currentUserLevel="currentUserLevel" :currentUserName="currentUserName" 
                   :currentUserHead="currentUserHead" :currentUserMessageCount="currentUserMessageCount" ></header-user-menu>
+                <li v-else><a :href="getMenuRealUrl('/sign-in/')">登录</a></li>
               </ul>
             </nav>
           </div>
@@ -100,6 +103,7 @@
                   </div>
                 </li>                  
       <ul class="" style="touch-action: auto;" id="">
+        <li v-if="!currentAuthed"><a :href="getMenuRealUrl('/sign-in/')">登录</a></li>
         <li v-for="(menu, index) in menuData" :key="index" :class="isMenuActive(menu)">
           <a v-if="isMenuActive(menu)=='menu-active'">{{ menu.name }}</a>
           <a v-else :href="getMenuRealUrl(menu.link)" @click="menuMoblieShow=false">{{ menu.name }}</a>
@@ -217,5 +221,14 @@ export default {
   background-color: #fff;
   height: 50px;
   z-index: 1;
+}
+@media (max-width: 576px) {
+  .main-menu-breadcrumb{
+    position: absolute;
+    top: 40px;
+  }
+  .main-breadcrumb-tile{
+    height: 30px;
+  }
 }
 </style>

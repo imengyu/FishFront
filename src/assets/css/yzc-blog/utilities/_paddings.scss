@@ -5,3 +5,9 @@
         }
     }
 }
+
+@media (min-width: 576px) {
+    .no-padding-left-md {
+        padding-left: 0!important;
+    }
+}

@@ -1049,6 +1049,7 @@
         @media (max-width: 576px) {
             padding: 9px 0 10px 0;
 
+            
             .btn-like {
                 font-size: 15px;
 
@@ -1057,13 +1058,17 @@
                 &:before {
                     width: 36px;
                     height: 36px;
-                    left: 10px;
+                    left: 0px;
                 }
             }
             .modal-wrap {
                 font-size: 14px;
 
                 a { padding: 18px 16px 18px 10px; }
+            }
+
+            &.active .btn-like:before {
+                left: 10px;
             }
         }
     }

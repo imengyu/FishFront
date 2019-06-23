@@ -389,6 +389,11 @@ export default {
   }
 }
 @media (max-width: 576px) {
+  .visitor-count{
+    bottom: 70px;
+    left: calc(50% - 130px);
+  }
+
   .main-head-desp .white-content {
     background-color: #fff;
     color: #000;

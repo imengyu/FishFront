@@ -822,6 +822,10 @@ $blog-nav-titles: (
 
 .post-container {
 
+    overflow: hidden;
+    word-break: break-all;
+    font-family: -apple-system,SF UI Text,Arial,PingFang SC,Hiragino Sans GB,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+    
     div {
         overflow: visible;
     }
@@ -1038,7 +1042,8 @@ $blog-nav-titles: (
     background-color: #fefefe;
     border-radius: .5rem;
     padding: 15px 20px;
-
+    font-family: -apple-system,SF UI Text,Arial,PingFang SC,Hiragino Sans GB,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+    
     @include prefix(transition, all 0.5s, webkit moz);
     @media (max-width: 425px) {
         padding: 15px 10px;
@@ -1234,6 +1239,8 @@ $blog-nav-titles: (
 	padding-bottom: 40px;
     border-left: 1px solid #e5e5e5;
     transition: 0.4s;
+
+    @include pc-fix-scrollbar-white();
     
     .catalog-toggle::before {
         content: "−";
@@ -1388,7 +1395,7 @@ $blog-nav-titles: (
             height: 100%;
             max-height: 100%;
             width: auto;
-            transition: transform ease-in-out 1s;            
+            transition: transform ease-in-out .6s;            
             position: absolute;
             top: 50%;
             left: 50%;
@@ -1481,7 +1488,7 @@ $blog-nav-titles: (
             right: 0;
             bottom: 0;
             background-color: #000;
-            opacity: .5;
+            opacity: .35;
             z-index: 0;
             border-radius: .25rem;
         }
@@ -1546,6 +1553,17 @@ $blog-nav-titles: (
         z-index: -1;
     }
 }
+
+//Global font
+
+.font-sonti {
+    font-family: Kai,Kaiti SC,KaiTi,BiauKai,\\6977\4F53,\\6977\4F53_GB2312,Songti SC,serif;
+}
+.font-heiti {
+    font-family: -apple-system,SF UI Text,Arial,PingFang SC,Hiragino Sans GB,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+}
+
+//Global dark mode
 
 @media (max-width: 576px) {
     .blog-side {

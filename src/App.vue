@@ -216,4 +216,9 @@ export default {
   padding: 8px 15px;
   text-align: right;
 }
+@media (max-width: 768px) {
+  .admin-area{
+    top: 60px;
+  }
+}
 </style>

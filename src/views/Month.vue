@@ -207,4 +207,12 @@ export default {
 .loading-host p {
   margin-top: 10px;
 }
+#main{
+  padding-top: 30px;
+}
+@media (max-width: 576px) {
+  #main{
+    padding-top: 25px;
+  }
+}
 </style>
