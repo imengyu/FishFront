@@ -10,21 +10,7 @@
     <el-main class="better-scroll-white" style="padding:0 36px">
       <el-tabs v-model="currentTab" @tab-click="handleTabClick">
         <el-tab-pane label="所有文章" name="all">
-          <div v-if="postListAllLoadStatus.indexOf('error')==0" class="box">
-            <div class="container" style="height:450px">
-              <div
-                class="box full text-center text-danger d-flex justify-content-center align-items-center flex-column"
-              >
-                <i class="fa fa-times-circle-o" aria-hidden="true" style="font-size: 3.5em"></i>
-                <p class="text-secondary mt-2">
-                  <span class="h4">加载失败</span>
-                  <br>
-                  {{ postListAllLoadStatus.split(':')[1] }}
-                </p>
-                <el-button type="primary" round @click="loadListAll">重试</el-button>
-              </div>
-            </div>
-          </div>
+          <error-page v-if="postListAllLoadStatus.indexOf('error')==0" v-bind:error="postListAllLoadStatus" v-bind:height="'450px'" @retry="loadListAll"></error-page> 
           <el-table
             v-else
             ref="listAll"
@@ -108,21 +94,7 @@
           </div>
         </el-tab-pane>
         <el-tab-pane label="草稿箱" name="draft">
-          <div v-if="postListDraftLoadStatus.indexOf('error')==0" class="box">
-            <div class="container" style="height:450px">
-              <div
-                class="box full text-center text-danger d-flex justify-content-center align-items-center flex-column"
-              >
-                <i class="fa fa-times-circle-o" aria-hidden="true" style="font-size: 3.5em"></i>
-                <p class="text-secondary mt-2">
-                  <span class="h4">加载失败</span>
-                  <br>
-                  {{ postListDraftLoadStatus.split(':')[0] }}
-                </p>
-                <el-button type="primary" round @click="loadListDraft">重试</el-button>
-              </div>
-            </div>
-          </div>
+          <error-page v-if="postListDraftLoadStatus.indexOf('error')==0" v-bind:error="postListDraftLoadStatus" v-bind:height="'450px'" @retry="loadListDraft"></error-page> 
           <el-table
             v-else
             ref="listDraft"
@@ -185,21 +157,7 @@
           </div>
         </el-tab-pane>
         <el-tab-pane label="已发布" name="publish">
-          <div v-if="postListPublishLoadStatus.indexOf('error')==0" class="box">
-            <div class="container" style="height:450px">
-              <div
-                class="box full text-center text-danger d-flex justify-content-center align-items-center flex-column"
-              >
-                <i class="fa fa-times-circle-o" aria-hidden="true" style="font-size: 3.5em"></i>
-                <p class="text-secondary mt-2">
-                  <span class="h4">加载失败</span>
-                  <br>
-                  {{ postListPublishLoadStatus.split(':')[0] }}
-                </p>
-                <el-button type="primary" round @click="loadListPublish">重试</el-button>
-              </div>
-            </div>
-          </div>
+          <error-page v-if="postListPublishLoadStatus.indexOf('error')==0" v-bind:error="postListPublishLoadStatus" v-bind:height="'450px'" @retry="loadListPublish"></error-page> 
           <el-table
             v-else
             ref="listPublish"
@@ -226,6 +184,7 @@
             </el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
+                <el-button size="mini" type="primary" @click="handleView(scope.$index, scope.row)">查看</el-button>
                 <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                 <el-button
                   size="mini"
@@ -284,6 +243,7 @@ import jQuery from "jquery";
 import Chart from "chart.js";
 import serverConsts from "../../constants/serverConsts.js";
 import toast from "../../assets/lib/toast/toast.simply.js";
+import ErrorPage from '../../components/ErrorPage'
 
 var $ = jQuery;
 
@@ -354,6 +314,9 @@ export default {
   mounted() {
     this.init();
   },
+  components: {
+    'error-page': ErrorPage,
+  },
   methods: {
     init: function() {
       this.$store.dispatch("global/resetHeader");
@@ -393,6 +356,9 @@ export default {
     },
     handleEdit(index, post) {
       window.open(this.getJumpRealUrl(serverConsts.PartPositions.editArchive + "?archive=" + post.id));
+    },
+    handleView(index, post){
+      window.open(this.Utils.getPostRealUrl(post.id));
     },
     handleDelete(index, post) {
       this.$swal({

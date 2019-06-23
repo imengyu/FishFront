@@ -442,7 +442,7 @@ export default {
         this.postNextPostTitle = "没有了";
       }
       //标题
-      document.title = this.postObject.title + " - " + serverConsts.SiteTitle;
+      document.title = this.postObject.title + (this.Utils.isNullOrEmpty(serverSettings.SiteTitle) ? '' : ' - ' + serverSettings.SiteTitle);
     },
     loadPostCatalog() {
       this.catalogTop = jQuery("#side_catalog").offset().top;

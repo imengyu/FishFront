@@ -192,14 +192,14 @@ export default {
   mounted() {
     this.init();
   },
-  watch:{
-    $route(to,from){
-      this.loadUser();
-    }
-  },
   methods: {
     init: function() {
-      this.loadUser();
+      this.$store.dispatch('global/resetHeader');
+      this.$store.dispatch('global/setFooterStyle', "small");
+      this.$emit("publicHeaderAdd", {
+        name: "用户中心",
+        link: "/sign-out/"
+      });
     },
     jump(link) {
       location.href = this.getJumpRealUrl(link);
@@ -207,19 +207,19 @@ export default {
     getJumpRealUrl(link) {
       return this.NET.URL_PREFIX + link;
     },
-    authInfoInited() {
-      var authedUser = this.$store.getters["auth/authInfo"];
-      if (authedUser) {
-        this.currentAuthedUser = authedUser;
+    authInfoInited(authed) {     
+      if (authed) {
+        this.currentAuthedUser = this.$store.getters["auth/authInfo"];
         if (this.currentUser && this.currentUser.id == this.currentAuthedUser.id)
             this.currentAuthed = true;
       }
+      this.loadUser();
     },
     loadUser: function() {
       var main = this;
       var currentUserId = this.$route.params.userid;
-      if (!this.Utils.isNumber(currentUserId) || currentUserId == "user")
-        currentUserId = "0";
+      if (!this.Utils.isNumber(currentUserId) && this.currentAuthedUser)
+        currentUserId = this.currentAuthedUser.id ?  this.currentAuthedUser.id : '0';
       var url = this.NET.API_URL + "/user/" + currentUserId;
       $.ajax({
         url: url,
@@ -250,7 +250,6 @@ export default {
       });
     },
     edit() {
-      var main = this;
       if (this.currentAuthedUser) {
         if (
           this.currentAuthedUser.level == serverConsts.UserLevels.writer ||
@@ -259,11 +258,11 @@ export default {
           this.jump("/admin/user-center/");
         } else {
           this.currentUserEditing = true;
-          setTimeout(function() {
-            if (main.currentUser.gender == "男") {
+          setTimeout(() => {
+            if (this.currentUser.gender == "男") {
               $("#radioMale").prop("checked", true);
               $("#radioFemale").prop("checked", false);
-            } else if (main.currentUser.gender == "女") {
+            } else if (this.currentUser.gender == "女") {
               $("#radioMale").prop("checked", false);
               $("#radioFemale").prop("checked", true);
             }
@@ -273,25 +272,15 @@ export default {
     },
     save() {
       var t = toast.toast("正在提交中...", "loading", -1);
-      var main = this;
-      $.ajax({
-        url: address_blog_api + "user/" + main.currentUser.id + "",
-        type: "put",
-        dataType: "json",
-        data: JSON.stringify(main.currentUser),
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: function(response) {
-          toast.toastClose(t);
-          if (response.success) {
-            toast("修改个人信息成功！", "success", 5000);
-            main.currentUserEditing = false;
-          } else main.$swal("修改个人信息失败", response.message, "error");
-        },
-        error: function(xhr, err) {
-          toast.toastClose(t);
-          toast.toast("修改个人信息失败 : " + err, "error", 5000);
-        }
+      this.axios.post(this.NET.API_URL + "/user/" + this.currentUser.id, this.currentUser).then(response => {
+        toast.toastClose(t);
+        if (response.success) {
+          toast("修改个人信息成功！", "success", 5000);
+          this.currentUserEditing = false;
+        } else this.$swal("修改个人信息失败", response.message, "error");
+      }).catch(response => {
+         this.$swal("修改个人信息失败", response, "error");
+        toast.toastClose(t);
       });
     },
     setGender(m) {

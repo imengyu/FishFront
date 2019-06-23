@@ -20,6 +20,8 @@ Vue.use(Router)
 import Index from '@/views/Index'
 import SignIn from '@/views/SignIn'
 import SignOut from '@/views/SignOut'
+import SignUp from '@/views/user/SignUp'
+
 import Archives from '@/views/Archives'
 import Month from '@/views/Month'
 import Page404 from '@/views/Page404'
@@ -28,21 +30,8 @@ import Classes from '@/views/Classes'
 import ViewPost from '@/views/ViewPost'
 import UserInfo from '@/views/UserInfo'
 
-import AdminIndex from '@/views/admin/Index'
-import AdminManageArchives from '@/views/admin/ManageArchives'
-import AdminManageClassfication from '@/views/admin/ManageClassfication'
-import AdminWriteArchive from '@/views/admin/WriteArchive'
-import AdminUserCenter from '@/views/admin/UserCenter'
-import AdminManageUsers from '@/views/admin/ManageUsers'
-import AdminNewUser from '@/views/admin/NewUser'
-import AdminSystemSettings from '@/views/admin/SystemSettings'
-import AdminSystemSkin from '@/views/admin/SystemSkin'
-
-import UserCenterChangePassword from '@/views/user/ChangePassword'
-
-
 export default new Router({
-  /*mode: 'history',*/
+  mode: 'history',
   routes: [
     {
       path: '/',
@@ -140,7 +129,7 @@ export default new Router({
     {
       path: '/admin/',
       name: 'AdminIndex',
-      component: AdminIndex,
+      component: () => import(/* webpackChunkName: "admin-index" */ '@/views/admin/Index'),
       meta: {
         title: '仪表盘',
         index: 3,
@@ -149,7 +138,7 @@ export default new Router({
     {
       path: '/admin/manage-archives/',
       name: 'AdminManageArchives',
-      component: AdminManageArchives,
+      component: () => import(/* webpackChunkName: "admin-marchives" */ '@/views/admin/ManageArchives'),
       meta: {
         title: '文章管理',
         index: 4,
@@ -158,7 +147,7 @@ export default new Router({
     {
       path: '/admin/write-archive/',
       name: 'AdminWriteArchive',
-      component: AdminWriteArchive,
+      component: () => import(/* webpackChunkName: "admin-warchive" */ '@/views/admin/WriteArchive'),
       meta: {
         title: '写文章',
         index: 4,
@@ -167,7 +156,7 @@ export default new Router({
     {
       path: '/admin/manage-classfication/',
       name: 'AdminManageClassfication',
-      component: AdminManageClassfication,
+      component: () => import(/* webpackChunkName: "admin-mclassfication" */ '@/views/admin/ManageClassfication'),
       meta: {
         title: '标签和分类管理',
         index: 4,
@@ -176,7 +165,7 @@ export default new Router({
     {
       path: '/admin/user-center/',
       name: 'AdminUserCenter',
-      component: AdminUserCenter,
+      component: () => import(/* webpackChunkName: "admin-user" */ '@/views/admin/UserCenter'),
       meta: {
         title: '用户信息修改',
         index: 4,
@@ -185,7 +174,7 @@ export default new Router({
     {
       path: '/admin/manage-users/',
       name: 'AdminManageUsers',
-      component: AdminManageUsers,
+      component: () => import(/* webpackChunkName: "admin-musers" */ '@/views/admin/ManageUsers'),
       meta: {
         title: '管理作者和用户',
         index: 4,
@@ -194,7 +183,7 @@ export default new Router({
     {
       path: '/admin/new-user/',
       name: 'AdminNewUser',
-      component: AdminNewUser,
+      component: () => import(/* webpackChunkName: "admin-nuser" */ '@/views/admin/NewUser'),
       meta: {
         title: '新建作者账号',
         index: 4,
@@ -203,7 +192,7 @@ export default new Router({
     {
       path: '/admin/settings/',
       name: 'AdminSystemSettings',
-      component: AdminSystemSettings,
+      component: () => import(/* webpackChunkName: "admin-settings" */ '@/views/admin/SystemSettings'),
       meta: {
         title: '修改系统设置',
         index: 2,
@@ -212,9 +201,9 @@ export default new Router({
     {
       path: '/admin/skin/',
       name: 'AdminSystemSkin',
-      component: AdminSystemSkin,
+      component: () => import(/* webpackChunkName: "admin-skin" */ '@/views/admin/SystemSkin'),
       meta: {
-        title: '博客主题',
+        title: '博客外观',
         index: 2,
       }
     },
@@ -223,7 +212,7 @@ export default new Router({
     {
       path: '/user/center/change-password/',
       name: 'UserCenterChangePassword',
-      component: UserCenterChangePassword,
+      component: () => import(/* webpackChunkName: "change-password" */ '@/views/user/ChangePassword'),
       meta: {
         title: '修改密码',
         index: 4,
@@ -231,14 +220,32 @@ export default new Router({
     },
     {
       path: '/user/center/rec-password/',
-      name: 'UserCenterChangePassword',
-      component: UserCenterChangePassword,
+      name: 'UserCenterFindPassword',
+      component: () => import(/* webpackChunkName: "rec-password" */ '@/views/user/FindPassword'),
       meta: {
         title: '找回密码',
         index: 4,
       }
     },
-
+    {
+      path: '/sign-up/',
+      name: 'SignUp',
+      component: SignUp,
+      meta: {
+        title: '注册',
+        index: 1,
+      }
+    },
+    {
+      path: '/user/center/active/',
+      name: 'UserCenterSignUpActive',
+      component: () => import(/* webpackChunkName: "center-active" */ '@/views/user/SignUpActive'),
+      meta: {
+        title: '激活账号',
+        index: 2,
+      }
+    },
+    
     // 404page
     {
       path: '*', // 页面不存在的情况下会跳到404页面

@@ -707,7 +707,7 @@ export default {
       });
     },
     anonymousCanComment() {
-      return serverConsts.AnonymousComment;
+      return serverSettings.AnonymousComment;
     },
 
 

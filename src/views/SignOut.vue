@@ -76,6 +76,7 @@ export default {
             this.Utils.delCookie(response.data.data.authTokenName);
           this.$store.dispatch("auth/setAuthed", false);
           this.$store.dispatch("auth/setAuthInfo", null);
+          this.$emit("resetAuthInfo");
         }
       }).catch(response => {
         this.logoutFinish = false;

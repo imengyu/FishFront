@@ -1,5 +1,5 @@
 <template>
-  <div :class="'fish-editor' + (fullEditor ? ' fullscreen' : ' ')">
+  <div :class="'fish-editor' + (fullEditor ? ' fullscreen' : '')">
     
     <div class="fish-editor-toolbar">
       <ul class="fish-editor-menu">
@@ -193,7 +193,7 @@
     </div>
     <div class="fish-editor-area">
       <div
-        :class="'fish-editor-preview-area post-container' + (fullPreviewArea ? ' fullarea': ' ')"
+        :class="'fish-editor-preview-area post-container' + (fullPreviewArea ? ' fullarea': '')"
         v-if="preview"
         v-html="value"
       ></div>
@@ -248,7 +248,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-            <button type="button" class="btn btn-primary" id="addLinkModalOK">确定</button>
+            <button type="button" class="btn btn-primary" @click="addLinkFinal">确定</button>
           </div>
         </div>
       </div>
@@ -283,7 +283,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-            <button type="button" class="btn btn-primary" id="addImageModalOK">确定</button>
+            <button type="button" class="btn btn-primary" @click="addImageFinal">确定</button>
           </div>
         </div>
       </div>
@@ -299,7 +299,7 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="gotoLineModalLabel">添加图片</h5>
+            <h5 class="modal-title" id="gotoLineModalLabel">跳转到行</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -314,7 +314,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-            <button type="button" class="btn btn-primary" id="gotoLineModalOK">确定</button>
+            <button type="button" class="btn btn-primary" @click="gotoLineFinal">确定</button>
           </div>
         </div>
       </div>
@@ -469,7 +469,7 @@ export default {
       this.insertOrReplace("<del>", "</deL>", true, true);
     },
     addItalic() {
-      this.insertOrReplace("<b>", "</b>", true, true);
+      this.insertOrReplace("<i>", "</i>", true, true);
     },
     addQuote() {
       this.insertOrReplace("<blockquote>", "</blockquote>", true, true);
@@ -484,49 +484,46 @@ export default {
       this.replaceCase(false);
     },
     addLink() {
-      var main = this;
       if (this.htmlEditor.somethingSelected())
         this.currentAddText = this.htmlEditor.getSelection();
       else this.currentAddText = "";
       this.currentAddLink = "";
 
       $("#addLinkModal").modal("show");
-      $("#addLinkModalOK").click(function() {
-        $("#addLinkModal").modal("hide");
-        main.insertOrReplace(
+    },
+    addLinkFinal(){
+      $("#addLinkModal").modal("hide");
+        this.insertOrReplace(
           '<a href="' +
-            main.currentAddLink +
+            this.currentAddLink +
             '"' +
             ($("#link-new-target").prop("checked") ? ' target="_blank"' : "") +
             ">" +
-            main.currentAddText,
+            this.currentAddText,
           "</a>",
           true,
           true
         );
-      });
     },
     addImage() {
-      var main = this;
       if (this.htmlEditor.somethingSelected())
         this.currentAddText = this.htmlEditor.getSelection();
       else this.currentAddText = "";
       this.currentAddLink = "";
-
       $("#addImageModal").modal("show");
-      $("#addImageModalOK").click(function() {
-        $("#addImageModal").modal("hide");
-        main.insertOrReplace(
-          '<img src="' +
-            main.currentAddLink +
-            '" alt="' +
-            main.currentAddText +
-            '" />',
-          "",
-          true,
-          true
-        );
-      });
+    },
+    addImageFinal(){
+      $("#addImageModal").modal("hide");
+      this.insertOrReplace(
+        '<img src="' +
+          this.currentAddLink +
+          '" alt="' +
+          this.currentAddText +
+          '" />',
+        "",
+        true,
+        true
+      );
     },
     addImageMediaCenter(){
       this.$emit('insert-image', 'select-in-media-center');
@@ -600,13 +597,12 @@ export default {
     },
 
     gotoLine() {
-      var main = this;
       $("#gotoLineModal").modal("show");
-      $("#gotoLineModalOK").click(function() {
-        $("#gotoLineModal").modal("hide");
-        var line = parseInt(main.currentGoLine);
-        if (line > 0) main.htmlEditor.setCursor(line);
-      });
+    },
+    gotoLineFinal(){
+      $("#gotoLineModal").modal("hide");
+      var line = parseInt(main.currentGoLine);
+      if (line > 0) main.htmlEditor.setCursor(line);
     },
     search() {
       this.htmlEditor.execCommand("find");

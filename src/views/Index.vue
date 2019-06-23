@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div :class="'visitor-count' + (statCurrentVisitorShow ? '' : ' hidden')">
+        你好！您是今天第 <span>{{ statCurrentVisitor }}</span> 个访问者！
+    </div>
     <div class="home-wrapper">
       <div class="container">
         <div :class="'row justify-content-center ' + (!isDetailsView ? 'main-show-center' : 'main-hide-center')">
@@ -78,9 +81,6 @@
           </div>
         </div>
       </div>
-      <div :class="'visitor-count' + (statCurrentVisitor &gt; 0 ? '' : ' hidden')">
-        你好！您是今天第 <span>{{ statCurrentVisitor }}</span> 个访问者！
-      </div>
     </div>
     <div class="main-footer">
       <ul>
@@ -108,6 +108,7 @@ export default {
       statIp: '-',
       statSiteLive: '-',
       statCurrentVisitor: -1,
+      statCurrentVisitorShow: false,
     };
   },
   mounted() {
@@ -155,8 +156,9 @@ export default {
           this.statPv = d.pv;
           this.statIp = d.ip;
           this.statArchiveCount = d.count + " 篇";
+          this.statCurrentVisitorShow = true;
           this.statCurrentVisitor = d.ip;
-          setTimeout(() => {  this.statCurrentVisitor = 0; }, 6000);
+          setTimeout(() => {  this.statCurrentVisitorShow = false; }, 6666);
           console.log("%c 你好！您是今天第 %c " + d.ip + " %c 个访问者！ ", "color:white;background-color:black;padding:5px 0", "color:white;background-color:#6195FF;padding:5px 0", "color:white;background-color:black;padding:5px 0")
         }
       })
@@ -174,7 +176,7 @@ export default {
   display: inline-block;
   position: absolute;
   bottom: 30px;
-  right: 30px;
+  left: 30px;
   opacity: 1;
   transition: opacity linear 1s;
 }

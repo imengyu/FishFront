@@ -1,7 +1,7 @@
 <template>
   <footer :id="footerStyle == 'normal' ? 'footer' : ''">
     <div v-if="footerStyle == 'small'" class="row align-items-center justify-content-center mt-3">
-      <p class="text-secondary">Copyright © 2019 Dreamfish.</p>
+      <p class="text-secondary" v-html="getFooterText()"></p>
     </div>
     <div v-else-if="footerStyle == 'normal'">
       <ul class="icons">
@@ -41,9 +41,7 @@
         </li>
       </ul>
       <ul class="copyright">
-        <li>
-          <i class="fa fa-copyright" aria-hidden="true"></i> 2019. All rights reserved
-        </li>
+        <li v-html="getFooterText()"></li>
         <li>
           Design by
           <a class="link" href="https://www.imyzc.com/archives/post/about/">DreamFish</a>
@@ -319,6 +317,9 @@ export default {
         document.documentElement.scrollTop ||
         document.body.scrollTop;
       this.backToTopShow = scrollTop > 200;
+    },
+    getFooterText(){
+      return serverSettings.FooterText;
     }
   }
 };

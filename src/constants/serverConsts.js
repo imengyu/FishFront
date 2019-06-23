@@ -1,11 +1,41 @@
 export default {
-    SiteTitle: 'ALONE SPACE',
-    AnonymousComment: true,
-    CollectVisitorStat: true,
-    CollectVisitorStatExclude: [
-        '/admin/',
-        '/user/'
-    ],
+
+    //Settings
+
+    defaultSettings: {
+        SiteTitle: 'ALONE SPACE',
+        FooterText: '<i class="fa fa-copyright" aria-hidden="true"></i> 2019 Dreamfish',
+        HeaderMenu: [
+            {
+              name: "主页",
+              link: "/"
+            },
+            {
+              name: "文章",
+              link: "/archives/"
+            },
+            {
+              name: "归档",
+              link: "/archives/month/"
+            },
+            {
+              name: "关于",
+              link: "/archives/post/about/"
+            }
+        ],   
+        AnonymousComment: true,
+        AllowRegister: true,
+        CollectVisitorStat: true,
+        CollectVisitorStatExclude: [
+            '/admin/',
+            '/user/',
+            '/sign-in/',
+            '/sign-out/',
+        ],    
+    },
+   
+    //Const values
+
     PartPositions: {
         viewPost: '/archives/post/',
         viewClass: '/archives/categories/',

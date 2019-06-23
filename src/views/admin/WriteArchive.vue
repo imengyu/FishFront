@@ -15,7 +15,7 @@
           <div v-if="currentArchiveObject" class="blog-editor-container">
             <el-input type="text" v-model="currentArchiveObject.title" placeholder="请输入文章标题" maxlength="100" show-word-limit class="btn-block mb-2"></el-input>
             <mavon-editor ref="editorMarkdown" v-if="currentArchiveObject.type=='markdown'" v-model="currentArchiveContent" @insert-image="handleInsertImage" @save="saveChange()" :style="'height:' + getBestEditorHeight() + 'px;border: 1px solid #ddd;'" :boxShadow="false"/>
-            <fish-editor ref="editorHtml" v-if="currentArchiveObject.type=='html'" v-model="currentArchiveContent" @insert-image="handleInsertImage" @save="saveChange()" :style="'height:' + getBestEditorHeight() + 'px'" v-bind:height="getBestEditorHeight()"></fish-editor>
+            <fish-editor ref="editorHtml" v-if="currentArchiveObject.type=='html'" v-model="currentArchiveContent" @insert-image="handleInsertImage" @save="saveChange()" :style="'height:' + getBestEditorHeight() + 'px;'"/>
           </div>
           <div v-if="currentArchiveObject" style="margin-top: 20px">
               文章格式：<el-select v-model="currentArchiveType" placeholder="请选择" style="width: 120px" @change="handleArcType">
@@ -94,7 +94,7 @@
         </el-tab-pane>
         <el-tab-pane label="媒体库" name="media-center">
           <!--媒体库标签页-->
-          <error-page v-if="currentIsNew" v-bind:title="'您需要保存文章以后才能使用媒体库功能'" v-bind:error="'您也可以先保存至草稿'" :can-retry="false"></error-page>
+          <error-page v-if="currentIsNew" v-bind:title="'使用媒体库功能需要保存文章'" v-bind:error="'您也可以先保存至草稿'" :can-retry="false"></error-page>
           <el-tabs v-else tabPosition="left" v-model="currentTabMedia" @tab-click="handleTabMediaCenterClick">
             <el-tab-pane label="图片库" name="image">
               <error-page v-if="mediaImageLoadStatus.indexOf('error:')==0" v-bind:error="mediaImageLoadStatus" v-bind:height="getBestEditorHeight() + 'px'"></error-page>
@@ -272,6 +272,23 @@
           <span class="text-secondary">您可以自定义此文章的上一篇/下一篇对应哪篇文章的ID，填写0则认为没有上一篇/下一篇文章。</span>
           
         </el-form-item>
+        <hr>
+        <el-form-item label="高级设置">
+          <el-switch v-model="editingBasicObjectMore" active-color="#13ce66" inactive-color="#688568"></el-switch>
+        </el-form-item> 
+        <el-form-item v-if="editingBasicObjectMore">
+          <b>重写文章参数</b><br>
+          <span class="text-secondary">如果文章显示的参数与实际不符，您可以重写它</span>
+        </el-form-item> 
+        <el-form-item v-if="editingBasicObjectMore" label="查看数">
+          <el-input placeholder="输入查看数" v-model="currentArchiveObject.viewCount"></el-input>
+        </el-form-item>
+        <el-form-item v-if="editingBasicObjectMore" label="评论数">
+          <el-input placeholder="输入评论数" v-model="currentArchiveObject.commentCount"></el-input>
+        </el-form-item>
+        <el-form-item v-if="editingBasicObjectMore" label="点赞数">
+          <el-input placeholder="输入点赞数" v-model="currentArchiveObject.commentCount"></el-input>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="editingBasicObject=false">确定</el-button>
@@ -378,6 +395,7 @@ export default {
       currentArchiveCategory: null,
 
       editingBasicObject: false,
+      editingBasicObjectMore: false,
 
       archiveTags: null,
       archiveCategories: null,
@@ -463,6 +481,10 @@ export default {
   },
   mounted() {
     this.init();
+    window.onbeforeunload = function() { return "请确认您的文章保存了以后再离开此页面哦！"; };
+  },
+  destroyed: function () {
+    window.onbeforeunload = undefined;
   },
   components: {
     'mavon-editor': MavonEditor,
@@ -479,7 +501,7 @@ export default {
       this.$store.dispatch("global/setAdminPanel", true);
       this.$store.dispatch("global/switchFooter", false);
       this.$store.dispatch("global/setHeaderMenuStyle", "main-menu-white full");
-      window.onbeforeunload = function() { return "请确认您的文章保存了以后再离开此页面哦！"; };
+      
     },
     jump(link) {
       location.href = this.getJumpRealUrl(link);
@@ -488,7 +510,8 @@ export default {
       return this.NET.URL_PREFIX + link;
     },
     getBestEditorHeight(){
-      return document.body.clientHeight - 330
+      var h = window.innerHeight - 330
+      return h;
     },
     authInfoInited(authed) {
       if (authed) {
@@ -554,9 +577,11 @@ export default {
     },
     handleInsertImage(type){
       if(type=='upload'){
+        if(this.handleCanUploadImage()) return;
         this.mediaImageUploadShouldInset = true;
         this.mediaImageUploading = true;
       }else if(type=='select-in-media-center'){
+        if(this.handleCanUploadImage()) return;
         this.handleMediaImageShowFasterInsert()
       }
     },
@@ -646,33 +671,37 @@ export default {
     //Media click
 
     handleChoosePrewImage(){
-      this.mediaImageChoosingPrewImage=true;
-      this.handleMediaImageShowFasterInsert()
+      if(this.handleCanUploadImage()) return;
+      this.mediaImageChoosingPrewImage = true;
+      if(this.mediaImageLoadStatus == 'notload') this.loadMediaImages();
+      this.mediaImageInserting = true;
     },
     handleClearPrewImage(){
       this.currentArchiveObject.previewImage = '';
     },
     handleMediaImageChoosePrewImage(){
-      this.mediaImageChoosingPrewImage=false;
+      this.mediaImageChoosingPrewImage = false;
       var selectImage = this.$refs.mediaImageListFastInsert.getSelectedItems();
       if(selectImage){
+        selectImage.checked = false;
         this.currentArchiveObject.previewImage = selectImage.resourcePath;
         toast.toast('修改文章缩略图成功','success');
       }
     },
     handleMediaImageFasterInsertDoInsert(){
       var selectImages = this.$refs.mediaImageListFastInsert.getSelectedItems();
-      for (var key in selectImages)
+      for (var key in selectImages){
         this.insertImage(selectImages[key]);
+        selectImages[key].checked = false;
+      }
     },
     handleMediaImageShowFasterInsert(){
-      if(this.mediaImageLoadStatus == 'notload')
-        this.loadMediaImages();
+      if(this.mediaImageLoadStatus == 'notload') this.loadMediaImages();
+      this.mediaImageChoosingPrewImage = false;
       this.mediaImageInserting = true;
     },
     handleMediaImageItemClick(act, item){
-      if(act=='add'){ this.mediaImageUploading = true; }
-      else if(act=='del'){
+      if(act=='del'){
         this.$confirm('此操作将删除该图片，已插入文章的图片将无法显示, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -701,12 +730,15 @@ export default {
             }
           })
         }).catch(() => {});
+      }else if(act=='add'){
+        this.mediaImageInserting = false;
+        this.mediaImageUploadShouldInset = false;
+        this.mediaImageUploading = true;
       }
     },
     handleMediaImageListPage(p){ this.loadMediaImages(1); },
     handleMediaVideoItemClick(act, item){
-      if(act=='add'){ this.mediaVideoUploading = true; }
-      else if(act=='del'){
+      if(act=='del'){
         this.$confirm('此操作将删除该视频，已插入文章的视频将无法显示, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -722,6 +754,7 @@ export default {
           })
         }).catch(() => {});
       }else if(act=='insert') this.insertVideo(item);
+      else if(act=='add') this.mediaVideoUploading = true;
     },
     handleMediaVideoListPage(p){ this.loadMediaVideos(1); },
     handleMediaFilesItemClick(act, item){
@@ -748,10 +781,17 @@ export default {
     //Uploader
 
     //Image
+    handleCanUploadImage(){ 
+      if(this.currentIsNew){
+        this.$alert('使用媒体库功能需要保存文章，请先保存您的文章哦（也可保存至草稿）', '媒体库暂时不可用');
+        return true;
+      }
+      return false
+    },
     handleUploadAddImage(){ this.$refs.uploadMediaImages.selectFiles(); },
     handleUploadImage(files){
       var arr = this.mediaImageUploadingFileList;
-      var successCallback = this.mediaImageUploadShouldInset ? this.handleUploadImageSuccess : this.handleUploadImageSuccessAndInsert;
+      var successCallback = this.mediaImageUploadShouldInset ? this.handleUploadImageSuccessAndInsert : this.handleUploadImageSuccess;
       if(this.mediaImageUploadShouldInset) this.mediaImageUploadShouldInset = false;
       for(var i=0;i<files.length;i++){
         var newItem = {
@@ -780,7 +820,7 @@ export default {
     handleUploadImageSuccess(item){ this.mediaImageUploadAnySuccess = true; },
     handleUploadImageSuccessAndInsert(item){
       this.mediaImageUploadAnySuccess = true;
-      this.insertImage(item);
+      this.insertImage(item.media);
     },
     handleUploadImageCancel(item){
       if(item.uploading) this.abortUpload(item);
@@ -1319,6 +1359,7 @@ export default {
     //
 
     insertImage(imageItem){
+      if(!imageItem) return;
       if(this.currentArchiveType == 'markdown'){
         this.$refs.editorMarkdown.insertText(this.$refs.editorMarkdown.getTextareaDom(), 
         {
@@ -1330,6 +1371,7 @@ export default {
         this.$refs.editorHtml.insertOrReplace('<img src="' + imageItem.resourcePath + '" alt="' + imageItem.title + '"/>','',false,true);
     },
     insertVideo(videoItem){
+      if(!videoItem) return;
       if(this.currentArchiveType == 'markdown'){
         this.$refs.editorMarkdown.insertText(this.$refs.editorMarkdown.getTextareaDom(), 
         {

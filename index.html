@@ -8,7 +8,7 @@
 </head>
 
 <body>
-  <!--Show the low ie not support tip-->
+  <!--显示 IE 不支持的提示-->
   <div id="ie-tip">
     <div class="low-ie-tip-8" id="lowie_tip_10" style="display: none"><div class="low-ie-tip-bottom-text" id="lowie_tip_bottom_text" ><span><b>本网站不支持 Internet Explorer</b></span><br />页面的功能<del style="color:rgb(181,8,46);">可能</del><u style="color:rgb(181,8,46);">一定</u>无法正常显示和工作</div><div class="low-ie-tip-bottom-text">我们推荐您使用<a href='https://www.microsoft.com/zh-cn/windows/microsoft-edge/'>Microsoft Edge</a> 或换用最新版<a href="https://www.google.cn/chrome/">Google Chrome</a> 浏览。</div><div class="low-ie-tip-bottom-s">如果您正在使用浏览器的<b>兼容模式</b>，请将其关闭。<br /><a href="#" onclick="force_view()">用户：我不管，我就是要用 IE 看你的网站</a></div><div class="low-ie-tip-bottom-version">Copyright &copy; 2019 DreanFish</div></div>
     <script>window.onload=function(){var h=window.navigator.userAgent;var f=h.indexOf("MSIE ");var e=h.indexOf("Trident/");if((f>-1)||(e>-1)){document.getElementById("lowie_tip_10").setAttribute("style","")}};function force_view(){alert('出现白屏、显示错误等问题不要怪我！');var v8=document.getElementById("lowie_tip_8"),v10=document.getElementById("lowie_tip_10");if(v8){v8.setAttribute("style","display: none;")}if(v10){v10.setAttribute("style","display: none;")}};</script>
@@ -16,6 +16,17 @@
     <!--[if lt IE 10]> <div class="low-ie-tip-8" id="lowie_tip_8"><div class="low-ie-tip-bottom-text" id="lowie_tip_bottom_text" ><span><b id="lowie_tip_title">本网站不支持远古版本的 Internet Explorer</b></span><br />要继续浏览，请升级您的IE至最新版<a href='https://www.microsoft.com/zh-cn/windows/microsoft-edge/'>Microsoft Edge</a> 或换用最新版<a href="https://www.google.cn/chrome/">Google Chrome</a> 浏览。</div><div class="low-ie-tip-bottom-s" id="low_ie_tip_s">如果您正在使用浏览器的<b>兼容模式</b>，请将其关闭</div><div class="low-ie-tip-bottom-version">Copyright &copy; 2019 DreanFish</div></div> <![endif]-->
     <!--[if lt IE 8]> <style>.low-ie-tip-8{position:static}</style><script>body = document.getElementsByTagName('body')[0];body.className = 'no-scroll';</script> <![endif]-->
     <!--[if lt IE 7]> <script>document.getElementById('lowie_tip_title').text='本网站不支持史前版本的 Internet Explorer';document.getElementById('low_ie_tip_s').text=''</script> <![endif]-->
+  </div>
+  <!--在Vue初始化之前会有一段时间白屏，设置一个加载中圆圈会好看一些-->
+  <div id="loading">
+    <div class="spinner">
+      <div class="bounce1"></div>
+      <div class="bounce2"></div>
+      <div class="bounce3"></div>
+      <br/><span class="spinner-text">加载中，很快就好了...</span>
+    </div>
+    
+    <style>#loading{position:absolute;top:0;left:0;right:0;bottom:0;transition:opacity linear .6s;opacity:1;background-color:#fff;z-index:1000;}#loading.hide{opacity:0;}.spinner{position:absolute;top:50%;left:50%;margin-top:-60px;margin-left:-75px;height:60px;width:150px;text-align:center}.spinner-text{font-size:12px;color:#888;margin-top:25px;display: block;}.spinner>div{width:30px;height:30px;background-color:#005fff;border-radius:100%;display:inline-block;-webkit-animation:bouncedelay 1.4s infinite ease-in-out;animation:bouncedelay 1.4s infinite ease-in-out;-webkit-animation-fill-mode:both;animation-fill-mode:both}.spinner .bounce1{-webkit-animation-delay:-0.32s;animation-delay:-0.32s}.spinner .bounce2{-webkit-animation-delay:-0.16s;animation-delay:-0.16s}@-webkit-keyframes bouncedelay{0%,80%,100%{-webkit-transform:scale(0.0)}40%{-webkit-transform:scale(1.0)}}@keyframes bouncedelay{0%,80%,100%{transform:scale(0.0);-webkit-transform:scale(0.0)}40%{transform:scale(1.0);-webkit-transform:scale(1.0)}}</style>
   </div>
   <!--App-->
   <div id="app"></div>

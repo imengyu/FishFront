@@ -24,6 +24,9 @@ export default
     getPostPrefix,
     getPostStatusString,
     getUserHasPrivilege,
+    swapItems,
+    upData,
+    downData
   }
 
 // 对象操作
@@ -271,4 +274,21 @@ function getJumpRealUrl(link) {
 }
 function jump(link) {
   location.href = getJumpRealUrl(link)
+}
+
+
+//数组操作
+//================
+
+function swapItems(arr, index1, index2){
+  　arr[index1] = arr.splice(index2,1,arr[index1])[0]
+  　return arr
+}
+function upData (arr, index) {
+  　if (arr.length > 1 && index !== 0)
+  　　　return swapItems(arr, index, index - 1)
+}
+function downData (arr, index) {
+  　if (arr.length > 1 && index !== (arr.length - 1))
+    　　return swapItems(arr, index, index + 1)
 }

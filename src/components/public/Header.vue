@@ -9,7 +9,7 @@
           <div :class="'col' + (headerColWidth?'-'+headerColWidth:'') + ' nav-title d-flex align-items-center justify-content-between'">
             <div class="nav-header-text d-flex align-items-center justify-content-between">
               <span class="logo" id="header-logo"></span>
-              <a href="/" id="header-title">ALONE SPACE</a>
+              <a href="/" id="header-title">{{ menuTilte }}</a>
               <el-button v-if="isAdmin" :icon="isAdminCollape ? 'el-icon-s-unfold' : 'el-icon-s-fold'" circle @click="switchAdminCollape()" style="margin-left: 13px;"></el-button>
               <nav v-if="pageBreadcrumb && pageShowBreadcrumb" class="main-breadcrumb main-menu-breadcrumb" aria-label="breadcrumb">
                 <ol class="breadcrumb">
@@ -31,61 +31,10 @@
                   <a v-if="isMenuActive(menu)=='menu-active'">{{ menu.name }}</a>
                   <a v-else :href="getMenuRealUrl(menu.link)">{{ menu.name }}</a>
                 </li>
-                <li v-if="currentAuthed" class="nav-user">
-                  <button
-                    v-if="currentUserLevel == 'admin'"
-                    type="button"
-                    class="flat-pill flat-btn flat-btn-transparent flat-danger mr-2"
-                    v-on:click="gotToWriteArchive()"
-                  >写文章</button>
-                  <div id="current_user_center_dropdown" class="dropdown">
-                    <img lass="current-user-head" :src="currentUserHead">
-                    <span
-                      v-if="currentUserMessageCount>0"
-                      class="current-user-message-count"
-                    >{{ currentUserMessageCount }}</span>
-                    <div class="dropdown-menu shadow-dirty dropdown-menu-right">
-                      <div class="message-list" id="current_user_message_list"></div>
-                    </div>
-                  </div>
-                  <div id="current_user_dropdown" class="dropdown">
-                    <span
-                      class="current-user-name"
-                      data-toggle="dropdown"
-                      aria-haspopup="true"
-                      aria-expanded="false"
-                      data-offset="0,20"
-                    >
-                      {{ currentUserName }}
-                      <i></i>
-                    </span>
-                    <div
-                      v-if="currentUserLevel == 'admin' || currentUserLevel == 'writer'"
-                      class="dropdown-menu dropdown-menu-right shadow-dirty"
-                    >
-                      <a class="dropdown-item" :href="getMenuRealUrl('/admin/')">博客控制台</a>
-                      <a class="dropdown-item" :href="getMenuRealUrl('/admin/write-archives/')">写文章</a>
-                      <a
-                        class="dropdown-item"
-                        :href="getMenuRealUrl('/admin/manage-archives/')"
-                      >文章管理</a>
-                      <a class="dropdown-item" :href="getMenuRealUrl('/admin/user-center/')">个人信息</a>
-                      <div class="dropdown-divider"></div>
-                      <a class="dropdown-item" :href="getMenuRealUrl('/sign-out/')">退出登录</a>
-                    </div>
-                    <div
-                      v-else-if="currentUserLevel == 'guest'"
-                      class="dropdown-menu dropdown-menu-right shadow-dirty"
-                    >
-                      <a class="dropdown-item" :href="getMenuRealUrl('/user/')">我的个人信息</a>
-                      <a class="dropdown-item" :href="getMenuRealUrl('/sign-out/')">退出登录</a>
-                    </div>
-                    <div v-else class="dropdown-menu dropdown-menu-right shadow-dirty">
-                      <a class="dropdown-item" :href="getMenuRealUrl('/sign-in/')">登录</a>
-                      <a class="dropdown-item" :href="getMenuRealUrl('/sign-up/')">注册</a>
-                    </div>
-                  </div>
-                </li>
+                <!--用户头像菜单组件-->
+                <header-user-menu v-if="currentAuthed" 
+                  :currentUserLevel="currentUserLevel" :currentUserName="currentUserName" 
+                  :currentUserHead="currentUserHead" :currentUserMessageCount="currentUserMessageCount" ></header-user-menu>
               </ul>
             </nav>
           </div>
@@ -163,6 +112,7 @@
 <script>
 import Vue from "vue";
 import { mapState, mapGetters, mapActions } from "vuex";
+import HeaderUserMenu from "./HeaderUserMenu"
 
 export default {
   name: "Header",
@@ -182,37 +132,24 @@ export default {
   }),
   data() {
     return {
-      menuDataOrg: [
-        {
-          name: "主页",
-          link: "/"
-        },
-        {
-          name: "文章",
-          link: "/archives/"
-        },
-        {
-          name: "归档",
-          link: "/archives/month/"
-        },
-        {
-          name: "关于",
-          link: "/archives/post/about/"
-        }
-      ],
+      menuDataOrg: null,
       menuData: null,
       menuMoblieShow: false,
+      menuTilte: '',
       currentAuthed: false,
       currentUserName: "",
       currentUserHead: "",
       currentUserLevel: "",
       currentUserMessageCount: 0,
-
-      
     };
+  },
+  components: {
+    'header-user-menu': HeaderUserMenu
   },
   mounted() {
     this.init();
+    this.menuDataOrg = serverSettings.HeaderMenu;
+    this.menuTilte = serverSettings.SiteTitle;
   },
   methods: {
     init() {

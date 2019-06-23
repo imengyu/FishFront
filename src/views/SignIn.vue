@@ -26,7 +26,7 @@
               <button
                 :class="'logon-tab mr-2' + (currentTab=='guest'?' active':'')"
                 id="logon-switch-guest"
-                v-on:click="currentTab='guest'"
+                v-on:click="currentTab='guest';verifyInited=false"
               >快速登录</button>
               <button
                 :class="'logon-tab' + (currentTab=='admin'?' active':'')"
@@ -54,10 +54,10 @@
                     placeholder="用户名"
                     v-model="currentUserName"
                   >
+                  <div class="invalid-feedback text-left">用户名不可为空！</div>
                   <button type="button" class="input-button" style="top:9px;right:11px">
                     <i class="fa fa-user" aria-hidden="true"></i>
                   </button>
-                  <div class="invalid-feedback text-left">用户名不可为空！</div>
                 </div>
                 <div class="form-group with-input-button">
                   <input
@@ -66,13 +66,13 @@
                     placeholder="密码"
                     v-model="currentPassword"
                   >
+                  <div class="invalid-feedback text-left">{{ invalidText2 }}</div>
                   <button type="button" class="input-button" style="top:7px;right:8px" @mousedown="passwordVisible=true" @mouseup="passwordVisible=false">
                     <i class="fa fa-eye" aria-hidden="true"></i>
-                  </button>
-                  <div class="invalid-feedback text-left">{{ invalidText2 }}</div>
+                  </button>             
                   <div class="mt-2 logon-act">
                     <a :href="getJumpRealUrl('/user/center/rec-password/')" class="logon-link float-left">忘记密码？</a>
-                    <a :href="getJumpRealUrl('/sign-up/')" target="_blank" class="logon-link float-right">注册会员</a>
+                    <a v-if="AllowRegister" :href="getJumpRealUrl('/sign-up/')" target="_blank" class="logon-link float-right">注册会员</a>
                   </div>
                 </div>
                 <div class="form-group">
@@ -118,8 +118,9 @@
 import "../assets/lib/verify/verify.min.js";
 import "../assets/lib/verify/verify.min.css";
 import Vue from 'vue'
-import jQuery from 'jquery'
+import $ from 'jquery'
 import Qs from 'qs'
+import serverConsts from '../constants/serverConsts';
 
 export default {
   name: "SignIn",
@@ -139,6 +140,11 @@ export default {
   },
   mounted() {
     this.init();
+  },
+  computed: {
+    AllowRegister: function(){
+      return serverSettings.AllowRegister;
+    }
   },
   watch: {
     $route(to, from) {
@@ -186,10 +192,11 @@ export default {
       this.authed = this.$store.getters["auth/authed"];
     },
     initVerifyCode: function() {
-      if (this.verifyInited) return;
-      this.verifyInited = true;
       var main = this;
       setTimeout(function() {
+        if($("#valid_panel").hasClass('v'))
+          return;
+        $("#valid_panel").addClass('v');
         $("#valid_panel").slideVerify({
           type: 2, //类型
           vOffset: 5, //误差量，根据需求自行调整
@@ -219,6 +226,7 @@ export default {
               $("#valid_panel").html(
                 '<div class="verify-bar-area" style="border-color: rgb(92, 184, 92); background-color: rgb(255, 255, 255);height: 40px; line-height: 40px;"><span class="verify-msg" style="color: rgb(92, 184, 92);"><i class="fa fa-check-circle-o"></i> 验证成功！</span></div>'
               );
+              $("#valid_panel").addClass('g');
               $("#valid_panel").fadeIn(200);
             });
             main.verifyed = true;
@@ -227,7 +235,7 @@ export default {
             main.verifyed = false;
           }
         });
-      }, 500);
+      }, 1000);
     },
     resetVerifyCode: function() {
       $("#valid_panel div").remove();
@@ -277,7 +285,7 @@ export default {
     login: function() {
       this.startValid = true;
       if (this.getValid1() != "flat" || this.getValid2() != "flat") return;
-      if (!this.verifyed) {
+      if (!this.verifyed && !$("#valid_panel").hasClass('g')) {
         this.$swal("请先完成验证以后再登录哦！", "", "warning");
         return;
       }
@@ -300,7 +308,7 @@ export default {
       var url = this.NET.API_URL + "/auth";
       var md5 = require('md5');
       this.logSending = true;
-      jQuery.ajax({
+      $.ajax({
         type: "POST",
         url: url,
         data: JSON.stringify({
@@ -328,7 +336,7 @@ export default {
                   data.data.userData.level == main.ServerConsts.UserLevels.admin)
               )
                 main.jump("/admin/");
-              else main.jump("/user/");
+              else main.jump("/user/x/");
             }
           } else {
             main.resetVerifyCode();

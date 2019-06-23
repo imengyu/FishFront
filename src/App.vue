@@ -1,20 +1,20 @@
 <template>
-  <div v-loading.fullscreen.lock="appLoading" id="app">
+  <div id="app">
     <app-header ref="Header" v-if="isHeaderShow" v-bind:is-admin="isAdminPanel"></app-header>
     <div v-if="isAdminPanel">
       <el-container class="admin-area" v-show="authInfoLoaded">
         <app-admin-sidearea></app-admin-sidearea>
         <el-container>
           <transition name="fade">
-            <router-view ref="View" @publicHeaderAdd="publicHeaderAdd"></router-view>
+            <router-view ref="View" @publicHeaderAdd="publicHeaderAdd" @resetAuthInfo="publicHeaderResetAuthInfo"></router-view>
           </transition>
-          <el-footer class="better-footer"><span>&copy; 2019 FishBlog</span></el-footer>
+          <el-footer class="better-footer" v-html="getFooterText()"></el-footer>
         </el-container>
       </el-container>
     </div>
     <div v-else>
       <transition name="fade">
-        <router-view @publicHeaderAdd="publicHeaderAdd"></router-view>
+        <router-view @publicHeaderAdd="publicHeaderAdd" @resetAuthInfo="publicHeaderResetAuthInfo"></router-view>
       </transition>
     </div>
     <app-footer ref="Footer" v-if="isFooterShow"></app-footer>
@@ -34,7 +34,6 @@ export default {
     return {
       authInfoLoaded: false,
       authInfoSended: false,
-      appLoading: false,
     }
   },
   computed: mapState({  
@@ -72,16 +71,20 @@ export default {
         if(this.$refs.Header)
           this.$refs.Header.reset();
       },
+      publicHeaderResetAuthInfo() {
+        if(this.$refs.Header)
+          this.$refs.Header.resetAuthInfo();
+      },
 
       //路由页面切换
       rePage(to){
         this.$nextTick(() => {
           //修改页面标题
-          if (to.meta.title) document.title = to.meta.title + ' - ' + serverConsts.SiteTitle;
-          else document.title = serverConsts.SiteTitle;
+          if (to.meta.title) document.title = to.meta.title + (this.Utils.isNullOrEmpty(serverSettings.SiteTitle) ? '' : ' - ' + serverSettings.SiteTitle);
+          else document.title = serverSettings.SiteTitle;
           this.publicHeaderReset();
           this.initLoginInfo(false);
-          if(serverConsts.CollectVisitorStat)
+          if(serverSettings.CollectVisitorStat)
             this.sendVisitroStat();
           setTimeout(() => {
             //控制台添加菜单项
@@ -167,14 +170,15 @@ export default {
       //发送页面浏览记录
       sendVisitroStat(){
         var currentPath = this.$route.path;
-        for(var key in serverConsts.CollectVisitorStatExclude){
-           if(serverConsts.CollectVisitorStatExclude[key] == currentPath 
-            || currentPath.indexOf(serverConsts.CollectVisitorStatExclude[key]) == 0)
+        for(var key in serverSettings.CollectVisitorStatExclude){
+           if(serverSettings.CollectVisitorStatExclude[key] == currentPath 
+            || currentPath.indexOf(serverSettings.CollectVisitorStatExclude[key]) == 0)
               return;
         }
        
         this.axios.post(this.NET.API_URL + '/stat', { url: location.href });
       },
+      getFooterText(){ return serverSettings.FooterText; },
   }
 
 }
@@ -207,12 +211,9 @@ export default {
 .better-footer{
   position: relative;
   height: 35px!important;
-  font-size: 14px;
-}
-.better-footer span{
-  position: absolute;
-  bottom: 5px;
-  right: 30px;
+  font-size: 13px;
   color: #a3a3a3;
+  padding: 8px 15px;
+  text-align: right;
 }
 </style>

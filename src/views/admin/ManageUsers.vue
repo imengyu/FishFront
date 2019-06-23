@@ -116,6 +116,7 @@
           <el-form-item label="用户权限" size="mini">
             <span v-if="currentEditingUser.level==0" class="text-secondary">当前用户已封禁，无法赋予权限，请将其解封再赋予权限</span>
             <span v-else-if="currentEditingUser.level==1" class="text-secondary">无法赋予管理员权限，管理员<b>拥有全部权限</b></span>
+            <span v-else-if="currentEditingUser.level&gt;2" class="text-secondary">游客无法赋予权限，如果一定要赋予权限，请将其提升至<b>作者组</b></span>
             <el-cascader
               v-else-if="currentUserCanGenPrivilege && currentEditingUserPrivileges"
               placeholder="要赋予该用户的权限"

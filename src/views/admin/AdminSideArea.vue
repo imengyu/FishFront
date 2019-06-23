@@ -9,7 +9,7 @@
         <el-menu-item index="/admin/write-archive/"><span slot="title">写文章</span></el-menu-item>
       </el-submenu>
       <el-menu-item index="/admin/manage-classfication/"><i class="el-icon-collection-tag"></i><span slot="title">分类和标签</span></el-menu-item>
-      <el-menu-item index="/admin/skin/"><i class="el-icon-magic-stick"></i><span slot="title">博客主题</span></el-menu-item>
+      <el-menu-item index="/admin/skin/"><i class="el-icon-magic-stick"></i><span slot="title">博客外观</span></el-menu-item>
       <el-submenu index="user-management">
         <template slot="title"><i class="el-icon-user"></i><span slot="title">作者和用户管理</span></template>
         <el-menu-item index="/admin/user-center/"><span slot="title">个人信息</span></el-menu-item>
