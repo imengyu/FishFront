@@ -302,69 +302,58 @@ export default {
 	      FAIL_NO_PRIVILEGE: -9,
 	      FAIL_NOT_ACTIVE: -11
       }
-      var main = this;
 	    var userName = this.currentUserName;
       var psw = this.currentPassword;
-      var url = this.NET.API_URL + "/auth";
       var md5 = require('md5');
       this.logSending = true;
-      $.ajax({
-        type: "POST",
-        url: url,
-        data: JSON.stringify({
+      this.axios.post(this.NET.API_URL + "/auth", {
           name: userName,
           passwd: md5(psw)
-        }),
-        crossDomain: true,
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        xhrFields: { withCredentials: true },
-        success: function(data) {
-          if (data.success) {
-            main.currentPassword = '';
+      }).then((response) => {
+        var data = response.data;
+        if (data.success) {
+            this.currentPassword = '';
             if (data.data && data.data.authToken)
-              main.Utils.setCookie(data.data.authTokenName, data.data.authToken);
+              this.Utils.setCookie(data.data.authTokenName, data.data.authToken, '/');
             window.localStorage.setItem("last_user", userName);
             //通知父组件刷新顶栏登录信息
-            main.$parent.initLoginInfo();
-            var a = main.getRedirectUrl();
-            if (!main.Utils.isNullOrEmpty(a)) location.href = decodeURIComponent(a);
+            this.$parent.initLoginInfo();
+            var a = this.getRedirectUrl();
+            if (!this.Utils.isNullOrEmpty(a)) location.href = decodeURIComponent(a);
             else {
               if (
                 data.data && data.data.userData &&
-                (data.data.userData.level == main.ServerConsts.UserLevels.writer ||
-                  data.data.userData.level == main.ServerConsts.UserLevels.admin)
+                (data.data.userData.level == this.ServerConsts.UserLevels.writer ||
+                  data.data.userData.level == this.ServerConsts.UserLevels.admin)
               )
-                main.jump("/admin/");
-              else main.jump("/user/x/");
+                this.jump("/admin/");
+              else this.jump("/user/x/");
             }
           } else {
-            main.resetVerifyCode();
-            main.logSending = false;
+            this.resetVerifyCode();
+            this.logSending = false;
             var extendCode = data.extendCode;
             if (extendCode == authCode.FAIL_NOUSER_FOUND) {
-              main.currentPassword = '';
-              main.$swal("登录失败", "用户不存在。" + data.message, "error");
+              this.currentPassword = '';
+              this.$swal("登录失败", "用户不存在。" + data.message, "error");
             } else if (extendCode == authCode.FAIL_USER_LOCKED)
-              main.$swal(
+              this.$swal(
                 "登录失败",
                 "该用户已被封禁，无法登录。请联系管理员解封。" + data.message,
                 "error"
               );
             else if (extendCode == authCode.FAIL_BAD_PASSWD) {
-             main.currentPassword = '';
-              main.$swal("登录失败", "用户名或密码不正确。" + data.message, "error");
+              this.currentPassword = '';
+              this.$swal("登录失败", "用户名或密码不正确。" + data.message, "error");
             } else if (extendCode == authCode.FAIL_NOT_ACTIVE) {
-              main.$swal("登录失败", "请先登录邮箱激活该用户，您才能登录。", "error");
-            } else main.$swal("登录失败", data.message, "error");
+              this.$swal("登录失败", "请先登录邮箱激活该用户，您才能登录。", "error");
+            } else this.$swal("登录失败", data.message, "error");
           }
-        },
-        error: function(jqXHR, errMsg) {
-          main.resetVerifyCode();
-          main.logSending = false;
-          main.$swal("登录失败", "请求失败 : " + errMsg, "error");
-        }
-      });
+      }).catch((err) => {
+        this.resetVerifyCode();
+        this.logSending = false;
+        this.$swal("登录失败", "请求失败 : " + err, "error");
+      })
     }
   }
 };

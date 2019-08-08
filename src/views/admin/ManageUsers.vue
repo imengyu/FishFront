@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-header style="text-align: right; font-size: 12px; padding: 24px 36px">
+    <el-header class="admin-header">
       <el-breadcrumb separator-class="el-icon-arrow-right">
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
         <el-breadcrumb-item>作者和用户管理</el-breadcrumb-item>
@@ -77,6 +77,7 @@
             >
               <el-option v-for="item in tableListSizeOpinions" :key="item.value" :label="item.label" :value="item.value"></el-option>
             </el-select>
+            <span class="text-secondary ml-3" style="font-size:12px">当前共有 <span class="text-primary">{{ tableUsersAllCount }}</span> 条数据</span>
           </div>
     </el-main>
     <el-main v-else>
@@ -161,6 +162,7 @@ export default {
       tableUsersPageCurrent: 1,
       tableUsersPageAll: 1,
       tableUsersShowTourist: false,
+      tableUsersAllCount: 0,
       tableListSizeOpinions: [
         {
           value: 10,
@@ -394,6 +396,7 @@ export default {
         .get(url)
         .then(response => {
           if (response.data.success) {
+            this.tableUsersAllCount  = response.data.data.totalElements;
             this.tableUsersDatas = response.data.data.content;
             this.tableUsersPageAll = response.data.data.totalPages;
             this.tableUsersLoadStatus = "loaded";
@@ -441,14 +444,6 @@ export default {
 </script>
 
 <style>
-.dialog-auto-width-50 .el-dialog {
-  width: 50%;
-}
-@media (max-width: 425px) {
-  .dialog-auto-width-50 .el-dialog {
-    width: 90%;
-  }
-}
 .el-form-item.el-form-item.el-form-item--medium {
   margin-bottom: 15px;
 }

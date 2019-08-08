@@ -64,6 +64,9 @@ export default {
     getMenuRealUrl(link) {
       return this.NET.URL_PREFIX + link;
     },
+    gotToWriteArchive() {
+      location.href = this.getMenuRealUrl("/admin/write-archive/");
+    },
   }
 };
 </script>

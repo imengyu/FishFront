@@ -32,7 +32,7 @@
             <form method="post">
               <div class="form-group">
                 <input :class="'flat' + valid0()"
-                  type="text"
+                  type="email"
                   id="email"
                   name="email"
                   placeholder="邮箱或手机号"
@@ -40,7 +40,7 @@
                   @blur="checkUserInputMessageValid()"
                   v-model="currentUserEmailOrPhone"
                 >
-                <div class="invalid-feedback">请输入您的邮箱或手机号</div>
+                <div class="invalid-feedback">请输入您的邮箱</div>
               </div>
               <div class="form-group">
                 <button

@@ -17,7 +17,7 @@
                 <i class="fa fa-sign-in" style="font-size:28px"></i>
             </button>
             <form ethod="post" id="comment_form" class="mt-3">
-                <div class="row" v-if="anonymousCanComment() && !authed">
+                <div class="row" v-if="AnonymousCanComment && !authed">
                     <div class="col-md-6">
                         <div class="form-group">
                             <input class="flat" type="text" name="comment_name" id="comment_name" placeholder="您的名字"
@@ -116,7 +116,7 @@
                         <button type="button" class="flat-btn flat-btn-black"
                             v-on:click="previewItem">{{ isEditing ? '预览' : '编辑' }}</button>
                         &nbsp;
-                        <button v-if="anonymousCanComment() || authed" type="button" class="flat-btn flat-btn-black"
+                        <button v-if="AnonymousCanComment || authed" type="button" class="flat-btn flat-btn-black"
                             v-on:click="submitComment">
                             <i class="fa fa-send"></i> 提交评论
                         </button><button v-else type="button" class="flat-btn flat-btn-black btn-disable"
@@ -246,6 +246,11 @@ export default {
   watch: {
     authedUserInfo(val) {
         this.loadLastUserInfo();
+    },
+  },
+  computed: {
+    AnonymousCanComment: function(){
+      return serverSettings.AnonymousComment
     },
   },
   methods: {
@@ -489,30 +494,29 @@ export default {
       }
     },
     submitComment() {
-      var main = this;
       var name = $("#comment_name").val();
       var mail = $("#comment_email").val();
       var website = $("#comment_website").val();
-      var id = main.currentPostId;
+      var id = this.currentPostId;
       var user_id = 0;
-      if (main.authed && main.authedUserInfo) {
-        user_id = main.authedUserInfo.id;
-        if (main.authedUserInfo.friendlyName)
-          name = main.authedUserInfo.friendlyName;
-        if (main.authedUserInfo.name) name = main.authedUserInfo.name;
-        if (main.authedUserInfo.email) mail = main.authedUserInfo.email;
-        if (main.authedUserInfo.home) website = main.authedUserInfo.home;
-      } else if (!anonymousComment) {
-        main.showFastLogin();
+      if (this.authed && this.authedUserInfo) {
+        user_id = this.authedUserInfo.id;
+        if (this.authedUserInfo.friendlyName)
+          name = this.authedUserInfo.friendlyName;
+        if (this.authedUserInfo.name) name = this.authedUserInfo.name;
+        if (this.authedUserInfo.email) mail = this.authedUserInfo.email;
+        if (this.authedUserInfo.home) website = this.authedUserInfo.home;
+      } else if (!serverSettings.AnonymousComment) {
+        this.showFastLogin();
         return;
       }
-      var content = main.currentEditComment;
+      var content = this.currentEditComment;
 
-      if (main.authed == false && this.Utils.isNullOrEmpty(name)) {
+      if (this.authed == false && this.Utils.isNullOrEmpty(name)) {
         this.$swal("请完善信息", "请填写您的名字（或是昵称），然后才能评论", "info");
         return;
       }
-      if (main.authed == false && this.Utils.isNullOrEmpty(mail)) {
+      if (this.authed == false && this.Utils.isNullOrEmpty(mail)) {
         this.$swal("请完善信息", "请填写您的邮箱，然后才能评论", "info");
         return;
       }
@@ -520,17 +524,16 @@ export default {
         this.$swal("请填写您的评论哦！", "", "info");
         return;
       }
-      if (main.authed == false && $("#comment_saveid").is(":checked")) {
+      if (this.authed == false && $("#comment_saveid").is(":checked")) {
         window.localStorage.setItem("last_cm_name", name);
         window.localStorage.setItem("last_cm_mail", mail);
         window.localStorage.setItem("last_cm_website", website);
         window.localStorage.setItem(
           "last_cm_mail_notify",
-          $("#comment_replyformail").is(":checked" ? "1" : "0")
+          $("#comment_replyformail").is(":checked") ? "1" : "0"
         );
       }
-      main.cancelReply();
-
+      this.cancelReply();
       var data = {
         authorId: user_id,
         authorName: name,
@@ -541,42 +544,21 @@ export default {
         postDate: new Date().format("yyyy-MM-dd HH:mm:ss"),
         commentContent: base64.encode(content)
       };
-
-      var url = this.NET.API_URL + "/post/" + id + "/comments";
-      $.ajax({
-        url: url,
-        type: "post",
-        data: JSON.stringify(data),
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        crossDomain: true,
-        xhrFields: { withCredentials: true },
-        success: function(dataObj) {
-          if (dataObj.success) {
+      this.axios.post(this.NET.API_URL + "/post/" + id + "/comments", data).then((response) => {
+         if (response.data.success) {
             $("#comment_content").val("");
-            main.mergeNewItem(dataObj.data);
-            main.currentEditComment = "";
-            main.currentPreviewItem = null;
+            this.mergeNewItem(response.data.data);
+            this.currentEditComment = "";
+            this.currentPreviewItem = null;
             this.$swal(
               "发表成功!",
               "您的评论已经发表，感谢您对我们的支持！",
               "success"
             );
-          } else
-            this.$swal(
-              "抱歉！发表失败了!",
-              "提交时发生了错误 " + dataObj.message,
-              "error"
-            );
-        },
-        error: function(e) {
-          this.$swal(
-            "抱歉！发表失败了!",
-            "提交时发生了错误 " + e.statusText,
-            "error"
-          );
-        }
-      });
+          } else this.$swal("抱歉！发表失败了!", "提交时发生了错误 " + response.data.message, "error");
+      }).catch((response) => {
+        this.$swal("抱歉！发表失败了!", "提交时发生了错误 " + response, "error");
+      })
     },
     mergeNewItem(newdata) {
       var newa = {},
@@ -661,7 +643,6 @@ export default {
       this.jump("/user/" + this.authedUserId + "/");
     },
     deleteComment(id) {
-      var main = this;
       this.$swal({
         type: "warning", // 弹框类型
         title: "删除评论", //标题
@@ -677,41 +658,15 @@ export default {
         reverseButtons: true // 是否 反转 两个按钮的位置 默认是  左边 确定  右边 取消
       }).then(isConfirm => {
         if (isConfirm.value) {
-          var url = this.NET.API_URL + "/post/" + main.currentPostId + "/comments/" + id;
-          $.ajax({
-            url: url,
-            type: "delete",
-            contentType: "application/json; charset=utf-8",
-            crossDomain: true,
-            xhrFields: { withCredentials: true },
-            success: function(dataObj) {
-              if (dataObj.success) {
-                this.$swal("删除成功！", "您的评论已经删除", "success");
-                main.deleteOldItem(id);
-              } else
-                this.$swal(
-                  "抱歉！删除失败了!",
-                  "提交时发生了错误 " + dataObj.message,
-                  "error"
-                );
-            },
-            error: function(e) {
-              this.$swal(
-                "抱歉！删除失败了!",
-                "提交时发生了错误 " + e.statusText,
-                "error"
-              );
-            }
+          this.axios.delete(this.NET.API_URL + "/post/" + this.currentPostId + "/comments/" + id).then((response) => {
+            this.$swal("删除成功！", "您的评论已经删除", "success");
+            this.deleteOldItem(id);
+          }).catch((response) => {
+            this.$swal("抱歉！删除失败了!", "提交时发生了错误 " + response, "error");
           });
         }
       });
     },
-    anonymousCanComment() {
-      return serverSettings.AnonymousComment;
-    },
-
-
-
   }
 };
 </script>

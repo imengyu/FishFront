@@ -3,16 +3,21 @@
     <div v-if="pageBackgroundImage" class="bg-img" id="def-header-bg" :style="'background-image: url(' + pageBackgroundImage + ');'">
       <div v-if="pageBackgroundOverlay" class="overlay" :style="'opacity: ' + pageBackgroundOverlayOpactity + ';'"></div>
     </div>
+    <!-- Admin side area button -->
+    <button v-if="isAdmin && isMobileView()" class="main-admin-sideare-header-sw-button-mobile" @click="switchAdminCollape()"><i :class="'fa ' + (isAdminCollape ? 'fa-arrow-right' : 'fa-bars')" aria-hidden="true"></i></button>
     <div :class="'container main-menu ' + headerMenuStyle">
+      <!-- Admin side area fix -->
+      <div v-if="isAdmin" :class="'main-admin-sideare-header' + (isAdminCollape?' collape':'')">
+        <el-tooltip class="item" effect="dark" :content="isAdminCollape ? '显示菜单' : '折叠菜单'" placement="bottom">
+          <button class="sw-button" @click="switchAdminCollape()"><i :class="'fa ' + (isAdminCollape ? 'fa-arrow-right' : 'fa-bars')" aria-hidden="true"></i></button>
+        </el-tooltip>
+      </div>
       <div class="container">
         <div :class="'row ' + headerRowClass">
-          <div :class="'col' + (headerColWidth?'-'+headerColWidth:'') + ' nav-title d-flex align-items-center justify-content-between'">
-            <div class="nav-header-text d-flex align-items-center justify-content-between">
+          <div :class="'col' + (headerColWidth?'-'+headerColWidth:'') + ' nav-title d-flex align-items-center justify-content-between'  + (isAdmin && !isMobileView() ? ' pl-1' : '')">
+            <div :class="'nav-header-text d-flex align-items-center justify-content-between' + (isAdmin && !isMobileView() ? (' main-admin-sideare-header-text' + (isAdminCollape ? ' collape' : '')): '')">
               <span class="logo" id="header-logo"></span>
               <a href="/" id="header-title">{{ menuTilte }}</a>
-              <el-tooltip class="item" effect="dark" :content="isAdminCollape ? '显示菜单' : '折叠菜单'" placement="bottom">
-                <el-button v-if="isAdmin" :icon="isAdminCollape ? 'el-icon-s-unfold' : 'el-icon-s-fold'" circle @click="switchAdminCollape()" style="margin-left: 13px;" size="small"></el-button>
-              </el-tooltip>
               <nav v-if="pageBreadcrumb && pageShowBreadcrumb" class="main-breadcrumb main-menu-breadcrumb" aria-label="breadcrumb">
                 <ol class="breadcrumb">
                   <li
@@ -178,9 +183,6 @@ export default {
     getMenuRealUrl(link) {
       return this.NET.URL_PREFIX + link;
     },
-    gotToWriteArchive() {
-      location.href = this.getMenuRealUrl("/admin/write-archive/");
-    },
     initLoginInfo(authInfo) {
       if (authInfo) {
         this.currentAuthed = true;
@@ -203,7 +205,10 @@ export default {
     },
     resetAuthInfo() {
       this.currentAuthed = false;
-    }
+    },
+    isMobileView(){
+      return document.body.clientWidth < 576;
+    },
   }
 };
 </script>
@@ -222,7 +227,81 @@ export default {
   height: 50px;
   z-index: 1;
 }
+.main-admin-sideare-header{
+  position: absolute;
+  background-color: #121f3e;
+  top: 0;
+  left: 0;
+  height: 70px;
+  width: 300px;
+  transition: width ease-in-out .3s;
+}
+.main-admin-sideare-header > button{
+  position: absolute;
+  top: 18px;
+  left: 283px;
+  transition: left ease-in-out .3s;
+  z-index: 1000;
+}
+.main-admin-sideare-header.collape > button{
+  left: 45px;
+}
+.main-admin-sideare-header.collape{
+  width: 65px;
+}
+.main-admin-sideare-header-text:not(.collape) > span,
+.main-admin-sideare-header-text:not(.collape) > a {
+  color: #fff;
+}
+.main-admin-sideare-header-text:not(.collape) > .logo {
+  background-image: url(../../assets/images/logo/logo-white.svg);
+}
+.main-admin-sideare-header-text.collape > .logo {
+  visibility: hidden;
+}
+.main-admin-sideare-header .sw-button {
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #fff;
+  border: 2px solid #fff;
+  color: #000;
+  outline: none;
+}
+.main-admin-sideare-header .sw-button:hover {
+  background-color: #6195FF;
+  border: 2px solid #6195FF;
+  color: #fff;
+  outline: none;
+}
+.main-admin-sideare-header-sw-button-mobile{
+  position: absolute;
+  top: 45px;
+  left: -25px;
+  text-align: right;
+  display: inline-block;
+  width: 50px;
+  height: 30px;
+  border-radius: 15px;
+  background-color: #fff;
+  border: 2px solid #fff;
+  color: #000;
+  font-size: 15px;
+  z-index: 3200;
+  outline: none;
+}
+.main-admin-sideare-header-sw-button-mobile:hover,.main-admin-sideare-header-sw-button-mobile:active{
+  background-color: #6195FF;
+  border: 2px solid #6195FF;
+  color: #fff;
+  outline: none;
+}
+
 @media (max-width: 576px) {
+  .main-admin-sideare-header{
+    display: none;
+  }
   .main-menu-breadcrumb{
     position: absolute;
     top: 40px;

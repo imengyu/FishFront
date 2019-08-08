@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-header style="text-align: right; font-size: 12px; padding: 24px 36px">
+    <el-header class="admin-header">
       <el-breadcrumb separator-class="el-icon-arrow-right">
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
         <el-breadcrumb-item>文章管理</el-breadcrumb-item>
@@ -24,7 +24,12 @@
             <el-table-column label="置顶" width="50">
               <template slot-scope="scope">{{ scope.row.topMost ? '是' : '' }}</template>
             </el-table-column>
-            <el-table-column prop="title" label="文章标题"></el-table-column>
+            <el-table-column label="文章标题">
+              <template slot-scope="scope">
+                <a v-if="scope.row.status == 1" :href="getBlogViewUrl(scope.row)" target="_blank">{{ scope.row.title }}</a>
+                <span v-else>{{ scope.row.title }}</span>
+              </template>
+            </el-table-column>
             <el-table-column label="所属分类" width="130">
               <template
                 slot-scope="scope"
@@ -91,6 +96,7 @@
                 :value="item.value"
               ></el-option>
             </el-select>
+            <span class="text-secondary ml-3" style="font-size:12px">当前共有 <span class="text-primary">{{ postListAllAllCount }}</span> 条数据</span>
           </div>
         </el-tab-pane>
         <el-tab-pane label="草稿箱" name="draft">
@@ -154,6 +160,7 @@
                 :value="item.value"
               ></el-option>
             </el-select>
+            <span class="text-secondary ml-3" style="font-size:12px">当前共有 <span class="text-primary">{{ postListDraftAllCount }}</span> 条数据</span>
           </div>
         </el-tab-pane>
         <el-tab-pane label="已发布" name="publish">
@@ -231,6 +238,7 @@
                 :value="item.value"
               ></el-option>
             </el-select>
+            <span class="text-secondary ml-3" style="font-size:12px">当前共有 <span class="text-primary">{{ postListPublishAllCount }}</span> 条数据</span>
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -258,12 +266,14 @@ export default {
       postListAllLoadStatus: "notload",
       postListAllShowAllArchives: false,
       postListAllSortBy: "date",
+      postListAllAllCount: 0,
 
       postListDraftData: null,
       postListDraftPageAll: 0,
       postListDraftPageSize: 20,
       postListDraftPageCurrent: 1,
       postListDraftLoadStatus: "notload",
+      postListDraftAllCount: 0,
 
       postListPublishData: null,
       postListPublishPageAll: 0,
@@ -271,6 +281,7 @@ export default {
       postListPublishPageCurrent: 1,
       postListPublishLoadStatus: "notload",
       postListPublishSortBy: "view",
+      postListPublishAllCount: 0,
 
       postListSizeOpinions: [
         {
@@ -327,9 +338,6 @@ export default {
     jump(link) {
       location.href = this.getJumpRealUrl(link);
     },
-    getJumpRealUrl(link) {
-      return this.NET.URL_PREFIX + link;
-    },
     authInfoInited() {
       this.currentUser = this.$store.getters["auth/authInfo"];
       this.currentUserIsAdmin =
@@ -341,6 +349,13 @@ export default {
     getPostStatusString(post) {
       return this.Utils.getPostStatusString(post.status);
     },
+    getJumpRealUrl(link) {
+      return this.NET.URL_PREFIX + link;
+    },
+    getBlogViewUrl(post){
+      return this.Utils.getPostRealUrl(post);
+    },
+
 
     //Events
     handleTabClick(tab) {
@@ -358,7 +373,7 @@ export default {
       window.open(this.getJumpRealUrl(serverConsts.PartPositions.editArchive + "?archive=" + post.id));
     },
     handleView(index, post){
-      window.open(this.Utils.getPostRealUrl(post.id));
+      window.open(this.Utils.getPostRealUrl(post));
     },
     handleDelete(index, post) {
       this.$swal({
@@ -418,6 +433,7 @@ export default {
         .get(url)
         .then(response => {
           if (response.data.success) {
+            this.postListAllAllCount = response.data.data.totalElements;
             this.postListAllData = response.data.data.content;
             this.postListAllPageAll = response.data.data.totalPages;
             this.postListAllLoadStatus = "loaded";
@@ -442,6 +458,7 @@ export default {
         .get(url)
         .then(response => {
           if (response.data.success) {
+            this.postListDraftAllCount = response.data.data.totalElements; 
             this.postListDraftData = response.data.data.content;
             this.postListDraftPageAll = response.data.data.totalPages;
             this.postListDraftLoadStatus = "loaded";
@@ -468,6 +485,7 @@ export default {
         .get(url)
         .then(response => {
           if (response.data.success) {
+            this.postListPublisAllCount = response.data.data.totalElements; 
             this.postListPublishData = response.data.data.content;
             this.postListPublishPageAll = response.data.data.totalPages;
             this.postListPublishLoadStatus = "loaded";

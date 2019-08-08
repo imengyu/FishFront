@@ -1,5 +1,6 @@
 
 export default {
+    ClientVersion: '1.5.1.0624',
     //后端Java接口地址
     //API_URL: 'http://localhost:8086/v1',
     API_URL: 'https://fishblog.api.imyzc.com/v1',

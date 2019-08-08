@@ -3,7 +3,7 @@ export default {
     //Settings
 
     defaultSettings: {
-        SiteTitle: 'ALONE SPACE',
+        SiteTitle: '梦想小鱼的博客',
         FooterText: '<i class="fa fa-copyright" aria-hidden="true"></i> 2019 Dreamfish',
         HeaderMenu: [
             {
@@ -25,6 +25,7 @@ export default {
         ],   
         AnonymousComment: true,
         AllowRegister: true,
+        MaxStatSaveDays: 30,
         CollectVisitorStat: true,
         CollectVisitorStatExclude: [
             '/admin/',

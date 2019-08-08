@@ -460,16 +460,16 @@ export default {
       this.$swal("About Fish Editor", "Very very simple html editor", "info");
     },
     addHead(hx) {
-      this.insertOrReplace("<" + hx + ">", "</" + hx + ">", true, true);
+      this.insertOrReplace("<" + hx + ">", "</" + hx + ">", true, true, true);
     },
     addBold() {
-      this.insertOrReplace("<b>", "</b>", true, true);
+      this.insertOrReplace("<b>", "</b>", true, true, true);
     },
     addDel() {
-      this.insertOrReplace("<del>", "</deL>", true, true);
+      this.insertOrReplace("<del>", "</deL>", true, true, true);
     },
     addItalic() {
-      this.insertOrReplace("<i>", "</i>", true, true);
+      this.insertOrReplace("<i>", "</i>", true, true, true);
     },
     addQuote() {
       this.insertOrReplace("<blockquote>", "</blockquote>", true, true);
@@ -498,8 +498,7 @@ export default {
             this.currentAddLink +
             '"' +
             ($("#link-new-target").prop("checked") ? ' target="_blank"' : "") +
-            ">" +
-            this.currentAddText,
+            ">" + (!this.htmlEditor.somethingSelected() ? this.currentAddText : ''),
           "</a>",
           true,
           true
@@ -538,12 +537,25 @@ export default {
       this.insertOrReplace("\n<pre>\n", "\n</pre>\n", true, true);
     },
     addCode() {
-      this.insertOrReplace("\n<pre>\n<code>\n", "\n</code>\n</pre>\n", true, true);
+      this.insertOrReplace("\n<pre>\n  <code class=\"lanuage\">\n", "\n  </code>\n</pre>\n", true, true);
     },
     addTable() {
       this.insertOrReplace(
-        "\n<table>\n<thread\n>",
-        "\n</thread>\n<tbody>\n</tbody>\n</table\n>",
+"\n<table class=\"table table-bordered\">\n\
+  <thread>\n\
+    <th>表头1</th>\n\
+    <th>表头2</th>\n\
+    <th>表头3</th>\n\
+  </thread>\n\
+  <tbody>\n\
+    <tr>\n\
+      <td>数据1</td>\n\
+      <td>数据2</td>\n\
+      <td>数据3</td>\n\
+    </tr>\n\
+  </tbody>\n\
+</table>\n",
+        "", 
         false,
         true
       );
@@ -557,25 +569,32 @@ export default {
       );
     },
     addOl() {
-      this.insertOrReplace("\n<ol>", "\n</ol>", true, true);
+      this.insertOrReplace("\n<ol>\n  <li>项目1</li>\n  <li>项目2</li>\n  <li>项目3</li>\n", "\n</ol>", true, true);
     },
     addUl() {
-      this.insertOrReplace("\n<ul>", "\n</ul>", true, true);
+      this.insertOrReplace("\n<ul>\n  <li>项目1</li>\n  <li>项目2</li>\n  <li>项目3</li>\n", "\n</ul>", true, true);
     },
     addHr() {
       this.insertOrReplace("<hr>", null, false, true);
     },
 
-    insertOrReplace(objStart, objEnd, canSurround, htmlTag) {
+    insertOrReplace(objStart, objEnd, canSurround, htmlTag, baseTag) {
       if (this.htmlEditor.somethingSelected()) {
         var old = this.htmlEditor.getSelection();
         if (canSurround) {
+          if(baseTag) { 
+            var oldText = this.alredaySurroundByBaseTag();
+            old = oldText ? oldText : old
+          }
           this.htmlEditor.replaceSelection(objStart + old + objEnd);
         } else this.htmlEditor.replaceSelection(objStart + old);
       } else {
         if (canSurround) this.htmlEditor.replaceSelection(objStart + objEnd);
         else this.htmlEditor.replaceSelection(objStart);
       }
+    },
+    alredaySurroundByBaseTag(text){
+      return false
     },
     replaceCase(up, onlyFirst) {
       if (this.htmlEditor.somethingSelected()) {

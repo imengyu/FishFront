@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-header style="text-align: right; font-size: 12px; padding: 24px 36px">
+    <el-header  class="admin-header">
       <el-breadcrumb separator-class="el-icon-arrow-right">
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
         <el-breadcrumb-item>文章管理</el-breadcrumb-item>
@@ -23,16 +23,22 @@
                 :key="item.value"
                 :label="item.label"
                 :value="item.value">
-                  <span style="float: left">{{ item.label }}</span>
-                  <span style="float: right; color: #8492a6; font-size: 13px; margin-left: 5px;">{{ item.text }}</span>
+                  <span style="float:left">{{ item.label }}</span>
+                  <span style="float:right;color:#8492a6;font-size:13px;margin-left:5px;">{{ item.text }}</span>
                 </el-option>
               </el-select>
+              <el-button v-if="!currentIsNew" type="text" class="ml-2" @click="saveDraft" size="mini">保存草稿</el-button>
+              <el-button v-else type="text" class="ml-2" disabled="disabled" size="mini">保存草稿</el-button>
+              <span v-if="editingAutoSave" class="ml-3 text-secondary" style="font-size:12px">{{ editingAutoSaveLastTime }}</span>
+
               <div class="btn-inline float-right">
                 <el-tooltip class="item" effect="dark" content="编辑文章基本信息" placement="left">
                   <el-button icon="el-icon-edit" circle @click="editingBasicObject=true"></el-button>
                 </el-tooltip>
-                <el-button v-if="getArchiveCanUnPublish()" round @click="jump('/archives/post/' + currentArchiveObject.id)"><i class="fa fa-eye mr-2"></i>转到文章页面</el-button>
-                
+                <el-tooltip class="item" effect="dark" content="转到文章页面" placement="top">
+                  <el-button v-if="getArchiveCanUnPublish()" circle @click="jump('/archives/post/' + currentArchiveObject.id)"><i class="fa fa-eye"></i></el-button>
+                </el-tooltip>
+
                 <el-button v-if="getArchiveCanPublish()" @click="publish()" round ><i class="fa fa-paper-plane-o mr-2"></i>发布文章</el-button>
                 <el-button v-if="getArchiveCanUnPublish()" type="info" @click="unPublish()" round>撤回文章</el-button>
                 
@@ -195,13 +201,19 @@
         </el-form-item> 
         <hr>
         <el-form-item label="文章路径参数">
-           <el-input type="text" v-model="currentArchiveObject.urlName" placeholder="文章路径参数，为空则不使用参数" maxlength="100" show-word-limit></el-input>
+           <el-input type="text" v-model="currentArchiveObject.urlName" placeholder="文章路径参数，为空则不使用参数" maxlength="250" show-word-limit></el-input>
           <span class="text-secondary">/post/{postUrlName}</span>
         </el-form-item>
+        <el-form-item label="文章显示目录">
+          <el-switch v-model="currentArchiveObject.showCatalog" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+        </el-form-item>
+        <el-form-item label="文章允许评论">
+          <el-switch v-model="currentArchiveObject.enableComment" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+        </el-form-item>
+        <el-form-item label="文章置顶">
+          <el-switch v-model="currentArchiveObject.topMost" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+        </el-form-item>
         <el-form-item>
-          <el-checkbox v-model="currentArchiveObject.topMost">文章置顶</el-checkbox>
-          <el-checkbox v-model="currentArchiveObject.enableComment">允许评论</el-checkbox>
-          <el-checkbox v-model="currentArchiveObject.showCatalog">显示目录</el-checkbox>
           <el-checkbox v-model="currentArchiveObject.showInList">显示在文章列表中</el-checkbox>
           <el-checkbox v-model="currentArchiveShowLastModifyDate">自动添加修改日期</el-checkbox>
         </el-form-item>
@@ -214,6 +226,9 @@
         </el-form-item>
         <el-form-item label="摘要">
           <el-input type="textarea" placeholder="请输入文章摘要" v-model="currentArchiveObject.previewText"></el-input>
+        </el-form-item>
+        <el-form-item label="文章关键词">
+          <el-input type="textarea" placeholder="请输入文章关键词，每个以英文逗号(,)分隔" v-model="currentArchiveObject.keywords"></el-input>
         </el-form-item>
         <el-form-item label="文章缩略图">
           <el-image
@@ -287,7 +302,7 @@
           <el-input placeholder="输入评论数" v-model="currentArchiveObject.commentCount"></el-input>
         </el-form-item>
         <el-form-item v-if="editingBasicObjectMore" label="点赞数">
-          <el-input placeholder="输入点赞数" v-model="currentArchiveObject.commentCount"></el-input>
+          <el-input placeholder="输入点赞数" v-model="currentArchiveObject.likeCount"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -353,6 +368,8 @@
         <el-button type="primary" @click="mediaImageInserting=false;mediaImageChoosingPrewImage?handleMediaImageChoosePrewImage():handleMediaImageFasterInsertDoInsert()" round>确定</el-button>
       </span>
     </el-dialog>
+    <!--重新登录对话框-->
+    <fast-relogin ref="fastReLogin" />
   </el-container> 
 </template>
 
@@ -366,6 +383,7 @@ import FishEditor from '../../components/FishEditor'
 import MavonEditor from '../../components/mavon-editor/mavon-editor.vue'
 import ImageList from '../../components/ImageList'
 import VideoList from '../../components/VideoList'
+import FastReLogin from '../../components/public/FastReLogin'
 import FileList from '../../components/FileList'
 import UploadingList from '../../components/UploadingList'
 import ErrorPage from '../../components/ErrorPage'
@@ -413,6 +431,9 @@ export default {
       ],
       archivePrefix: [],
 
+      editingAutoSave: false,
+      editingAutoSaveLastTime: null,
+      editingAutoSaveInterval: null,
 
       commentListData: null,
       commentListPageAll: 0,
@@ -481,9 +502,14 @@ export default {
   },
   mounted() {
     this.init();
-    window.onbeforeunload = function() { return "请确认您的文章保存了以后再离开此页面哦！"; };
+    this.editingAutoSaveInterval = setInterval(() => { this.saveDraft(true) }, 300000);//5分钟自动保存
+    window.onbeforeunload=function(e){
+      var e=window.event||e;
+      e.returnValue=("请确认您的文章保存了以后再离开此页面哦！");
+    }
   },
   destroyed: function () {
+    clearInterval(this.editingAutoSaveInterval);
     window.onbeforeunload = undefined;
   },
   components: {
@@ -493,7 +519,8 @@ export default {
     'error-page': ErrorPage,
     'video-list': VideoList,
     'file-list': FileList,
-    'uploading-list': UploadingList
+    'uploading-list': UploadingList,
+    'fast-relogin': FastReLogin
   },
   methods: {
     init: function() {
@@ -946,7 +973,6 @@ export default {
         this.$refs.uploadMediaFiles.clearSelectFiles();
       }
     },
-
     //
     // 数据加载方法
     //
@@ -961,6 +987,7 @@ export default {
           this.currentArchiveType = response.data.data.type;
           this.currentArchiveObjectBackup = this.Utils.clone(this.currentArchiveObject);
           this.loadPDataStart();
+          this.loadDraft();
         }else{
           this.currentArchiveLoading = false;
           this.currentArchiveObject = null;
@@ -1078,6 +1105,17 @@ export default {
       this.mediaFilesLoadStatus = 'notload';
       this.mediaFilesData = null;
       this.handleTabClick(null);
+    },
+    loadDraft() {      
+      this.axios.get(this.NET.API_URL + "/post/" + this.currentArchiveObject.id + "/draft").then(response => {
+        if(response.data.success && response.data.data.hasDraft){
+          this.Utils.cloneValue(this.currentArchiveObject, response.data.data.json);
+          this.loadPDataStart();
+          this.editingAutoSave = true;
+          this.editingAutoSaveLastTime = '已恢复 ' + response.data.data.lastUpdateTime + ' 保存的草稿';
+          toast.toast('读取文章草稿成功！', 'success');
+        }
+      });
     },
     loadComments(){
       if(this.currentIsNew) return;
@@ -1266,7 +1304,7 @@ export default {
         var response = null;
         try { response = eval("(" + result.response + ")"); }
         catch (e) { this.failUpload(uploadingItem, e); }
-        if(!uploadingItem.markedCancel) response.success ? this.finishUpload(uploadingItem) : this.failUpload(uploadingItem, response.message);
+        if(!uploadingItem.markedCancel) response.success ? (uploadingItem.media = response.data, this.finishUpload(uploadingItem)) : this.failUpload(uploadingItem, response.message);
       }
       xhr.onerror = () => { if(!uploadingItem.markedCancel) this.failUpload(uploadingItem, xhr.statusText); }; //请求失败
       xhr.upload.onprogress = (result) => {
@@ -1333,6 +1371,7 @@ export default {
           if(response.success) { 
             if(!uploadingItem.markedCancel) {
               uploadingItem.uploadBlobCurrent++;
+              uploadingItem.media = response.data
               this.uploadMultipartBlob(uploadingItem, uploadMultiToken);
             }
           } else this.failUpload(uploadingItem, response.message);
@@ -1388,26 +1427,19 @@ export default {
     //
 
     //参数验证
-    saveValidate(){
+    saveValidate(targetStatus, noalert){
       if(this.Utils.isNullOrEmpty(this.currentArchiveObject.title)) {
-        this.$alert('您正在提交没有标题的文章, 必须输入文章的标题才能保存文章哦', '提交失败', { confirmButtonText: '我知道了' });
+        if(!noalert) this.$alert('您正在提交没有标题的文章, 必须输入文章的标题才能保存文章哦', '提交失败', { confirmButtonText: '我知道了' });
         return true;
       }
-      if(this.Utils.isNullOrEmpty(this.currentArchiveContent)) {
-        this.$alert('您正在提交一篇空的文章, 必须写一些文章内容才能保存文章哦', '提交失败', { confirmButtonText: '我知道了' });
+      if(((targetStatus == -1 && this.currentArchiveObject.status == serverConsts.ArchiveStatus.PUBLISH) || targetStatus == serverConsts.ArchiveStatus.PUBLISH) && this.Utils.isNullOrEmpty(this.currentArchiveContent)) {
+        if(!noalert) this.$alert('您正在发布一篇空的文章, 必须写一些文章内容才能发布文章哦', '发布失败', { confirmButtonText: '我知道了' });
         return true;
       }
     },
     //文章提交操作
     //保存
-    saveSubmit(targetStatus, successCallback){
-
-      //先验证参数
-      if(this.saveValidate()){
-        successCallback(false);
-        return;
-      }
-
+    savePreAct(targetStatus){
       //同步一些已修改数据至 Object 中
       this.currentArchiveObject.type = this.archiveType;
       //生成Tags标签数据
@@ -1433,10 +1465,9 @@ export default {
       this.currentArchiveObject.content = base64.encode(this.currentArchiveContent);
       //设置一些初始值
       if (this.currentIsNew) {
-        if (this.Utils.isNullOrEmpty(this.currentArchiveObject.urlName)) genPostUrlName(); 
         if (this.currentUser) {
         //设置作者id
-        this.currentArchiveObject.authorId = this.currentUser.id;
+          this.currentArchiveObject.authorId = this.currentUser.id;
         //设置作者名字 
         if(!this.Utils.isNullOrEmpty(this.currentUser.friendlyName))
           this.currentArchiveObject.author = this.currentUser.friendlyName;
@@ -1447,22 +1478,30 @@ export default {
       //修改文章状态
       if(targetStatus!=-1){
         this.currentArchiveObject.status = targetStatus;
-        this.currentArchiveObject = targetStatus;
       }
-      setTimeout(() => {
+    },
+    saveSubmit(targetStatus, successCallback){
+
+      //先验证参数
+      if(this.saveValidate(targetStatus)){
+        successCallback(false);
+        return;
+      }
+      this.savePreAct(targetStatus);  
         //提交
         if (this.currentIsNew) {
           this.axios.post(this.NET.API_URL + "/post", this.currentArchiveObject).then(response => {
             if (response.data.success) {
               //重新刷新返回的数据
+              this.editingAutoSave = false;
               this.currentArchiveObject = response.data.data;
               this.currentArchiveObjectBackup = this.Utils.clone(this.currentArchiveObject);
               this.currentIsNew = false;
               successCallback();
               this.$swal("文章保存成功！", '', "success");
             } else {
-              successCallback(false);
-              this.$swal("抱歉！新建文章失败", response.data.message, "error");
+              if(!successCallback(false, response.data.code == 401))
+                this.$swal("抱歉！新建文章失败", response.data.message, "error");
             }
           }).catch(response => {
             successCallback(false);
@@ -1472,21 +1511,41 @@ export default {
           this.axios.put(this.NET.API_URL + "/post/" + this.currentArchiveObject.id, this.currentArchiveObject).then(response => {
             if (response.data.success) successCallback(true); 
             else {
-              successCallback(false);
-              this.$swal("抱歉！提交文章失败了", response.data.message, "error");
+              this.editingAutoSave = false;
+              if(!successCallback(false, response.data.code == 401))
+                this.$swal("抱歉！提交文章失败了", response.data.message, "error");
             }
           }).catch(response => {
             successCallback(false);
             this.$swal("提交文章失败了", "错误信息：" + response + '。 请检查您的网络？', "error"); 
           });
         }
-      }, 600);
+    },
+    saveDraft(auto) {
+      //先验证参数
+      if(this.saveValidate(-1, auto)){
+        this.editingAutoSave = true;
+        this.editingAutoSaveLastTime = (auto ? '自动' : '') + '保存草稿失败，空文章不能保存草稿';
+        return;
+      }
+      this.savePreAct(-1);
+      if(this.getArchiveCanUnChange()){
+        this.axios.put(this.NET.API_URL + "/post/" + this.currentArchiveObject.id + "/draft", this.currentArchiveObject).then(response => {
+          if(response.data.success){
+            this.editingAutoSave = true;
+            this.editingAutoSaveLastTime = '已保存至草稿 ' + new Date().format("HH:ii:ss");
+            toast.toast('文章已保存至草稿 ' + this.editingAutoSaveLastTime, 'success');
+          }else if(response.data.code == 401){
+             this.$refs.fastReLogin.doFastLogin(this.saveDraft);
+          }
+        });
+      }
     },
 
     //放弃修改
     cancelChange() {
-      this.$confirm('真的要放弃修改吗? 注意，您的未保存修改将会丢失！', '提示', {
-        confirmButtonText: '确定',
+      this.$confirm('真的要放弃修改吗? 注意，您的未保存修改将会丢失，并恢复您编辑文章之前的状态！', '提示', {
+        confirmButtonText: '确定放弃',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
@@ -1507,8 +1566,12 @@ export default {
         if (st=='draft') targetStatus = serverConsts.ArchiveStatus.DRAFT;
         else if(st=='private') targetStatus = serverConsts.ArchiveStatus.PRIVATE;
         else if(st=='publish') targetStatus = serverConsts.ArchiveStatus.PUBLISH;
-        this.saveSubmit(targetStatus, (success) => {
+        this.saveSubmit(targetStatus, (success, isAuthExpired) => {
           toast.toastClose(t);
+          if(isAuthExpired){
+            this.$refs.fastReLogin.doFastLogin(() => { this.saveChange(st) });
+            return true
+          }
           if(success) this.$swal('文章修改提交成功！', '', 'success')
         });
       }).catch(() => {});;
@@ -1522,8 +1585,12 @@ export default {
         type: 'warning'
       }).then(() => {
         var t = toast.toast('正在提交文章', 'loading', -1);
-        this.saveSubmit(serverConsts.ArchiveStatus.PUBLISH, (success) => {
+        this.saveSubmit(serverConsts.ArchiveStatus.PUBLISH, (success, isAuthExpired) => {
           toast.toastClose(t);
+          if(isAuthExpired){
+            this.$refs.fastReLogin.doFastLogin(this.publish);
+            return true
+          }
           if(success) swal('文章发布成功！', '', 'success')
         });                  
       }).catch((e) => {
@@ -1538,8 +1605,12 @@ export default {
         type: 'warning'
       }).then(() => {
         var t = toast.toast('正在撤回文章', 'loading', -1);
-        this.saveSubmit(serverConsts.ArchiveStatus.DRAFT, (success) => {
+        this.saveSubmit(serverConsts.ArchiveStatus.DRAFT, (success, isAuthExpired) => {
           toast.toastClose(t);
+          if(isAuthExpired){
+            this.$refs.fastReLogin.doFastLogin(this.unPublish);
+            return true
+          }
           if(success) toast.toast('成功将文章撤回到草稿箱', 'success');
         })  
       }).catch(() => {});
@@ -1552,22 +1623,6 @@ export default {
 <style>
 .blog-editor-container{
   overflow: hidden;
-}
-.dialog-auto-width-30 .el-dialog {
-  width: 30%;
-}
-.dialog-auto-width-50 .el-dialog {
-  width: 50%;
-}
-.dialog-auto-width-70 .el-dialog {
-  width: 70%;
-}
-@media (max-width: 425px) {
-  .dialog-auto-width-50 .el-dialog,
-  .dialog-auto-width-30 .el-dialog,
-  .dialog-auto-width-70 .el-dialog {
-    width: 90%;
-  }
 }
 .swal2-container.swal2-shown{
   z-index: 3000;

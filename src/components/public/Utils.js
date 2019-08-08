@@ -241,6 +241,12 @@ function setCookie(name, value) {
   exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
   document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString();
 }
+function setCookie(name, value, path) {
+  var Days = 30;
+  var exp = new Date();
+  exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+  document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString() + ";path=" + path;
+}
 /**
  * 读取 Cookie
  * @param {String} name Cookie 名称

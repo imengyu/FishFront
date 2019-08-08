@@ -216,6 +216,14 @@ a:active { color: #0045bb; text-decoration: none; }
 
 .social-icon-douban { background-position: -140px 0; }
 
+.dialog-auto-width-30 .el-dialog { width: 30%; }
+
+.dialog-auto-width-50 .el-dialog { width: 50%; }
+
+.dialog-auto-width-70 .el-dialog { width: 70%; }
+
+@media (max-width: 425px) { .dialog-auto-width-50 .el-dialog, .dialog-auto-width-30 .el-dialog, .dialog-auto-width-70 .el-dialog { width: 90%; } }
+
 @font-face { font-family: 'Emoji'; src: url("../fonts/seguiemj.eot"); src: url("../fonts/seguiemj.eot?#iefix") format("embedded-opentype"), url("../fonts/seguiemj.ttf") format("truetype"), url("../fonts/seguiemj.woff2") format("woff2"), url("../fonts/seguiemj.woff") format("woff"); }
 
 @font-face { font-family: 'AbductionII'; src: url("../fonts/AbductionII.eot"); src: url("../fonts/AbductionII.eot?#iefix") format("embedded-opentype"), url("../fonts/AbductionII.woff") format("woff"); font-weight: normal; font-style: normal; }
@@ -572,20 +580,6 @@ body.mobile-nav-active #mobile-nav { left: 0; }
 #header-minimum .main-menu { background-color: rgba(90, 90, 90, 0.9); }
 
 #header-minimum .main-menu-white { background-color: #fff; box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.06); -webkit-box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.06); -moz-box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.06); }
-
-.more { -webkit-transition: color 0.2s ease; transition: color 0.2s ease; transform: translateY(0); -webkit-transform: translateY(0); -moz-transform: translateY(0); -o-transform: translateY(0); -ms-transform: translateY(0); border: none; bottom: 0; color: #fff; font-size: 0.8em; height: 8.5em; left: 50%; letter-spacing: 0.3em; margin-left: -8em; opacity: 1; outline: 0; padding-left: 0.225em; position: absolute; text-align: center; text-transform: uppercase; width: 16em; z-index: 1; }
-
-.more.sw { bottom: 120px; height: 30px; font-size: 12px; }
-
-.more.sw.top { margin-bottom: 15px; }
-
-.more.sw.bottom { margin-top: 15px; }
-
-.more:active, .more:hover { color: #6195FF; outline: 0; }
-
-.more:focus { outline: 0; }
-
-.more i { color: inherit; margin-top: 5px; font-size: 3em; display: block; -webkit-animation: finger 1.5s infinite; animation: finger 1.5s infinite; }
 
 @-webkit-keyframes finger { 0% { opacity: 1;
     -webkit-transform: translateY(0px);
@@ -1103,9 +1097,7 @@ footer > div { max-width: 100%; }
   .skew-title span:before, .skew-title span:after { width: 30px; height: 45px; }
   .skew-title .left, .skew-title .right { text-align: center; } }
 
-@media (max-width: 768px) { .more { height: 6em; }
-  .more.sw { top: 70px; bottom: 0px; }
-  .info-area .info-thumb { box-shadow: none !important; -webkit-box-shadow: none !important; -moz-box-shadow: none !important; transform: rotate(0); -webkit-transform: rotate(0); }
+@media (max-width: 768px) { .info-area .info-thumb { box-shadow: none !important; -webkit-box-shadow: none !important; -moz-box-shadow: none !important; transform: rotate(0); -webkit-transform: rotate(0); }
   .info-area .info-content { box-shadow: none !important; -webkit-box-shadow: none !important; -moz-box-shadow: none !important; transform: rotate(0); -webkit-transform: rotate(0); } }
 
 .section { position: relative; }
@@ -1230,7 +1222,7 @@ h3.blog-title { border-bottom: 1px solid #eee; color: #484848; font-weight: norm
 
 .blog-side-head .icons li { display: inline-block; padding: 0 0.75em 0 0; }
 
-.author { position: relative; background: url(/images/background/mebg.jpg) center center no-repeat; background-size: cover; height: 140px; margin: -25px -25px 50px; border-top-right-radius: .25rem; border-top-left-radius: .25rem; }
+.author { position: relative; background: url(/images/background/mebg2.jpg) center center no-repeat; background-size: cover; height: 120px; margin: -25px -25px 50px; border-top-right-radius: .25rem; border-top-left-radius: .25rem; }
 
 .author img { width: 84px; height: 84px; border-radius: 50%; overflow: hidden; position: absolute; bottom: -42px; left: 50%; margin-left: -42px; border: 1px solid rgba(255, 255, 255, 0.6); -webkit-box-shadow: 0 0 20px rgba(0, 0, 0, 0.34); box-shadow: 0 0 20px rgba(0, 0, 0, 0.34); }
 
@@ -1409,7 +1401,7 @@ h3.blog-title { border-bottom: 1px solid #eee; color: #484848; font-weight: norm
 
 .blog-content-result { max-width: 100%; overflow: hidden; }
 
-.post-container { overflow: hidden; word-break: break-all; font-family: -apple-system,SF UI Text,Arial,PingFang SC,Hiragino Sans GB,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif; }
+.post-container { overflow: visible; word-break: break-all; font-family: -apple-system,SF UI Text,Arial,PingFang SC,Hiragino Sans GB,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif; }
 
 .post-container div { overflow: visible; }
 

@@ -16,9 +16,11 @@ import VueClipboard from 'vue-clipboard2'
 import NET from './constants/const.js'
 import serverConsts from './constants/serverConsts.js'
 import toast from './assets/lib/toast/toast.simply'
+import MetaInfo from 'vue-meta-info'
 
 //组件初始化
 
+Vue.use(MetaInfo)
 Vue.use(VueClipboard)
 Vue.use(VueAxios, axios);
 Vue.use(ElementUI);

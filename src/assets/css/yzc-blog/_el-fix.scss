@@ -1,0 +1,16 @@
+.dialog-auto-width-30 .el-dialog {
+    width: 30%;
+}
+.dialog-auto-width-50 .el-dialog {
+    width: 50%;
+}
+.dialog-auto-width-70 .el-dialog {
+    width: 70%;
+}
+@media (max-width: 425px) {
+    .dialog-auto-width-50 .el-dialog,
+    .dialog-auto-width-30 .el-dialog,
+    .dialog-auto-width-70 .el-dialog {
+        width: 90%;
+    }
+}

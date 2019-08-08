@@ -95,6 +95,7 @@
                   id="side_catalog_close_toggle"
                   href="javascript:void(0)"
                   class="side-catalog-close"
+                  v-on:click="switchCatalog"
                 >
                   <i class="fa fa-times"></i>
                 </a>

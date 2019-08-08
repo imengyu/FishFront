@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-header style="text-align: right; font-size: 12px; padding: 24px 36px">
+    <el-header class="admin-header">
       <el-breadcrumb separator-class="el-icon-arrow-right">
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
         <el-breadcrumb-item>分类和标签</el-breadcrumb-item>
@@ -513,17 +513,3 @@ export default {
 };
 </script>
 
-<style>
-.dialog-auto-width-30 .el-dialog {
-  width: 30%;
-}
-.dialog-auto-width-50 .el-dialog {
-  width: 50%;
-}
-@media (max-width: 425px) {
-  .dialog-auto-width-50 .el-dialog,
-  .dialog-auto-width-30 .el-dialog {
-    width: 90%;
-  }
-}
-</style>

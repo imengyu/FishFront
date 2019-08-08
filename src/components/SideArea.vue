@@ -264,7 +264,7 @@ export default {
     },
     getUserCardBackground() {
       if (!this.bloggerInfo || this.Utils.isNullOrEmpty(this.bloggerInfo.cardBackground))
-        return require("../assets/images/background/mebg.jpg");
+        return require("../assets/images/background/mebg2.jpg");
       else return this.bloggerInfo.cardBackground;
     }
   }

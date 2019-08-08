@@ -9,7 +9,7 @@
           <div class="col-sm-12 col-md-10 col-lg-8">
             <div class="home-content">
               <div class="main-head text-center">
-                <h1>DreamFish'S Blog</h1>
+                <h1>梦欤的博客</h1>
                 <p>Cold and quiet space, cool but Useless</p>
               </div>
             </div>
@@ -23,9 +23,9 @@
               <div class="main-head-desp text-center">              
                 <p><span class="main-alone-text">这儿是一片孤独的土地</span></p>
                 <div class="white-content">
-                  <h3 style="padding-top: 10px; padding-bottom: 10px;">欢迎来到 DreamFish 的博客</h3>
+                  <h3 style="padding-top: 10px; padding-bottom: 10px;">欢迎来到 梦欤 的博客</h3>
                   亲爱的陌生人，你好。这是我的博客，我在此分享一些技术上的学习心得
-                  <br>我是 DreamFish ，一名普通大学生，对，非常垃圾和菜💩
+                  <br>我是 梦欤 ，一名普通大学生，对，非常垃圾和菜💩
                   <br>感谢你能来光顾如此垃圾的我的博客 （＞人＜；）
                   <br>如果你也喜欢一样的技术，我们不妨聊一聊？
                   <br>
@@ -71,7 +71,8 @@
               style="border-top-right-radius: 0px!important;border-bottom-right-radius: 0px!important;border-right: none!important"
               v-on:click="switchMain()"
             >
-              <i :class="'fa fa-angle-down mr-0' + (isDetailsView ? ' revrse-180' : '')"></i>
+              <i :class="'fa fa-angle-down mr-2' + (isDetailsView ? ' revrse-180' : '')"></i>
+              {{ isDetailsView ? '隐藏': '关于' }}
             </button><button
               type="button"
               class="flat-pill flat-btn flat-btn-white mt-3 ml-0"
@@ -99,6 +100,33 @@
 <script>
 export default {
   name: "Index",
+  metaInfo: {
+    title: '梦欤的博客',
+    meta: [
+      {
+        name: 'keyWords',
+        content: '梦欤的博客,梦欤的小站,梦欤,梦想小鱼的小家,梦想小鱼的随手记录册,YuZeCheng,俞则成'
+      },
+      {
+        name: 'description',
+        content: '梦欤的个人小站-一只不太炫酷的程序猿的学习分享博客，分享IT技术，一起学习成长！'
+      },
+    ],
+    link: [
+      {
+        rel: 'archives',
+        href: '/archives/'
+      },
+      {
+        rel: 'month',
+        href: '/archives/month'
+      },
+      {
+        rel: 'about',
+        href: '/archives/post/about'
+      },
+    ]
+  },
   data() {
     return {
       isDetailsView: false,
@@ -122,7 +150,7 @@ export default {
       this.$store.dispatch('global/switchFooter', false);
       this.$store.dispatch('global/setHeaderStyle', "header");
       this.$store.dispatch('global/setHeaderMenuStyle', "main-menu-black main-menu-fade-black full");
-      this.$store.dispatch('global/setPageBackgroundImage', require("../assets/images/background/background5.jpg"));
+      this.$store.dispatch('global/setPageBackgroundImage', require("../assets/images/background/background6.jpg"));
 
       this.loadStats();
     },
@@ -204,7 +232,6 @@ export default {
   padding-top: 75px;
   padding-bottom: 0;
   color: #fff;
-  background-image: url(/images/background/bg_mc.jpg);
   background-position-y: -150px;
 }
 .main-head-desp p {
@@ -323,6 +350,9 @@ export default {
   opacity: 0;
   height: 0;
 }
+.main-hide-center * {
+  height: 0;
+}
 .main-show-center {
   transform: scale(1);
   transition: transform 0.5s, opacity 0.8s ease-in-out;
@@ -349,7 +379,7 @@ export default {
 
 .main-ufo {
   position: absolute;
-  height: 225px;
+  height: 230px;
   width: 300px;
   top: -55px;
   left: 50%;
@@ -357,6 +387,7 @@ export default {
   z-index: -1;
   background-image: url(../assets/images/blocks/ufo-small.png);
   background-repeat: no-repeat;
+  background-position-y: center;
 }
 
 .home-wrapper {

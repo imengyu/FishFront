@@ -1,18 +1,17 @@
 <template>
   <div id="app">
     <app-header ref="Header" v-if="isHeaderShow" v-bind:is-admin="isAdminPanel"></app-header>
-    <div v-if="isAdminPanel">
+    <div v-if="isAdminPanel" id="admin">
       <el-container class="admin-area" v-show="authInfoLoaded">
         <app-admin-sidearea></app-admin-sidearea>
-        <el-container>
+        <el-container :class="isAdminCollape ? 'admin-container admin-collape' : 'admin-container'">
           <transition name="fade">
             <router-view ref="View" @publicHeaderAdd="publicHeaderAdd" @resetAuthInfo="publicHeaderResetAuthInfo"></router-view>
           </transition>
-          <el-footer class="better-footer" v-html="getFooterText()"></el-footer>
         </el-container>
       </el-container>
     </div>
-    <div v-else>
+    <div v-else id="common">
       <transition name="fade">
         <router-view @publicHeaderAdd="publicHeaderAdd" @resetAuthInfo="publicHeaderResetAuthInfo"></router-view>
       </transition>
@@ -178,7 +177,6 @@ export default {
        
         this.axios.post(this.NET.API_URL + '/stat', { url: location.href });
       },
-      getFooterText(){ return serverSettings.FooterText; },
   }
 
 }
@@ -204,9 +202,19 @@ export default {
   right: 0;
   bottom: 0;
   max-height: 100%;
-  overflow: hidden;
+  overflow: visible;
   font-family: Arial, Helvetica, sans-serif;
   background: rgba(88, 115, 254, 0.02);
+}
+.admin-container{
+  padding-bottom: 10px
+}
+.admin-header{
+  position: relative;
+  text-align: right; 
+  font-size: 12px; 
+  transition: all linear .3s;
+  padding: 24px!important;
 }
 .better-footer{
   position: relative;
@@ -215,6 +223,19 @@ export default {
   color: #a3a3a3;
   padding: 8px 15px;
   text-align: right;
+}
+@media (min-width: 768px) { 
+  .admin-header{
+    position: absolute;
+    top: -65px;
+    left: 320px;
+    z-index: 1000;
+  }
+  .admin-collape .admin-header{
+    position: absolute;
+    top: -65px;
+    left: 260px;
+  }
 }
 @media (max-width: 768px) {
   .admin-area{

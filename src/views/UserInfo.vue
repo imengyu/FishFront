@@ -309,7 +309,7 @@ export default {
     },
     getUserCardBackground() {
       if (this.Utils.isNullOrEmpty(this.currentUser.cardBackground))
-        return require("../assets/images/background/mebg.jpg");
+        return require("../assets/images/background/mebg2.jpg");
       else return this.currentUser.cardBackground;
     },
   }

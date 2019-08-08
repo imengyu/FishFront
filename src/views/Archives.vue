@@ -65,6 +65,19 @@ import { slider, slideritem } from 'vue-concise-slider'
 
 export default {
   name: "Archives",
+  metaInfo: {
+    title: '梦欤的文章',
+    meta: [
+      {
+        name: 'keyWords',
+        content: '梦欤的博客,梦欤的小站,梦欤,梦想小鱼的小家,梦想小鱼的随手记录册,YuZeCheng,俞则成'
+      },
+      {
+        name: 'description',
+        content: '梦欤的个人小站-文章视图，记录梦想小鱼的学习，分享知识'
+      },
+    ],
+  },
   data() {
     return {
       blogDataList: null,

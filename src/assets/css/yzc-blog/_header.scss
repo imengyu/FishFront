@@ -74,59 +74,6 @@
 }
 
 
-//Header More scroll button
-.more {
-    transition: color 0.2s ease;
-
-    @include prefix(transform, translateY(0));
-
-	border: none;
-	bottom: 0;
-	color: $white;
-	font-size: 0.8em;
-	height: 8.5em;
-	left: 50%;
-	letter-spacing: 0.3em;
-	margin-left: -8em;
-	opacity: 1;
-	outline: 0;
-	padding-left: 0.225em;
-	position: absolute;
-	text-align: center;
-	text-transform: uppercase;
-	width: 16em;
-    z-index: 1;
-    
-    &.sw {
-        bottom: 120px;
-        height: 30px;
-        font-size: 12px;
-
-        &.top{
-            margin-bottom: 15px;
-        }
-        &.bottom{
-            margin-top: 15px;
-        }
-    }
-    &:active,&:hover {
-        color: #6195FF;
-        outline: 0;
-    }
-    &:focus {
-        outline: 0;
-    }
-
-    i {
-        color: inherit;
-        margin-top: 5px;
-        font-size: 3em;
-        display: block;
-        -webkit-animation: finger 1.5s infinite;
-        animation: finger 1.5s infinite;
-    }
-}
-
 //Header More Anim
 @-webkit-keyframes finger {
 	0% {

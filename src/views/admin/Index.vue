@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-header style="text-align: right; font-size: 12px; padding: 24px">
+    <el-header class="admin-header">
       <el-breadcrumb separator-class="el-icon-arrow-right">
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
         <el-breadcrumb-item>仪表盘</el-breadcrumb-item>

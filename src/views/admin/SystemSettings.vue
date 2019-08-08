@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-header style="text-align: right; font-size: 12px; padding: 24px">
+    <el-header class="admin-header">
       <el-breadcrumb separator-class="el-icon-arrow-right">
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
         <el-breadcrumb-item>系统设置</el-breadcrumb-item>
@@ -64,6 +64,9 @@
                 <el-button  @click="addExcludeItem()">添加</el-button>
               </div>
               <div class="text-secondary mt-2">填写您不想收集用户访问数据的页面路径，以绝对路径表示，例如 <span class="text-primary">/archoves/post/about</span> 是一个有效的路径。</div>
+            </el-form-item>
+            <el-form-item label="用户访问日志保留天数">
+              <el-input-number v-model="setMaxStatSaveDays" :min="10" :max="365" label="用户访问日志保留天数"></el-input-number> 天
             </el-form-item>
             <hr>
             <el-form-item>
@@ -158,7 +161,12 @@
         </el-tab-pane>
         <el-tab-pane label="系统信息" name="about">
           <div class="ml-3">
-            待完成
+            <h5>系统信息</h5>
+            <span class="text-primary">系统版本</span> : {{ vSystemVersion }}<br/>
+            <span class="text-primary">后端地址</span> : {{ vApiUrl }}<br/>
+            <span class="text-primary">后端版本</span> : {{ vApiVersion }}<br/>
+            <span class="text-primary">启动时间</span> : {{ vSystemStartupDay }}<br/>
+            <span class="text-primary">运行天数</span> : {{ vSystemRunDay }}<br/>
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -232,10 +240,17 @@ export default {
       setCollectVisitorStatExclude: [],
       setAllowRegister: false,
       setAnonymousComment: false,
+      setMaxStatSaveDays: 30,
 
       setLoaded: false,
       collectVisitorStatExcludeSelectItems: null,
 
+      vLoaded: false,
+      vSystemVersion: '',
+      vApiUrl: '',
+      vApiVersion: '正在获取...',
+      vSystemRunDay: '正在获取...',
+      vSystemStartupDay: '正在获取...',
     };
   },
   computed: {
@@ -277,6 +292,8 @@ export default {
         this.loadVisitLog();
       if(this.currentTab=='common' || this.currentTab=='more' &&!this.setLoaded)
         this.loadSettings();
+      if(this.currentTab=='about' &&!this.vLoaded)
+        this.loadSysInfo();
     },
 
     addExcludeItem(){
@@ -354,6 +371,28 @@ export default {
       this.setCollectVisitorStatExclude = this.Utils.clone(serverSettings.CollectVisitorStatExclude);
       this.setAllowRegister = serverSettings.AllowRegister;
       this.setAnonymousComment = serverSettings.AnonymousComment;
+      this.setMaxStatSaveDays = serverSettings.MaxStatSaveDays;
+    },
+    loadSysInfo(){
+      this.vLoaded = true;
+      this.vApiUrl = this.NET.API_URL;
+      this.vSystemVersion = this.NET.ClientVersion;
+      this.axios.get(this.NET.API_URL + '/version').then((response) => {
+        if(response.data.success) this.vApiVersion = response.data.data;
+        else this.vApiVersion = '获取失败';
+      }).catch(() => { this.vApiVersion = '获取失败'; });
+      this.axios.get(this.NET.API_URL + '/stat/runDay').then((response) => {
+        if(response.data.success){ 
+          this.vSystemStartupDay = response.data.data.startupDate;
+          this.vSystemRunDay = response.data.data.runDay + ' 天';
+        }
+        else {
+          this.vSystemRunDay = '获取失败';
+          this.vSystemStartupDay ='获取失败';
+        }
+      }).catch(() => { this.vSystemRunDay = '获取失败';this.vSystemStartupDay ='获取失败'; });
+
+
     },
 
     //保存设置
@@ -370,6 +409,7 @@ export default {
           CollectVisitorStatExclude: this.setCollectVisitorStatExclude,
           AllowRegister: this.setAllowRegister,
           AnonymousComment: this.setAnonymousComment,
+          MaxStatSaveDays: this.setMaxStatSaveDays,
         };
         this.axios.put(this.NET.API_URL + '/settings.json', newSettings).then((response) => {
           if(response.data.success) {

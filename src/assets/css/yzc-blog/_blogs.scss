@@ -180,9 +180,9 @@ h3.blog-title{
 }
 .author{
 	position: relative;
-    background: url(/images/background/mebg.jpg) center center no-repeat;
+    background: url(/images/background/mebg2.jpg) center center no-repeat;
     background-size: cover;
-    height: 140px;
+    height: 120px;
     margin: -25px -25px 50px;
     border: {
         top-right-radius:.25rem;
@@ -822,7 +822,7 @@ $blog-nav-titles: (
 
 .post-container {
 
-    overflow: hidden;
+    overflow: visible;
     word-break: break-all;
     font-family: -apple-system,SF UI Text,Arial,PingFang SC,Hiragino Sans GB,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
     
